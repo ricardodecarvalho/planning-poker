@@ -70,7 +70,7 @@ function App(): JSX.Element {
                             <button
                                 key={index}
                                 type='button'
-                                className='btn btn-light btn-lg'
+                                className='btn btn-outline-secondary btn-lg m-1'
                                 onClick={() => {
                                     setText(point)
                                     setShowCard(true)

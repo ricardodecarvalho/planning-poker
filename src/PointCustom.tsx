@@ -2,7 +2,16 @@ import React from "react"
 
 const classes = 'fixed-top w-100 vh-100 d-flex bg-white justify-content-center align-items-center'
 
+
 function PointCustom({ onAbort, onSubmit }: any) {
+    const refInput = React.useRef<HTMLInputElement>(null)
+
+    React.useEffect(() => {
+        if (refInput.current) {
+            refInput.current.focus()
+        }
+    }, [])
+
     const [pointCustom, setPointCustom] = React.useState<string>('')
 
     function handlePointCustom(event: any) {
@@ -14,18 +23,34 @@ function PointCustom({ onAbort, onSubmit }: any) {
 
     function handleSubmit(event: any) {
         event.preventDefault();
-        onSubmit(pointCustom)
-        onAbort()
+        if (pointCustom !== '') {
+            onSubmit(pointCustom)
+            onAbort()
+        } else if (refInput.current) {
+            refInput.current.focus()
+        }
+    }
+
+    function handleKeyDown(event: any) {
+        if (event.keyCode === 27) {
+            onAbort()
+        }
     }
 
     return (
         <div
-            className={classes}
+            className={classes} onKeyDown={handleKeyDown}
         >
             <form onSubmit={handleSubmit}>
-                <input type='text' value={pointCustom} onChange={handlePointCustom} />
-                <input type='submit' value='Enviar' />
-                <input type='button' value='Cancelar' onClick={onAbort} />
+                <input
+                    ref={refInput}
+                    type='text'
+                    className='form-control'
+                    value={pointCustom}
+                    onChange={handlePointCustom}
+                />
+                <input type='submit' className='btn btn-primary' value='Salvar' />
+                <input type='button' className='btn btn-danger' value='X' onClick={onAbort} />
             </form>
         </div>
     )
