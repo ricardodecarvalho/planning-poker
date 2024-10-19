@@ -1,0 +1,13 @@
+{
+    "rules": {
+      ".read": "auth != null",
+      ".write": "auth != null",
+      "status": {
+        "$userId": {
+          ".read": "$userId === auth.uid",
+          ".write": "$userId === auth.uid"
+        }
+      }
+    }
+  }
+  

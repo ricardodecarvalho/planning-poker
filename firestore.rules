@@ -1,0 +1,11 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Permitir que qualquer usuário autenticado crie, leia, atualize e delete qualquer documento
+    match /{document=**} {
+      allow read, write, create, update: if request.auth != null;
+    }
+  }
+}
