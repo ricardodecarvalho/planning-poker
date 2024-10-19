@@ -1,5 +1,4 @@
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import "./App.css";
 import PokerRoom from "./components/PokerRoom";
 import Login from "./components/Login";
 import Private from "./components/Private";

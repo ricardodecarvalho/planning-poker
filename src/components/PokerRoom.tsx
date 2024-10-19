@@ -72,14 +72,12 @@ const PokerRoom = () => {
     const unsubscribeRoom = onSnapshot(roomRef, (docSnapshot) => {
       const roomData = docSnapshot.data();
       if (roomData?.participants && roomData.participants.length > 0) {
-        console.log("@1")
         setParticipants(roomData.participants);
       }
     });
 
     // Adicionar o participante atual à sala
     const addParticipantToRoom = async () => {
-      console.log("@2")
       await updateDoc(roomRef, {
         participants: arrayUnion(auth.currentUser?.uid),
       });
@@ -96,7 +94,7 @@ const PokerRoom = () => {
 
     if (participants.length > 10) {
       console.error("Too many participants to fetch at once");
-      return
+      return;
     }
 
     const fetchUsersByParticipants = async (participants: string[]) => {
@@ -261,7 +259,9 @@ const PokerRoom = () => {
             </li>
           ))}
         </ul>
-        {showVotes && <p>Average: {average.toFixed(2)}</p>}
+        {showVotes && votesValues.length > 0 && (
+          <p>Average: {average.toFixed(2)}</p>
+        )}
       </div>
     </div>
   );
