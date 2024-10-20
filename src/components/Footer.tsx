@@ -2,6 +2,8 @@ import styled from "styled-components";
 
 import GitHubLogo from "../assets/images/github-mark.svg";
 
+const DONATE_LINK = import.meta.env.VITE_DONATE_LINK;
+
 const StyledFooter = styled.footer`
   position: fixed;
   bottom: 0;
@@ -12,14 +14,16 @@ const StyledFooter = styled.footer`
 const FooterContainer = styled.div`
   display: flex;
   justify-content: center;
-  align-items: center;
   width: 100%;
+  gap: 1rem;
 `;
 
 const GitHub = styled.div`
   display: flex;
   gap: 0.5rem;
 `;
+
+const Donate = styled.div``;
 
 const Footer = () => {
   return (
@@ -34,6 +38,12 @@ const Footer = () => {
             Repository
           </a>
         </GitHub>
+        {" | "}
+        <Donate>
+          <a target="_blank" href={DONATE_LINK}>
+            Donate
+          </a>
+        </Donate>
       </FooterContainer>
     </StyledFooter>
   );
