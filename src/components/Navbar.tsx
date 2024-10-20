@@ -26,7 +26,7 @@ const Navbar = () => {
   }, []);
 
   return (
-    <nav className="navbar sticky-top bg-primary-subtle border-bottom">
+    <nav className="navbar sticky-top bg-white border-bottom">
       <div className="container-fluid">
         <span className="navbar-brand mb-0 h1">
           {logoUrl && (
