@@ -4,6 +4,7 @@ import { storage } from "../firebase";
 import { useEffect, useState } from "react";
 
 const logoStorage = import.meta.env.VITE_FIREBASE_STORAGE_LOGO;
+const appName = import.meta.env.VITE_APP_NAME;
 
 const Login = () => {
   const { loginWithGoogle } = useAuth();
@@ -33,7 +34,7 @@ const Login = () => {
       <div className="mt-5 d-flex flex-column justify-content-center gap-3">
         <h1 className="text-center">
           <span className="text-body-secondary">Welcome to</span>{" "}
-          <span style={{ whiteSpace: "nowrap" }}>Agile Planning Poker</span>
+          <span style={{ whiteSpace: "nowrap" }}>{appName}</span>
         </h1>
         <button
           className="btn btn-outline-primary btn-lg"
