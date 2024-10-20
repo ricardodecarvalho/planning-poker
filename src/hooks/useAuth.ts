@@ -53,10 +53,18 @@ const useAuth = () => {
       });
   };
 
+  const getDisplayName = () => {
+    if (auth.currentUser?.displayName) {
+      return auth.currentUser.displayName.split(" ")[0];
+    }
+    return auth.currentUser?.email?.split("@")[0];
+  };
+
   return {
     user,
     loading,
     loginWithGoogle,
+    getDisplayName,
   };
 };
 

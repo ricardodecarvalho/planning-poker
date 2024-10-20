@@ -28,9 +28,12 @@ const Room = () => {
     navigate(`/room/${roomRef.id}`);
   };
   return (
-    <div>
-      <h2>Room</h2>
-      <button onClick={createRoom}>Create Room</button>
+    <div className="container">
+      <div className="mt-3 d-flex flex-column justify-content-center gap-3">
+        <button onClick={createRoom} className="btn btn-outline-primary btn-lg">
+          Create a Room
+        </button>
+      </div>
     </div>
   );
 };

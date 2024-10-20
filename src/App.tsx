@@ -4,6 +4,8 @@ import Login from "./components/Login";
 import Private from "./components/Private";
 import Room from "./components/Room";
 
+import "bootstrap/dist/css/bootstrap.min.css";
+
 function App() {
   return (
     <Router>

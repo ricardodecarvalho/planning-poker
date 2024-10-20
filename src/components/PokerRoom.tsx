@@ -15,6 +15,52 @@ import {
 } from "firebase/firestore";
 import { User } from "firebase/auth";
 
+import styled from "styled-components";
+import Share from "./Share";
+
+const HorizontalContainer = styled.div`
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
+  scrollbar-width: none;
+  gap: 1rem;
+  width: 100%;
+  text-align: center;
+  padding: 0 1.5rem 0 0;
+`;
+
+const Card = styled.button<{ checked: boolean }>`
+  display: flex;
+  font-size: 2rem;
+  height: 8rem;
+  min-width: 4.8rem;
+  border: 1px solid #ccc;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  background-color: #fff;
+  padding: 0.5rem;
+  margin: 0;
+  transition: all 0.1s linear;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    background-color: #007bff;
+    color: #fff;
+  }
+
+  ${({ checked }) => checked && "background-color: #007bff; color: #fff;"}
+`;
+
+const VoteBadge = styled.span`
+  width: 3rem;
+`;
+
+const Results = styled.div`
+  min-height: 10rem;
+`;
+
 interface Vote {
   userId: string;
   voteValue: number;
@@ -25,11 +71,13 @@ interface Vote {
 const PokerRoom = () => {
   const { roomId } = useParams();
 
-  const [vote, setVote] = useState<number | null>(null);
+  const [vote, setVote] = useState<number | string | null>(null);
   const [votes, setVotes] = useState<Vote[]>([]);
   const [participants, setParticipants] = useState<string[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [showVotes, setShowVotes] = useState(false);
+
+  const votingSystem = [0, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, "?", "☕"];
 
   // Observar showVotes em tempo real
   useEffect(() => {
@@ -57,6 +105,9 @@ const PokerRoom = () => {
     const unsubscribeVotes = onSnapshot(votesRef, (snapshot) => {
       const allVotes = snapshot.docs.map((doc) => doc.data() as Vote);
       setVotes(allVotes);
+      if (allVotes.length === 0) {
+        setVote(null);
+      }
     });
 
     // Limpar o listener quando o componente desmontar
@@ -133,7 +184,7 @@ const PokerRoom = () => {
   }, [participants]);
 
   // Submeter um voto
-  const handleVote = async (voteValue: number) => {
+  const handleVote = async (voteValue: number | string) => {
     try {
       const voteRef = doc(
         collection(firestore, `rooms/${roomId}/votes`),
@@ -175,6 +226,8 @@ const PokerRoom = () => {
       // Esperar todas as promessas de deleção serem concluídas
       await Promise.all(deletePromises);
 
+      setVote(null);
+
       console.log(`All votes cleared for room: ${roomId}`);
     } catch (error) {
       console.error("Error clearing votes: ", error);
@@ -206,62 +259,103 @@ const PokerRoom = () => {
     return {
       ...vote,
       user: {
-        displayName: user?.displayName || user?.email,
+        displayName:
+          user?.displayName?.split(" ")[0] || user?.email?.split("@")[0],
       },
     };
   });
 
   // calcular a media dos votos
-  const votesValues = votesMap.map((vote) => vote.voteValue);
+  const votesMapFiltered = votesMap.filter(
+    (vote) => typeof vote.voteValue === "number"
+  );
+  const votesValues = votesMapFiltered.map((vote) => vote.voteValue);
   const average =
     votesValues.reduce((acc, value) => acc + value, 0) / votesValues.length;
 
   return (
-    <div>
-      <button onClick={() => auth.signOut()}>Sign out</button>
-      <h2>Planning Poker</h2>
+    <div className="container">
+      {/* Compartilhar */}
+      <Share {...{ roomId }} />
 
       {/* Lista de Participantes */}
-      <div>
-        <h3>Participants:</h3>
-        <ul>
-          {users.map((user) => (
-            <li key={user.uid}>{user.displayName || user.email}</li>
-          ))}
-        </ul>
-      </div>
-
-      {/* Votar */}
-      <div>
-        <h3>Your vote: {vote !== null ? vote : "No vote yet"}</h3>
-        {[1, 2, 3, 5, 8, 13].map((value) => (
-          <button
-            key={value}
-            disabled={showVotes}
-            onClick={() => handleVote(value)}
-          >
-            {value}
-          </button>
-        ))}
+      <div className="mt-2">
+        <h5>
+          Participants{" "}
+          <span className="badge text-bg-primary rounded-pill">
+            {users.length}
+          </span>
+        </h5>
+        <HorizontalContainer>
+          <ul className="list-group list-group-horizontal">
+            {users.map((user) => (
+              <li key={user.uid} className="list-group-item">
+                {user.displayName?.split(" ")[0] || user.email?.split("@")[0]}
+              </li>
+            ))}
+          </ul>
+        </HorizontalContainer>
       </div>
 
       {/* Mostrar os votos */}
-      <div>
-        <h3>Votes:</h3>
-        <button onClick={handleShowVotes}>{`${
-          showVotes ? "Hide votes" : "Show votes"
-        }`}</button>
-        <button onClick={() => clearVotes(roomId)}>Clean votes</button>
-        <ul>
-          {votesMap.map((vote) => (
-            <li key={vote.userId}>
-              {vote.user.displayName}: {showVotes ? vote.voteValue : "x"}
-            </li>
+      <Results className="card mt-2">
+        <div className="card-body">
+          <h5 className="card-title">Results</h5>
+
+          {showVotes && votesValues.length > 0 && (
+            <h6 className="card-subtitle mb-2 text-body-secondary">
+              Average: {average.toFixed(2)}
+            </h6>
+          )}
+
+          <ul className="list-group list-group-flush">
+            {votesMap.map((vote) => (
+              <li className="list-group-item" key={vote.userId}>
+                <VoteBadge className="badge text-bg-dark me-2 position-relative">
+                  {showVotes ? (
+                    vote.voteValue
+                  ) : (
+                    <span className="visually-hidden">?</span>
+                  )}
+                </VoteBadge>
+                {vote.user.displayName}
+              </li>
+            ))}
+          </ul>
+
+          {votes.length > 0 && (
+            <div className="mt-2 btn-group">
+              <button
+                className="btn btn-success btn-sm"
+                onClick={handleShowVotes}
+              >
+                {`${showVotes ? "Hide votes" : "Show votes"}`}
+              </button>
+
+              <button
+                className="btn btn-danger btn-sm"
+                onClick={() => clearVotes(roomId)}
+              >
+                Clean votes
+              </button>
+            </div>
+          )}
+        </div>
+      </Results>
+
+      {/* Cards */}
+      <div className="position-fixed bottom-0 w-100 mb-3">
+        <HorizontalContainer>
+          {votingSystem.map((value) => (
+            <Card
+              key={value}
+              checked={vote === value}
+              onClick={() => handleVote(value)}
+            >
+              {value}
+            </Card>
           ))}
-        </ul>
-        {showVotes && votesValues.length > 0 && (
-          <p>Average: {average.toFixed(2)}</p>
-        )}
+        </HorizontalContainer>
       </div>
     </div>
   );
