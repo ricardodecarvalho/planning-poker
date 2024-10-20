@@ -10,35 +10,31 @@ const Share = ({ roomId }: { roomId: string | undefined }) => {
   }
 
   return (
-    <nav className="navbar bg-body-tertiary">
-      <div className="container d-flex justify-content-end">
-        <div className="d-flex gap-2">
-          <span className="navbar-text">
-            Copy and share this link with your friends
-          </span>
-          <button
-            className="btn btn-light btn-sm"
-            onClick={() => {
-              navigator.clipboard
-                .writeText(`${window.location.origin}/room/${roomId}`)
-                .then(() => {
-                  setCopied(true);
-                  setTimeout(() => setCopied(false), 3000);
-                });
-            }}
-          >
-            {!copied && <img src={ContentCopyIcon} alt="Share icon" />}
+    <div className="d-flex justify-content-end gap-2">
+      <span className="navbar-text">
+        Copy and share this link with your friends
+      </span>
+      <button
+        className="btn btn-light btn-sm"
+        onClick={() => {
+          navigator.clipboard
+            .writeText(`${window.location.origin}/room/${roomId}`)
+            .then(() => {
+              setCopied(true);
+              setTimeout(() => setCopied(false), 3000);
+            });
+        }}
+      >
+        {!copied && <img src={ContentCopyIcon} alt="Share icon" />}
 
-            {copied && (
-              <>
-                <img src={CheckIcon} alt="Copied icon" />{" "}
-                <span className="text-success">Copied!</span>
-              </>
-            )}
-          </button>
-        </div>
-      </div>
-    </nav>
+        {copied && (
+          <>
+            <img src={CheckIcon} alt="Copied icon" />{" "}
+            <span className="text-success">Copied!</span>
+          </>
+        )}
+      </button>
+    </div>
   );
 };
 

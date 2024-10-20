@@ -6,11 +6,7 @@ import { ToastContainer } from "react-toastify";
 import AppRouter from "./components/AppRouter";
 import Footer from "./components/Footer";
 
-const GlobalStyle = createGlobalStyle`
-  body {
-    background-color: #f8f9fa;
-  }
-`;
+const GlobalStyle = createGlobalStyle``;
 
 function App() {
   return (
