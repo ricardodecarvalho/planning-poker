@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { auth, firestore } from "../firebase";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   arrayUnion,
   collection,
   deleteDoc,
   doc,
+  getDoc,
   getDocs,
   onSnapshot,
   query,
@@ -71,6 +72,8 @@ interface Vote {
 const PokerRoom = () => {
   const { roomId } = useParams();
 
+  const navigate = useNavigate();
+
   const [vote, setVote] = useState<number | string | null>(null);
   const [votes, setVotes] = useState<Vote[]>([]);
   const [participants, setParticipants] = useState<string[]>([]);
@@ -78,6 +81,24 @@ const PokerRoom = () => {
   const [showVotes, setShowVotes] = useState(false);
 
   const votingSystem = [0, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, "?", "☕"];
+
+  // Verificar se é uma sala válida
+  useEffect(() => {
+    if (!roomId) return;
+
+    const roomRef = doc(firestore, "rooms", roomId);
+
+    const checkRoom = async () => {
+      const roomSnapshot = await getDoc(roomRef);
+
+      if (!roomSnapshot.exists()) {
+        navigate("/");
+        return;
+      }
+    };
+
+    checkRoom();
+  }, [navigate, roomId]);
 
   // Observar showVotes em tempo real
   useEffect(() => {
@@ -227,6 +248,7 @@ const PokerRoom = () => {
       await Promise.all(deletePromises);
 
       setVote(null);
+      handleShowVotes()
 
       console.log(`All votes cleared for room: ${roomId}`);
     } catch (error) {

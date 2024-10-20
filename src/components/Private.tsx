@@ -1,9 +1,12 @@
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate, Outlet, useParams } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
 import Navbar from "./Navbar";
 
 const Private = () => {
   const { user, loading } = useAuth();
+
+  const { roomId } = useParams();
+  const redirect = roomId ? `/room/${roomId}` : "/";
 
   if (loading) {
     return (
@@ -16,7 +19,7 @@ const Private = () => {
   }
 
   if (!user) {
-    return <Navigate to="/login" />;
+    return <Navigate to="/login" state={{ redirect }} />;
   }
 
   return (

@@ -7,10 +7,15 @@ import {
 import { auth, firestore } from "../firebase";
 import { useEffect, useState } from "react";
 import { doc, setDoc } from "firebase/firestore";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const useAuth = () => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const navigate = useNavigate();
+
+  const location = useLocation();
 
   useEffect(() => {
     setLoading(true);
@@ -38,6 +43,8 @@ const useAuth = () => {
         };
 
         await setDoc(userDocRef, userData);
+
+        navigate(location.state?.redirect || "/");
       })
       .catch((error) => {
         const errorCode = error.code;
