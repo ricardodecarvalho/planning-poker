@@ -18,17 +18,15 @@ import { User } from "firebase/auth";
 
 import styled from "styled-components";
 import Share from "./Share";
+import { toast } from "react-toastify";
 
 const HorizontalContainer = styled.div`
   display: flex;
   overflow-x: auto;
   overflow-y: hidden;
   white-space: nowrap;
-  scrollbar-width: none;
   gap: 1rem;
   width: 100%;
-  text-align: center;
-  padding: 0 1.5rem 0 0;
 `;
 
 const Card = styled.button<{ checked: boolean }>`
@@ -47,8 +45,9 @@ const Card = styled.button<{ checked: boolean }>`
   justify-content: center;
 
   &:hover {
-    background-color: #007bff;
+    background-color: #212529;
     color: #fff;
+    border-color: #212529;
   }
 
   ${({ checked }) => checked && "background-color: #007bff; color: #fff;"}
@@ -59,7 +58,7 @@ const VoteBadge = styled.span`
 `;
 
 const Results = styled.div`
-  min-height: 10rem;
+  min-height: 20rem;
 `;
 
 interface Vote {
@@ -164,11 +163,7 @@ const PokerRoom = () => {
   useEffect(() => {
     if (participants.length === 0) return;
 
-    if (participants.length > 10) {
-      console.error("Too many participants to fetch at once");
-      return;
-    }
-
+    // Solução para mais de 10 Participantes
     const fetchUsersByParticipants = async (participants: string[]) => {
       try {
         const usersRef = collection(firestore, "users");
@@ -223,12 +218,14 @@ const PokerRoom = () => {
       setVote(voteValue);
     } catch (error) {
       console.error("Error adding document: ", error);
+      toast.error("Error adding vote");
     }
   };
 
   const clearVotes = async (roomId: string | undefined) => {
     if (!roomId) {
       console.error("No room ID provided");
+      toast.error("Error clearing votes, no room ID provided");
       return;
     }
 
@@ -248,35 +245,37 @@ const PokerRoom = () => {
       await Promise.all(deletePromises);
 
       setVote(null);
+      handleShowVotes(false);
 
       console.log(`All votes cleared for room: ${roomId}`);
     } catch (error) {
       console.error("Error clearing votes: ", error);
+      toast.error("Error clearing votes");
     }
   };
 
-  const handleShowVotes = async () => {
+  const handleShowVotes = async (action: boolean) => {
     if (!roomId) return;
 
     try {
       const roomRef = doc(firestore, "rooms", roomId);
 
       await updateDoc(roomRef, {
-        showVotes: !showVotes,
+        showVotes: action,
       });
-      setShowVotes(!showVotes);
+      setShowVotes(action);
     } catch (error) {
       console.error("Error updating room: ", error);
+      toast.error("Error updating room");
     }
   };
 
-  const usersMap = users.reduce((acc, user) => {
-    acc[user.uid] = user;
-    return acc;
-  }, {} as Record<string, User>);
+  // Mapeando os usuários por uid
+  const usersMap = new Map(users.map((user) => [user.uid, user]));
 
+  // Mapeando os votos e associando o displayName apropriado
   const votesMap = votes.map((vote) => {
-    const user = usersMap[vote.userId];
+    const user = usersMap.get(vote.userId);
     return {
       ...vote,
       user: {
@@ -286,13 +285,15 @@ const PokerRoom = () => {
     };
   });
 
-  // calcular a media dos votos
-  const votesMapFiltered = votesMap.filter(
+  // Calcular a média dos votos válidos (apenas números)
+  const validVotes = votesMap.filter(
     (vote) => typeof vote.voteValue === "number"
   );
-  const votesValues = votesMapFiltered.map((vote) => vote.voteValue);
-  const average =
-    votesValues.reduce((acc, value) => acc + value, 0) / votesValues.length;
+  const totalVotes = validVotes.reduce(
+    (acc, vote) => acc + (vote.voteValue || 0),
+    0
+  );
+  const average = validVotes.length ? totalVotes / validVotes.length : 0;
 
   return (
     <div className="container">
@@ -323,7 +324,7 @@ const PokerRoom = () => {
         <div className="card-body">
           <h5 className="card-title">Results</h5>
 
-          {showVotes && votesValues.length > 0 && (
+          {showVotes && (
             <h6 className="card-subtitle mb-2 text-body-secondary">
               Average: {average.toFixed(2)}
             </h6>
@@ -348,7 +349,7 @@ const PokerRoom = () => {
             <div className="mt-2 btn-group">
               <button
                 className="btn btn-success btn-sm"
-                onClick={handleShowVotes}
+                onClick={() => handleShowVotes(!showVotes)}
               >
                 {`${showVotes ? "Hide votes" : "Show votes"}`}
               </button>
@@ -365,7 +366,7 @@ const PokerRoom = () => {
       </Results>
 
       {/* Cards */}
-      <div className="position-fixed bottom-0 w-100 mb-3">
+      <div className="mt-3">
         <HorizontalContainer>
           {votingSystem.map((value) => (
             <Card

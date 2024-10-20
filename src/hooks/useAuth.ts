@@ -8,20 +8,21 @@ import { auth, firestore } from "../firebase";
 import { useEffect, useState } from "react";
 import { doc, setDoc } from "firebase/firestore";
 import { useLocation, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const useAuth = () => {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loadingAuthStateChanged, setLoadingAuthStateChanged] = useState(true);
+  const [loadingLoginWithGoogle, setLoadingLoginWithGoogle] = useState(false);
 
   const navigate = useNavigate();
-
   const location = useLocation();
 
   useEffect(() => {
-    setLoading(true);
+    setLoadingAuthStateChanged(true);
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
-      setLoading(false);
+      setLoadingAuthStateChanged(false);
     });
 
     return () => unsubscribe();
@@ -29,6 +30,8 @@ const useAuth = () => {
 
   const loginWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
+
+    setLoadingLoginWithGoogle(true);
 
     signInWithPopup(auth, provider)
       .then(async (result) => {
@@ -44,6 +47,8 @@ const useAuth = () => {
 
         await setDoc(userDocRef, userData);
 
+        toast.success("Successfully logged in with Google.");
+
         navigate(location.state?.redirect || "/");
       })
       .catch((error) => {
@@ -57,6 +62,11 @@ const useAuth = () => {
 
         const credential = GoogleAuthProvider.credentialFromError(error);
         console.log(credential);
+
+        toast.error("An error occurred while trying to login with Google.");
+      })
+      .finally(() => {
+        setLoadingLoginWithGoogle(false);
       });
   };
 
@@ -69,7 +79,8 @@ const useAuth = () => {
 
   return {
     user,
-    loading,
+    loadingAuthStateChanged,
+    loadingLoginWithGoogle,
     loginWithGoogle,
     getDisplayName,
   };

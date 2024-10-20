@@ -3,12 +3,12 @@ import useAuth from "../hooks/useAuth";
 import Navbar from "./Navbar";
 
 const Private = () => {
-  const { user, loading } = useAuth();
+  const { user, loadingAuthStateChanged } = useAuth();
 
   const { roomId } = useParams();
   const redirect = roomId ? `/room/${roomId}` : "/";
 
-  if (loading) {
+  if (loadingAuthStateChanged) {
     return (
       <div className="d-flex justify-content-center">
         <div className="spinner-border mt-5" role="status">

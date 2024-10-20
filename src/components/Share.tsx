@@ -1,5 +1,6 @@
 import { useState } from "react";
-import IconShare from "../assets/images/share.svg";
+import ContentCopyIcon from "../assets/images/content_copy.svg";
+import CheckIcon from "../assets/images/check.svg";
 
 const Share = ({ roomId }: { roomId: string | undefined }) => {
   const [copied, setCopied] = useState(false);
@@ -12,7 +13,9 @@ const Share = ({ roomId }: { roomId: string | undefined }) => {
     <nav className="navbar bg-body-tertiary">
       <div className="container d-flex justify-content-end">
         <div className="d-flex gap-2">
-          <span className="navbar-text">Share this room</span>
+          <span className="navbar-text">
+            Copy and share this link with your friends
+          </span>
           <button
             className="btn btn-light btn-sm"
             onClick={() => {
@@ -24,8 +27,14 @@ const Share = ({ roomId }: { roomId: string | undefined }) => {
                 });
             }}
           >
-            <img src={IconShare} alt="Share" />{" "}
-            {copied && <span className="text-success">Copied!</span>}
+            {!copied && <img src={ContentCopyIcon} alt="Share icon" />}
+
+            {copied && (
+              <>
+                <img src={CheckIcon} alt="Copied icon" />{" "}
+                <span className="text-success">Copied!</span>
+              </>
+            )}
           </button>
         </div>
       </div>

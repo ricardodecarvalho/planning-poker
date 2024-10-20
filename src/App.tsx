@@ -1,24 +1,25 @@
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import PokerRoom from "./components/PokerRoom";
-import Login from "./components/Login";
-import Private from "./components/Private";
-import Room from "./components/Room";
+import { createGlobalStyle } from "styled-components";
 
 import "bootstrap/dist/css/bootstrap.min.css";
+import "react-toastify/dist/ReactToastify.min.css";
+import { ToastContainer } from "react-toastify";
+import AppRouter from "./components/AppRouter";
+import Footer from "./components/Footer";
+
+const GlobalStyle = createGlobalStyle`
+  body {
+    background-color: #f8f9fa;
+  }
+`;
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route element={<Private />}>
-          <Route path="/" element={<Room />} />
-          <Route path="/room/:roomId" element={<PokerRoom />} />
-          <Route path="/private" element={<div>'The room is full :('</div>} />
-          <Route path="*" element={<div>404 - Page Not Found</div>} />
-        </Route>
-      </Routes>
-    </Router>
+    <>
+      <GlobalStyle />
+      <ToastContainer autoClose={5000} closeOnClick theme="colored" />
+      <AppRouter />
+      <Footer />
+    </>
   );
 }
 
