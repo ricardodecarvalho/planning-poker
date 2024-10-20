@@ -248,7 +248,6 @@ const PokerRoom = () => {
       await Promise.all(deletePromises);
 
       setVote(null);
-      handleShowVotes()
 
       console.log(`All votes cleared for room: ${roomId}`);
     } catch (error) {
