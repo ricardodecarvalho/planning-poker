@@ -29,6 +29,7 @@ const Login = () => {
           src={logoUrl}
           className="mx-auto d-block mt-5"
           alt="Logo planning poker"
+          height={200}
         />
       )}
       <div className="mt-5 d-flex flex-column justify-content-center gap-3">
