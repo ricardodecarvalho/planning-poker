@@ -358,7 +358,7 @@ const PokerRoom = () => {
                 className="btn btn-danger btn-sm"
                 onClick={() => clearVotes(roomId)}
               >
-                Clean votes
+                Clear votes
               </button>
             </div>
           )}
