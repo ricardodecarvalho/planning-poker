@@ -1,9 +1,9 @@
-![Website](https://img.shields.io/website?url=https%3A%2F%2Fplanning-poker.skapitao.com)
+[![Website](https://img.shields.io/website?url=https%3A%2F%2Fplanning-poker.skapitao.com)](https://planning-poker.skapitao.com)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](#contribution)
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](/LICENSE)
 ![GitHub contributors](https://img.shields.io/github/contributors/ricardodecarvalho/planning-poker)
 
-# [Planning Poker Agile](https://planning-poker.skapitao.com/)
+# [Planning Poker Agile](https://planning-poker.skapitao.com)
 
 A Planning Poker tool to help agile teams estimate the development effort of tasks.
 
