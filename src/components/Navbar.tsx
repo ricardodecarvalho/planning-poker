@@ -3,7 +3,7 @@ import { getDownloadURL, ref } from "firebase/storage";
 
 import { auth, storage } from "../firebase";
 import IconLogout from "../assets/images/logout.svg";
-import useAuth from "../hooks/useAuth";
+import { Link, useLocation } from "react-router-dom";
 
 const logoStorage = import.meta.env.VITE_FIREBASE_STORAGE_LOGO;
 const appName = import.meta.env.VITE_APP_NAME;
@@ -11,7 +11,7 @@ const appName = import.meta.env.VITE_APP_NAME;
 const Navbar = () => {
   const [logoUrl, setLogoUrl] = useState("");
 
-  const { getDisplayName } = useAuth();
+  const location = useLocation();
 
   useEffect(() => {
     const storageRef = ref(storage, logoStorage);
@@ -39,8 +39,15 @@ const Navbar = () => {
           )}
           {appName}
         </span>
+        <div className="navbar-nav">
+          {location.pathname !== "/create-room" && (
+            <Link to="/create-room" className="nav-link">
+              Create Room
+            </Link>
+          )}
+        </div>
         <div>
-          <span className="navbar-text me-2">{getDisplayName()}</span>
+          {/* <span className="navbar-text me-2">{getDisplayName()}</span> */}
           <button
             className="btn btn-light btn-sm"
             onClick={() => auth.signOut()}
