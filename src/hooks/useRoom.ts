@@ -3,7 +3,7 @@ import { useCallback } from "react";
 import { firestore } from "../firebase";
 import { useNavigate } from "react-router-dom";
 
-interface Props {
+interface CheckRoomProps {
   roomId?: string;
 }
 
@@ -11,7 +11,7 @@ const useRoom = () => {
   const navigate = useNavigate();
 
   const checkRoom = useCallback(
-    async ({ roomId }: Props) => {
+    async ({ roomId }: CheckRoomProps) => {
       if (!roomId) return;
 
       const roomRef = doc(firestore, "rooms", roomId);
@@ -27,7 +27,7 @@ const useRoom = () => {
   );
 
   return {
-    checkRoom,
+    checkRoom
   };
 };
 

@@ -12,6 +12,7 @@ const CreateRoomButton = styled.button`
 
 const Room = () => {
   const navigate = useNavigate();
+
   const createRoom = async () => {
     if (!auth.currentUser) {
       console.error("User not authenticated");

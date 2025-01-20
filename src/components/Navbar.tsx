@@ -25,6 +25,10 @@ const Navbar = () => {
       });
   }, []);
 
+  const logout = async () => {
+    auth.signOut();
+  };
+
   return (
     <nav className="navbar sticky-top bg-white">
       <div className="container-fluid">
@@ -50,7 +54,7 @@ const Navbar = () => {
           {/* <span className="navbar-text me-2">{getDisplayName()}</span> */}
           <button
             className="btn btn-light btn-sm"
-            onClick={() => auth.signOut()}
+            onClick={logout}
             title="Logout"
           >
             <img src={IconLogout} alt="Logout" height="20" />

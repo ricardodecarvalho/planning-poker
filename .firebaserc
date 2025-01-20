@@ -1,5 +1,7 @@
 {
   "projects": {
     "default": "planing-poker-7f898"
-  }
+  },
+  "targets": {},
+  "etags": {}
 }

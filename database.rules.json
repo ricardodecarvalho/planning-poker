@@ -1,13 +1,12 @@
 {
-    "rules": {
-      ".read": "auth != null",
-      ".write": "auth != null",
-      "status": {
+  "rules": {
+    "presence": {
+      "$roomId": {
         "$userId": {
-          ".read": "$userId === auth.uid",
-          ".write": "$userId === auth.uid"
+          ".read": "auth != null",
+          ".write": "auth != null && auth.uid === $userId"
         }
       }
     }
   }
-  
+}

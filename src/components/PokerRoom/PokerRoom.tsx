@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { User } from "firebase/auth";
 
 import Share from "./../Share";
@@ -15,11 +15,11 @@ import useVotes from "../../hooks/useVotes";
 import useParticipants from "../../hooks/useParticipants";
 import UserList from "../UserList";
 import { getUniqueDisplayNames } from "../../util";
+import useUserConnection from "../../hooks/useUserConnection";
+import { auth } from "../../firebase";
 
 const PokerRoom = () => {
   const { roomId } = useParams();
-
-  const navigate = useNavigate();
 
   const { checkRoom } = useRoom();
   const { isShowVotes, votes, vote, clearVotes, handleShowVotes, handleVote } =
@@ -31,11 +31,19 @@ const PokerRoom = () => {
 
   const votingSystem = [0, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, "?", "☕"];
 
+  const { enterRoom } = useUserConnection();
+
+  useEffect(() => {
+    if (!roomId) return;
+    const userId = auth.currentUser?.uid || "";
+    enterRoom(roomId, userId);
+  }, [enterRoom, roomId]);
+
   // Verificar se é uma sala válida
   useEffect(() => {
     if (!roomId) return;
     checkRoom({ roomId });
-  }, [checkRoom, navigate, roomId]);
+  }, [checkRoom, roomId]);
 
   // Buscar os usuários pelos IDs dos participantes
   useEffect(() => {
