@@ -2,7 +2,17 @@ import { useState } from "react";
 import ContentCopyIcon from "../assets/images/content_copy.svg";
 import CheckIcon from "../assets/images/check.svg";
 
-const Share = ({ roomId }: { roomId: string | undefined }) => {
+interface ShareProps {
+  roomId: string | undefined;
+  message?: string;
+  label?: string;
+}
+
+const Share = ({
+  roomId,
+  message = "Copy and share this link with your friends",
+  label,
+}: ShareProps) => {
   const [copied, setCopied] = useState(false);
 
   if (!roomId) {
@@ -11,11 +21,9 @@ const Share = ({ roomId }: { roomId: string | undefined }) => {
 
   return (
     <div className="d-flex justify-content-end gap-2">
-      <span className="navbar-text">
-        Copy and share this link with your friends
-      </span>
+      <span className="navbar-text">{message}</span>
       <button
-        className="btn btn-light btn-sm"
+        className="btn btn-light"
         onClick={() => {
           navigator.clipboard
             .writeText(`${window.location.origin}/room/${roomId}`)
@@ -25,7 +33,11 @@ const Share = ({ roomId }: { roomId: string | undefined }) => {
             });
         }}
       >
-        {!copied && <img src={ContentCopyIcon} alt="Share icon" />}
+        {label && `${label} `}
+
+        {!copied && (
+          <img src={ContentCopyIcon} alt="Share icon" title="Copy room URL" />
+        )}
 
         {copied && (
           <>

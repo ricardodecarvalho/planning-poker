@@ -1,5 +1,15 @@
-import { doc, getDoc } from "firebase/firestore";
-import { useCallback } from "react";
+import {
+  collection,
+  deleteDoc,
+  doc,
+  DocumentData,
+  getDoc,
+  getDocs,
+  orderBy,
+  query,
+  where,
+} from "firebase/firestore";
+import { useCallback, useState } from "react";
 import { firestore } from "../firebase";
 import { useNavigate } from "react-router-dom";
 
@@ -7,8 +17,19 @@ interface CheckRoomProps {
   roomId?: string;
 }
 
+interface Room {
+  createdAt: string;
+  createdBy: string;
+  id: string;
+  participants: string[];
+  showVotes: boolean;
+}
+
 const useRoom = () => {
   const navigate = useNavigate();
+
+  const [rooms, setRooms] = useState<Room[]>([]);
+  const [loading, setLoading] = useState(false);
 
   const checkRoom = useCallback(
     async ({ roomId }: CheckRoomProps) => {
@@ -26,8 +47,39 @@ const useRoom = () => {
     [navigate]
   );
 
+  const deleteRoom = useCallback(async ({ roomId }: CheckRoomProps) => {
+    if (!roomId) return;
+    const roomRef = doc(firestore, "rooms", roomId);
+    await deleteDoc(roomRef);
+  }, []);
+
+  const getRoomsByUser = useCallback(async (userId: string) => {
+    setLoading(true);
+    const roomsRef = collection(firestore, "rooms");
+    const q = query(
+      roomsRef,
+      where("createdBy", "==", userId),
+      orderBy("createdAt", "desc")
+    );
+    const querySnapshot = await getDocs(q);
+    const rooms = querySnapshot.docs.map((doc) => {
+      const data = doc.data() as DocumentData & Omit<Room, "id">;
+      return {
+        id: doc.id,
+        ...data,
+      };
+    });
+    setRooms(rooms);
+    setLoading(false);
+  }, []);
+
   return {
-    checkRoom
+    checkRoom,
+    deleteRoom,
+    getRoomsByUser,
+    rooms,
+    setRooms,
+    loading,
   };
 };
 

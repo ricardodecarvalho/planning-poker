@@ -1,6 +1,7 @@
 import { Navigate, Outlet, useParams } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
 import Navbar from "./Navbar";
+import LoadingSpinner from "./LoadingSpinner";
 
 const Private = () => {
   const { user, loadingAuthStateChanged } = useAuth();
@@ -11,9 +12,7 @@ const Private = () => {
   if (loadingAuthStateChanged) {
     return (
       <div className="d-flex justify-content-center">
-        <div className="spinner-border mt-5" role="status">
-          <span className="visually-hidden">Loading...</span>
-        </div>
+        <LoadingSpinner />
       </div>
     );
   }

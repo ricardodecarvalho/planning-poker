@@ -3,15 +3,13 @@ import { getDownloadURL, ref } from "firebase/storage";
 
 import { auth, storage } from "../firebase";
 import IconLogout from "../assets/images/logout.svg";
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const logoStorage = import.meta.env.VITE_FIREBASE_STORAGE_LOGO;
 const appName = import.meta.env.VITE_APP_NAME;
 
 const Navbar = () => {
   const [logoUrl, setLogoUrl] = useState("");
-
-  const location = useLocation();
 
   useEffect(() => {
     const storageRef = ref(storage, logoStorage);
@@ -30,26 +28,23 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="navbar sticky-top bg-white">
+    <nav className="navbar border-bottom sticky-top bg-white mb-3">
       <div className="container-fluid">
         <span className="navbar-brand mb-0 h1">
           {logoUrl && (
-            <img
-              src={logoUrl}
-              alt="Logo"
-              height="24"
-              className="d-inline-block align-text-top pe-2"
-            />
-          )}
-          {appName}
-        </span>
-        <div className="navbar-nav">
-          {location.pathname !== "/create-room" && (
-            <Link to="/create-room" className="nav-link">
-              Create Room
+            <Link to="/" title="Go home">
+              <img
+                src={logoUrl}
+                alt="Logo"
+                height="24"
+                className="d-inline-block align-text-top pe-2"
+              />
             </Link>
           )}
-        </div>
+          <Link to="/" className="navbar-brand" title="Go home">
+            {appName}
+          </Link>
+        </span>
         <div>
           {/* <span className="navbar-text me-2">{getDisplayName()}</span> */}
           <button

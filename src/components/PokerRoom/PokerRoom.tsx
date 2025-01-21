@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { User } from "firebase/auth";
 
 import Share from "./../Share";
@@ -81,8 +81,23 @@ const PokerRoom = () => {
 
   return (
     <div className="container">
-      {/* Compartilhar */}
-      <Share {...{ roomId }} />
+      <div className="row">
+        <div className="col-md-6">
+          <nav aria-label="breadcrumb">
+            <ol className="breadcrumb">
+              <li className="breadcrumb-item">
+                <Link to="/">Voltar</Link>
+              </li>
+              <li className="breadcrumb-item active" aria-current="page">
+                Current Room
+              </li>
+            </ol>
+          </nav>
+        </div>
+        <div className="col-md-6">
+          <Share {...{ roomId }} />
+        </div>
+      </div>
 
       {/* Lista de Participantes */}
       <div className="mt-2">
