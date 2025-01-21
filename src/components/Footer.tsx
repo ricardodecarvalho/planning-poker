@@ -5,10 +5,11 @@ import GitHubLogo from "../assets/images/github-mark.svg";
 const DONATE_LINK = import.meta.env.VITE_DONATE_LINK;
 
 const StyledFooter = styled.footer`
-  position: fixed;
+  position: sticky;
   bottom: 0;
   width: 100%;
-  margin-bottom: 1rem;
+  margin: 1rem 0;
+  background-color: #ffffff;
 `;
 
 const FooterContainer = styled.div`
