@@ -85,23 +85,25 @@ const Rooms = () => {
 
       {!loading && !isMobile && rooms && rooms?.length > 0 && (
         <div className="table-responsive mt-3">
-          <table className="table">
+          <table className="table table-hover table-sm align-middle">
             <thead>
               <tr>
                 <th>Room ID</th>
-                <th>Created At</th>
+                <th>
+                  Created At
+                </th>
                 <th className="text-end">Actions</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="table-group-divider">
               {rooms?.map((room) => (
                 <tr key={room.id}>
-                  <td style={{ verticalAlign: "middle" }}>
+                  <td>
                     <Link to={`/room/${room.id}`} title="Enter room">
                       {room.id}
                     </Link>
                   </td>
-                  <td style={{ verticalAlign: "middle" }}>
+                  <td>
                     {new Date(room.createdAt).toLocaleDateString(undefined, {
                       year: "2-digit",
                       month: "2-digit",
@@ -110,15 +112,14 @@ const Rooms = () => {
                       minute: "2-digit",
                     })}
                   </td>
-                  <td
-                    className="d-flex justify-content-end gap-2"
-                    style={{ verticalAlign: "middle" }}
-                  >
-                    <Share roomId={room.id} message="" />
-                    <DeleteRoom
-                      roomId={room.id}
-                      onDelete={() => handleDeleteRoom(room.id)}
-                    />
+                  <td>
+                    <div className="d-flex justify-content-end gap-2">
+                      <Share roomId={room.id} message="" />
+                      <DeleteRoom
+                        roomId={room.id}
+                        onDelete={() => handleDeleteRoom(room.id)}
+                      />
+                    </div>
                   </td>
                 </tr>
               ))}

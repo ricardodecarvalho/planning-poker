@@ -6,9 +6,15 @@ interface DeleteRoomProps {
   roomId: string;
   onDelete?: () => void;
   label?: string;
+  btnSize?: string;
 }
 
-const DeleteRoom = ({ roomId, label, onDelete }: DeleteRoomProps) => {
+const DeleteRoom = ({
+  roomId,
+  label,
+  onDelete,
+  btnSize = "btn-sm",
+}: DeleteRoomProps) => {
   const { showModal } = useModal();
 
   const { deleteRoom } = useRoom();
@@ -31,7 +37,7 @@ const DeleteRoom = ({ roomId, label, onDelete }: DeleteRoomProps) => {
   return (
     <>
       <button
-        className="btn btn-light"
+        className={`btn btn-light ${btnSize}`}
         data-bs-toggle="modal"
         onClick={() => handleDeleteRoom(roomId)}
       >
