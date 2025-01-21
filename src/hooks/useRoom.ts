@@ -54,23 +54,30 @@ const useRoom = () => {
   }, []);
 
   const getRoomsByUser = useCallback(async (userId: string) => {
-    setLoading(true);
-    const roomsRef = collection(firestore, "rooms");
-    const q = query(
-      roomsRef,
-      where("createdBy", "==", userId),
-      orderBy("createdAt", "desc")
-    );
-    const querySnapshot = await getDocs(q);
-    const rooms = querySnapshot.docs.map((doc) => {
-      const data = doc.data() as DocumentData & Omit<Room, "id">;
-      return {
-        id: doc.id,
-        ...data,
-      };
-    });
-    setRooms(rooms);
-    setLoading(false);
+    try {
+      setLoading(true);
+      const roomsRef = collection(firestore, "rooms");
+      const q = query(
+        roomsRef,
+        where("createdBy", "==", userId),
+        orderBy("createdAt", "desc")
+      );
+      const querySnapshot = await getDocs(q);
+      const rooms = querySnapshot.docs.map((doc) => {
+        const data = doc.data() as DocumentData & Omit<Room, "id">;
+        return {
+          id: doc.id,
+          ...data,
+        };
+      });
+      setRooms(rooms);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error getting rooms", error);
+      setRooms([]);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   return {
