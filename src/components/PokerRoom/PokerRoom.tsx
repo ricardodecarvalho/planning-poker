@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 
 import { Link, useParams } from "react-router-dom";
-import { User } from "firebase/auth";
 
 import Share from "./../Share";
 import {
@@ -12,7 +11,7 @@ import {
 } from "./PokerRoom.styles";
 import useRoom from "../../hooks/useRoom";
 import useVotes from "../../hooks/useVotes";
-import useParticipants from "../../hooks/useParticipants";
+import useParticipants, { Participant } from "../../hooks/useParticipants";
 import UserList from "../UserList";
 import { getUniqueDisplayNames } from "../../util";
 import useUserConnection from "../../hooks/useUserConnection";
@@ -27,7 +26,7 @@ const PokerRoom = () => {
 
   const { participants, fetchUsersByParticipants } = useParticipants(roomId);
 
-  const [users, setUsers] = useState<User[]>([]);
+  const [users, setUsers] = useState<Participant[]>([]);
 
   const votingSystem = [0, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, "?", "☕"];
 
@@ -49,10 +48,10 @@ const PokerRoom = () => {
   useEffect(() => {
     if (participants.length === 0) return;
 
-    fetchUsersByParticipants(participants).then((users) => {
+    fetchUsersByParticipants(participants, roomId).then((users) => {
       setUsers(getUniqueDisplayNames(users));
     });
-  }, [fetchUsersByParticipants, participants]);
+  }, [fetchUsersByParticipants, participants, roomId]);
 
   // Mapeando os usuários por uid
   const usersMap = new Map(users.map((user) => [user.uid, user]));

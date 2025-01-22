@@ -1,6 +1,6 @@
-import { User } from "firebase/auth";
 import { Vote } from "../hooks/useVotes";
 import styled from "styled-components";
+import { Participant } from "../hooks/useParticipants";
 
 const List = styled.li<{ $hasVoted: boolean }>`
   ${({ $hasVoted }) =>
@@ -18,7 +18,12 @@ const List = styled.li<{ $hasVoted: boolean }>`
   `};
 `;
 
-const UserList = ({ users, votes }: { users: User[]; votes: Vote[] }) => {
+interface UserListProps {
+  users: Participant[];
+  votes: Vote[];
+}
+
+const UserList = ({ users, votes }: UserListProps) => {
   return (
     <ul className="list-group list-group-horizontal">
       {users.map((user) => {

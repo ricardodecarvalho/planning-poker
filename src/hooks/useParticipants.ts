@@ -9,8 +9,17 @@ import {
   where,
 } from "firebase/firestore";
 import { useCallback, useEffect, useState } from "react";
-import { auth, firestore } from "../firebase";
+import { auth, database, firestore } from "../firebase";
 import { User } from "firebase/auth";
+import { child, get, ref } from "firebase/database";
+
+interface ParticipantStatus {
+  [userId: string]: boolean;
+}
+
+export interface Participant extends User {
+  online?: boolean;
+}
 
 const useParticipants = (roomId?: string) => {
   const [participants, setParticipants] = useState<string[]>([]);
@@ -39,9 +48,28 @@ const useParticipants = (roomId?: string) => {
     return () => unsubscribeRoom();
   }, [roomId]);
 
+  const fetchParticipantStatus = useCallback(async (roomId: string) => {
+    const dbRef = ref(database);
+    const parsedData: ParticipantStatus = {};
+
+    try {
+      const snapshot = await get(child(dbRef, `presence/${roomId}`));
+      if (snapshot.exists()) {
+        const data = snapshot.val() || {};
+        Object.keys(data).forEach((userId) => {
+          parsedData[userId] = data[userId].state === "online";
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching participant status: ", error);
+    }
+
+    return parsedData;
+  }, []);
+
   // Solução para mais de 10 Participantes
   const fetchUsersByParticipants = useCallback(
-    async (participants: string[]) => {
+    async (participants: string[], roomId: string | undefined) => {
       try {
         const usersRef = collection(firestore, "users");
 
@@ -51,7 +79,7 @@ const useParticipants = (roomId?: string) => {
           chunkedParticipants.push(participants.slice(i, i + 10));
         }
 
-        const users: User[] = [];
+        const users: Participant[] = [];
 
         // Executar uma consulta para cada chunk de até 10 participantes
         for (const chunk of chunkedParticipants) {
@@ -64,6 +92,8 @@ const useParticipants = (roomId?: string) => {
           });
         }
 
+        if (!roomId) return users;
+
         return users;
       } catch (error) {
         console.error("Error fetching users: ", error);
@@ -75,7 +105,8 @@ const useParticipants = (roomId?: string) => {
 
   return {
     participants,
-    fetchUsersByParticipants
+    fetchUsersByParticipants,
+    fetchParticipantStatus,
   };
 };
 

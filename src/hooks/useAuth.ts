@@ -42,7 +42,7 @@ const useAuth = () => {
           displayName: user?.displayName,
           email: user?.email,
           uid: user?.uid,
-          createdAt: new Date().toISOString(),
+          createdAt: new Date().toISOString()
         };
 
         await setDoc(userDocRef, userData);
