@@ -28,7 +28,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="navbar border-bottom sticky-top bg-white mb-3">
+    <nav className="navbar border-bottom sticky-top bg-white mb-md-3 mb-2">
       <div className="container-fluid">
         <span className="navbar-brand mb-0 h1">
           {logoUrl && (

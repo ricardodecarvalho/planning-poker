@@ -5,8 +5,6 @@ import GitHubLogo from "../assets/images/github-mark.svg";
 const DONATE_LINK = import.meta.env.VITE_DONATE_LINK;
 
 const StyledFooter = styled.footer`
-  position: sticky;
-  bottom: 0;
   width: 100%;
   margin: 1rem 0;
   background-color: #ffffff;

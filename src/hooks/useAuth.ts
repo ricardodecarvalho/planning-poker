@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { doc, setDoc } from "firebase/firestore";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { randomColorScheme } from "../util";
 
 const useAuth = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -39,10 +40,12 @@ const useAuth = () => {
         const userDocRef = doc(firestore, "users", user.uid);
 
         const userData = {
-          displayName: user?.displayName,
-          email: user?.email,
-          uid: user?.uid,
-          createdAt: new Date().toISOString()
+          displayName: user.displayName,
+          email: user.email,
+          uid: user.uid,
+          createdAt: new Date().toISOString(),
+          photoURL: user?.photoURL,
+          colorScheme: randomColorScheme(),
         };
 
         await setDoc(userDocRef, userData);

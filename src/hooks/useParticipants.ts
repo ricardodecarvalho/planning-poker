@@ -2,6 +2,7 @@ import {
   arrayUnion,
   collection,
   doc,
+  getDoc,
   getDocs,
   onSnapshot,
   query,
@@ -12,6 +13,7 @@ import { useCallback, useEffect, useState } from "react";
 import { auth, database, firestore } from "../firebase";
 import { User } from "firebase/auth";
 import { child, get, ref } from "firebase/database";
+import { useNavigate } from "react-router-dom";
 
 interface ParticipantStatus {
   [userId: string]: boolean;
@@ -19,10 +21,37 @@ interface ParticipantStatus {
 
 export interface Participant extends User {
   online?: boolean;
+  createdAt: string;
+  colorScheme: {
+    bg: string;
+    text: string;
+  };
 }
 
 const useParticipants = (roomId?: string) => {
   const [participants, setParticipants] = useState<string[]>([]);
+
+  const navigate = useNavigate();
+
+  const checkRoomCapacity = async (roomId: string) => {
+    if (!roomId) return;
+
+    const roomRef = doc(firestore, "rooms", roomId);
+
+    const roomSnapshot = await getDoc(roomRef);
+
+    // Definir a capacidade máxima da sala
+    const maxParticipants = 2;
+
+    console.log("roomSnapshot: ", roomSnapshot);
+
+    const roomData = roomSnapshot.data();
+
+    if (roomData?.participants.length >= maxParticipants) {
+      navigate("/full-room");
+      return;
+    }
+  };
 
   // Observar os participantes em tempo real
   useEffect(() => {
@@ -46,7 +75,7 @@ const useParticipants = (roomId?: string) => {
     addParticipantToRoom();
 
     return () => unsubscribeRoom();
-  }, [roomId]);
+  }, [navigate, participants.length, roomId]);
 
   const fetchParticipantStatus = useCallback(async (roomId: string) => {
     const dbRef = ref(database);
@@ -87,7 +116,7 @@ const useParticipants = (roomId?: string) => {
           const querySnapshot = await getDocs(usersQuery);
 
           querySnapshot.docs.forEach((doc) => {
-            const userData = doc.data() as User;
+            const userData = doc.data() as Participant;
             users.push(userData);
           });
         }
@@ -107,6 +136,7 @@ const useParticipants = (roomId?: string) => {
     participants,
     fetchUsersByParticipants,
     fetchParticipantStatus,
+    checkRoomCapacity,
   };
 };
 

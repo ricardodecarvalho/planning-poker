@@ -1,0 +1,146 @@
+import { useEffect, useState } from "react";
+
+import { Link, useParams } from "react-router-dom";
+
+import Share from "./../Share";
+import {
+  Card,
+  HorizontalContainer,
+  Results,
+  VoteBadge,
+} from "./PokerRoom.styles";
+import useRoom from "../../hooks/useRoom";
+import useVotes from "../../hooks/useVotes";
+import useParticipants, { Participant } from "../../hooks/useParticipants";
+import UserList from "../UserList";
+import { getUniqueDisplayNames } from "../../util";
+import useUserConnection from "../../hooks/useUserConnection";
+import { auth } from "../../firebase";
+
+const PokerRoomCopy = () => {
+  const { roomId } = useParams();
+
+  const { checkRoom } = useRoom();
+  const { isShowVotes, votes, vote, clearVotes, handleShowVotes, handleVote } =
+    useVotes(roomId);
+
+  const { participants, fetchUsersByParticipants } = useParticipants(roomId);
+
+  const [users, setUsers] = useState<Participant[]>([]);
+
+  const votingSystem = [0, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, "?", "☕"];
+
+  const { enterRoom } = useUserConnection();
+
+  useEffect(() => {
+    if (!roomId) return;
+    const userId = auth.currentUser?.uid || "";
+    enterRoom(roomId, userId);
+  }, [enterRoom, roomId]);
+
+  // Verificar se é uma sala válida
+  useEffect(() => {
+    if (!roomId) return;
+    checkRoom({ roomId });
+  }, [checkRoom, roomId]);
+
+  // Buscar os usuários pelos IDs dos participantes
+  useEffect(() => {
+    if (participants.length === 0) return;
+
+    fetchUsersByParticipants(participants, roomId).then((users) => {
+      setUsers(getUniqueDisplayNames(users));
+    });
+  }, [fetchUsersByParticipants, participants, roomId]);
+
+  // Mapeando os usuários por uid
+  const usersMap = new Map(users.map((user) => [user.uid, user]));
+
+  // Mapeando os votos e associando o displayName apropriado
+  const votesMap = votes.map((vote) => {
+    const user = usersMap.get(vote.userId);
+    return {
+      ...vote,
+      user: {
+        displayName: user?.displayName,
+      },
+    };
+  });
+
+  // Calcular a média dos votos válidos (apenas números)
+  const validVotes = votesMap.filter(
+    (vote) => typeof vote.voteValue === "number"
+  );
+  const totalVotes = validVotes.reduce(
+    (acc, vote) => acc + (vote.voteValue || 0),
+    0
+  );
+
+  const average = validVotes.length ? totalVotes / validVotes.length : 0;
+
+  return (
+    <div className="container">
+      <div className="row">
+        <div className="col-md-6">
+          <nav aria-label="breadcrumb">
+            <ol className="breadcrumb">
+              <li className="breadcrumb-item">
+                <Link to="/">Voltar</Link>
+              </li>
+              <li className="breadcrumb-item active" aria-current="page">
+                Current Room (Copy)
+              </li>
+            </ol>
+          </nav>
+        </div>
+        <div className="col-md-6">
+          <Share {...{ roomId }} />
+        </div>
+      </div>
+
+      {/* Lista de Participantes */}
+      <div className="mt-2">
+        <h5>
+          Participants{" "}
+          <span className="badge text-bg-primary rounded-pill">
+            {users.length}
+          </span>
+        </h5>
+
+        <ul className="list-group list-group-flush">
+          <li className="list-group-item list-group-item-light">Waiting...</li>
+          {users.map((user) => {
+            const userVote = votes.find((vote) => vote.userId === user.uid);
+            const hasVotedClass = !!userVote;
+            return (
+              <li
+                key={user.uid}
+                className={`list-group-item`}
+              >
+                {user.displayName}
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+
+      {/* Cards */}
+      <div className="mt-3">
+        <HorizontalContainer>
+          {votingSystem.map((value) => (
+            <Card
+              key={value}
+              checked={vote === value}
+              onClick={() => handleVote(value)}
+              disabled={isShowVotes}
+            >
+              {value}
+            </Card>
+          ))}
+        </HorizontalContainer>
+      </div>
+    </div>
+  );
+};
+
+export default PokerRoomCopy;

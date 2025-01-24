@@ -1,45 +1,74 @@
-import { Vote } from "../hooks/useVotes";
+import Avatar from "./Avatar";
+import { VotingStatus } from "../util";
 import styled from "styled-components";
-import { Participant } from "../hooks/useParticipants";
 
-const List = styled.li<{ $hasVoted: boolean }>`
-  ${({ $hasVoted }) =>
-    $hasVoted &&
-    `
-    background: repeating-linear-gradient(
-      45deg,
-      #cccccc,
-      #cccccc 10px,
-      #e1e1e1 10px,
-      #e1e1e1 20px
-    );
+const Container = styled.div`
+  max-height: 350px;
+  overflow-y: auto;
 
-    color: #666;
-  `};
+  @media (min-width: 768px) {
+    max-height: 600px;
+  }
 `;
 
 interface UserListProps {
-  users: Participant[];
-  votes: Vote[];
+  votingStatus: VotingStatus;
+  isShowVotes: boolean;
 }
 
-const UserList = ({ users, votes }: UserListProps) => {
+const UserList = ({ votingStatus, isShowVotes }: UserListProps) => {
+  const hasNotVoted = (votingStatus?.hasNotVoted.length ?? 0) > 0;
+  const hasVoted = (votingStatus?.hasVoted?.length ?? 0) > 0;
+
   return (
-    <ul className="list-group list-group-horizontal">
-      {users.map((user) => {
-        const userVote = votes.find((vote) => vote.userId === user.uid);
-        const hasVotedClass = !!userVote;
-        return (
-          <List
-            key={user.uid}
-            className={`list-group-item`}
-            $hasVoted={hasVotedClass}
-          >
-            {user.displayName}
-          </List>
-        );
-      })}
-    </ul>
+    <Container>
+      {hasNotVoted && (
+        <ul className="list-group list-group-flush">
+          <li className="list-group-item">
+            <div className="fw-bold">Waiting for vote...</div>
+          </li>
+          {votingStatus?.hasNotVoted.map((participant) => {
+            return (
+              <li key={participant.uid} className={`list-group-item`}>
+                <div className="d-flex align-items-center">
+                  <Avatar {...participant} />
+                  {participant.displayName}
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+
+      {hasVoted && (
+        <ul className="list-group list-group-flush">
+          <li className="list-group-item">
+            <div className="fw-bold">Voted</div>
+          </li>
+          {votingStatus?.hasVoted.map((participant) => {
+            return (
+              <li
+                key={participant.uid}
+                className={`list-group-item d-flex justify-content-between align-items-center`}
+              >
+                <div className="d-flex align-items-center">
+                  <Avatar {...participant} />
+                  {participant.displayName}
+                </div>
+                {isShowVotes && (
+                  <span
+                    className="d-flex justify-content-center align-items-center rounded-2 text-bg-light fs-6"
+                    style={{ width: "32px", height: "32px" }}
+                  >
+                    {participant.vote.voteValue}
+                  </span>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </Container>
   );
 };
 

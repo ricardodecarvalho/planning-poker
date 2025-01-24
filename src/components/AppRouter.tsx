@@ -14,7 +14,7 @@ const AppRouter = () => {
           <Route path="/create-room" element={<Rooms />} />
           <Route path="/room/:roomId" element={<PokerRoom />} />
           <Route path="/Rooms" element={<Rooms />} />
-          <Route path="/private" element={<div>'The room is full :('</div>} />
+          <Route path="/full-room" element={<div>'The room is full :('</div>} />
           <Route path="*" element={<div>404 - Page Not Found</div>} />
         </Route>
       </Routes>

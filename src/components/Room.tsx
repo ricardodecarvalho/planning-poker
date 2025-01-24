@@ -28,11 +28,7 @@ const Room = () => {
       participants: [userId],
     };
 
-    console.log("Creating room with data: ", roomData);
-
     const roomRef = await addDoc(collection(firestore, "rooms"), roomData);
-
-    console.log("Room created with ID: ", roomRef.id);
 
     navigate(`/room/${roomRef.id}`);
   };

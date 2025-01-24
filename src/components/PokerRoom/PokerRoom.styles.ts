@@ -24,12 +24,6 @@ export const Card = styled.button<{ checked: boolean }>`
   align-items: center;
   justify-content: center;
 
-  &:hover {
-    background-color: #212529;
-    color: #fff;
-    border-color: #212529;
-  }
-
   ${({ checked }) => checked && "background-color: #007bff; color: #fff;"}
 `;
 

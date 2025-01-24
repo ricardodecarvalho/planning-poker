@@ -31,6 +31,8 @@ const useRoom = () => {
   const [rooms, setRooms] = useState<Room[]>([]);
   const [loading, setLoading] = useState(false);
 
+  const [currentRoomOwner, setCurrentRoomOwner] = useState<string>();
+
   const checkRoom = useCallback(
     async ({ roomId }: CheckRoomProps) => {
       if (!roomId) return;
@@ -43,6 +45,9 @@ const useRoom = () => {
         navigate("/");
         return;
       }
+
+      const data = roomSnapshot.data();
+      setCurrentRoomOwner(data.createdBy);
     },
     [navigate]
   );
@@ -87,6 +92,7 @@ const useRoom = () => {
     rooms,
     setRooms,
     loading,
+    currentRoomOwner
   };
 };
 

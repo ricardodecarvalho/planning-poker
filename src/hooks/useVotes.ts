@@ -3,6 +3,7 @@ import {
   collection,
   deleteDoc,
   doc,
+  getDoc,
   getDocs,
   onSnapshot,
   setDoc,
@@ -100,16 +101,30 @@ const useVotes = (roomId: string | undefined) => {
 
   const handleVote = async (voteValue: number | string) => {
     try {
+      const userId = auth.currentUser?.uid;
       const voteRef = doc(
         collection(firestore, `rooms/${roomId}/votes`),
-        auth.currentUser?.uid
+        userId
       );
 
+      const voteSnapshot = await getDoc(voteRef);
+
+      if (voteSnapshot.exists()) {
+        const existingVote = voteSnapshot.data().voteValue;
+  
+        if (existingVote === voteValue) {
+          // Remove vote if the same value is clicked
+          await deleteDoc(voteRef);
+          setVote(null); // Clear the current vote in local state
+          return;
+        }
+      }
+
       const voteData = {
-        userId: auth.currentUser?.uid,
-        voteValue: voteValue,
+        userId,
+        voteValue,
         votedAt: new Date().toISOString(),
-        roomId: roomId,
+        roomId,
       };
 
       await setDoc(voteRef, voteData);

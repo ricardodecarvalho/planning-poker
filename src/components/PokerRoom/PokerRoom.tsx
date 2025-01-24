@@ -1,26 +1,22 @@
 import { useEffect, useState } from "react";
 
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 import Share from "./../Share";
-import {
-  Card,
-  HorizontalContainer,
-  Results,
-  VoteBadge,
-} from "./PokerRoom.styles";
+import { Card, HorizontalContainer } from "./PokerRoom.styles";
 import useRoom from "../../hooks/useRoom";
 import useVotes from "../../hooks/useVotes";
 import useParticipants, { Participant } from "../../hooks/useParticipants";
 import UserList from "../UserList";
-import { getUniqueDisplayNames } from "../../util";
+import { getUniqueDisplayNames, getVotingStatus } from "../../util";
 import useUserConnection from "../../hooks/useUserConnection";
 import { auth } from "../../firebase";
+import Avatar from "../Avatar";
 
 const PokerRoom = () => {
   const { roomId } = useParams();
 
-  const { checkRoom } = useRoom();
+  const { checkRoom, currentRoomOwner } = useRoom();
   const { isShowVotes, votes, vote, clearVotes, handleShowVotes, handleVote } =
     useVotes(roomId);
 
@@ -53,112 +49,84 @@ const PokerRoom = () => {
     });
   }, [fetchUsersByParticipants, participants, roomId]);
 
-  // Mapeando os usuários por uid
-  const usersMap = new Map(users.map((user) => [user.uid, user]));
-
-  // Mapeando os votos e associando o displayName apropriado
-  const votesMap = votes.map((vote) => {
-    const user = usersMap.get(vote.userId);
-    return {
-      ...vote,
-      user: {
-        displayName: user?.displayName,
-      },
-    };
-  });
-
-  // Calcular a média dos votos válidos (apenas números)
-  const validVotes = votesMap.filter(
-    (vote) => typeof vote.voteValue === "number"
-  );
-  const totalVotes = validVotes.reduce(
-    (acc, vote) => acc + (vote.voteValue || 0),
-    0
-  );
-
-  const average = validVotes.length ? totalVotes / validVotes.length : 0;
+  const votingStatus = getVotingStatus(users, votes);
 
   return (
     <div className="container">
       <div className="row">
-        <div className="col-md-6">
-          <nav aria-label="breadcrumb">
-            <ol className="breadcrumb">
-              <li className="breadcrumb-item">
-                <Link to="/">Voltar</Link>
-              </li>
-              <li className="breadcrumb-item active" aria-current="page">
-                Current Room
-              </li>
-            </ol>
-          </nav>
-        </div>
-        <div className="col-md-6">
-          <Share {...{ roomId }} />
+        <div className="col-12 mb-2">
+          <Share {...{ roomId }} message="Copy room URL" />
         </div>
       </div>
 
-      {/* Lista de Participantes */}
-      <div className="mt-2">
-        <h5>
-          Participants{" "}
-          <span className="badge text-bg-primary rounded-pill">
-            {users.length}
-          </span>
-        </h5>
-        <HorizontalContainer>
-          <UserList {...{ users, votes }} />
-        </HorizontalContainer>
-      </div>
-
-      {/* Mostrar os votos */}
-      <Results className="card mt-2">
-        <div className="card-body">
-          <h5 className="card-title">Results</h5>
-
-          {isShowVotes && (
-            <h6 className="card-subtitle mb-2 text-body-secondary">
-              Average: {average.toFixed(2)}
-            </h6>
-          )}
-
-          <ul className="list-group list-group-flush">
-            {votesMap.map((vote) => (
-              <li className="list-group-item" key={vote.userId}>
-                <VoteBadge className="badge text-bg-dark me-2 position-relative">
-                  {isShowVotes ? (
-                    vote.voteValue
-                  ) : (
-                    <span className="visually-hidden">?</span>
-                  )}
-                </VoteBadge>
-                {vote.user.displayName}
-              </li>
-            ))}
-          </ul>
-
-          {votes.length > 0 && (
-            <div className="mt-2 btn-group">
+      <div className="row">
+        {auth.currentUser?.uid === currentRoomOwner && (
+          <div className="col-md-12 col-lg-3 order-lg-3 order-1 mb-4">
+            <div className="d-grid gap-2 d-md-flex justify-content-md-end">
               <button
-                className="btn btn-success btn-sm"
+                className="btn btn-primary"
                 onClick={() => handleShowVotes(!isShowVotes)}
               >
                 {`${isShowVotes ? "Hide votes" : "Show votes"}`}
               </button>
-
               <button
-                className="btn btn-danger btn-sm"
+                className="btn btn-danger"
                 onClick={() => clearVotes(roomId)}
               >
                 Clear votes
               </button>
             </div>
+          </div>
+        )}
+
+        <div className="col-md-4 col-lg-3 order-md-1 order-2 mt-1 mt-md-3">
+          <UserList {...{ votingStatus, isShowVotes }} />
+        </div>
+
+        <div className="col-md-8 col-lg-6 order-md-2 order-1 mt-md-5">
+          {isShowVotes && (
+            <div className="d-flex justify-content-center align-items-center flex-column">
+              <h5>Average</h5>
+              <div
+                style={{ width: "150px", height: "150px" }}
+                className="d-flex justify-content-center align-items-center border border-4 rounded-circle border-dark-subtle"
+              >
+                <p className="fw-bolder fs-2 m-0">
+                  {votingStatus.average.toFixed(2)}
+                </p>
+              </div>
+
+              <div className="mt-3 mt-md-3">
+                <ul className="list-group list-group-flush">
+                  {Object.keys(votingStatus.votesGrouped).map((vote) => (
+                    <li key={vote} className="list-group-item ps-5 pe-5">
+                      <div className="d-flex justify-content-end align-items-center">
+                        {votingStatus.votesGrouped[vote].map((participant) => (
+                          <div
+                            key={participant.uid}
+                            style={{ marginLeft: "-15px" }}
+                          >
+                            <Avatar {...participant} />
+                          </div>
+                        ))}
+                        <span
+                          className="d-flex justify-content-center align-items-center rounded-2 text-bg-light fs-6 mb-0 border border-secondary"
+                          style={{ width: "32px", height: "32px" }}
+                        >
+                          {vote}
+                        </span>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
           )}
         </div>
-      </Results>
+      </div>
 
       {/* Cards */}
-      <div className="mt-3">
+      <div className="mt-5">
         <HorizontalContainer>
           {votingSystem.map((value) => (
             <Card
