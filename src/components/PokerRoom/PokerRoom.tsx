@@ -10,8 +10,9 @@ import useParticipants, { Participant } from "../../hooks/useParticipants";
 import UserList from "../UserList";
 import { getUniqueDisplayNames, getVotingStatus } from "../../util";
 import useUserConnection from "../../hooks/useUserConnection";
-import { auth } from "../../firebase";
+import { auth, firestore } from "../../firebase";
 import Avatar from "../Avatar";
+import { collection, doc, onSnapshot, updateDoc } from "firebase/firestore";
 
 const PokerRoom = () => {
   const { roomId } = useParams();
@@ -28,11 +29,45 @@ const PokerRoom = () => {
 
   const { enterRoom } = useUserConnection();
 
+  const userId = auth.currentUser?.uid;
+
+  // monitorar a presença do usuário
   useEffect(() => {
-    if (!roomId) return;
-    const userId = auth.currentUser?.uid || "";
+    if (!userId) return;
+
+    const usersRef = collection(firestore, "users");
+
+    const unsubscribe = onSnapshot(usersRef, (docSnapshot) => {
+      docSnapshot.docChanges().forEach((change) => {
+        if (change.type === "modified") {
+          const modifiedUser = change.doc.data();
+
+          const userExists = users.map((user) =>
+            user.uid === modifiedUser.uid ? (modifiedUser as Participant) : user
+          );
+
+          setUsers(getUniqueDisplayNames(userExists));
+        }
+      });
+    });
+
+    const updateUser = async () => {
+      const userDocRef = doc(firestore, "users", userId);
+      const userData = {
+        state: "online",
+      };
+
+      await updateDoc(userDocRef, userData);
+    };
+    updateUser();
+
+    return () => unsubscribe();
+  }, [userId, users]);
+
+  useEffect(() => {
+    if (!roomId || !userId) return;
     enterRoom(roomId, userId);
-  }, [enterRoom, roomId]);
+  }, [enterRoom, roomId, userId]);
 
   // Verificar se é uma sala válida
   useEffect(() => {

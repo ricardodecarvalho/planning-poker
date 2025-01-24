@@ -46,6 +46,7 @@ const useAuth = () => {
           createdAt: new Date().toISOString(),
           photoURL: user?.photoURL,
           colorScheme: randomColorScheme(),
+          state: "online",
         };
 
         await setDoc(userDocRef, userData);

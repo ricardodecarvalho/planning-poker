@@ -1,41 +1,32 @@
 import * as admin from "firebase-admin";
-import { FieldValue } from "firebase-admin/firestore";
 import { onValueDeleted } from "firebase-functions/v2/database";
 
-// Inicialize o Firebase Admin SDK
 admin.initializeApp();
 
 const firestore = admin.firestore();
 
-export const onUserDisconnect = onValueDeleted(
+export const onUserUpdate = onValueDeleted(
   {
-    ref: "/presence/{roomId}/{userId}", // Caminho monitorado no Realtime Database
+    ref: "/presence/{roomId}/{userId}",
   },
   async (event) => {
     const { roomId, userId } = event.params;
 
     try {
-      console.log(`User ${userId} disconnected from room ${roomId}`);
+      console.log(`User ${userId} updated from room ${roomId}`);
 
-      // Obtenha o documento da sala no Firestore
-      const roomDoc = firestore.collection("rooms").doc(roomId);
-      const roomSnapshot = await roomDoc.get();
+      const userDoc = firestore.collection("users").doc(userId);
+      const userSnapshot = await userDoc.get();
 
-      if (!roomSnapshot.exists) {
-        console.log(`Room ${roomId} does not exist`);
+      if (!userSnapshot.exists) {
+        console.log(`User ${userId} does not exist`);
         return;
       }
 
-      // Remova o usuário do array de participantes
-      await roomDoc.update({
-        participants: FieldValue.arrayRemove(userId),
-      });
+      await userDoc.update({
+        state: "offline",
+      })
 
-      // remove user vote
-      const voteRef = firestore.collection(`rooms/${roomId}/votes`).doc(userId);
-      await voteRef.delete();
-
-      console.log(`User ${userId} removed from room ${roomId}`);
     } catch (error) {
       console.error("Error updating Firestore:", error);
     }

@@ -12,14 +12,17 @@ const classes = (colorScheme: UserColorScheme) => {
   return ` ${colorScheme?.bg} ${colorScheme?.text}`;
 };
 
-const Avatar = ({ photoURL, displayName, colorScheme }: Participant) => {
+const Avatar = ({ photoURL, displayName, colorScheme, state }: Participant) => {
+  const isOnline = state === "online";
+  const bg = isOnline ? "bg-success" : "bg-danger";
+
   if (!photoURL && displayName) {
     return (
       <span
         title={displayName || ""}
         className={`rounded-circle me-2 border border-2 border-white ${classes(
           colorScheme
-        )} d-flex justify-content-center align-items-center`}
+        )} d-flex justify-content-center align-items-center position-relative`}
         style={{
           width: 32,
           height: 32,
@@ -29,20 +32,43 @@ const Avatar = ({ photoURL, displayName, colorScheme }: Participant) => {
         }}
       >
         {initials(displayName)}
+        <span
+          className={`position-absolute p-1 ${bg} rounded-circle border border-1 border-white`}
+          style={{ bottom: -2, right: -2 }}
+        >
+          <span className="visually-hidden">User state</span>
+        </span>
       </span>
     );
   }
 
   if (photoURL) {
     return (
-      <img
-        src={photoURL}
-        alt=""
-        width="32"
-        height="32"
-        className="rounded-circle me-2 border border-2 border-white"
-        title={displayName || ""}
-      />
+      <div
+        className="position-relative me-2"
+        style={{
+          width: 32,
+          height: 32,
+          fontSize: 12,
+          fontWeight: "bold",
+          cursor: "default",
+        }}
+      >
+        <img
+          src={photoURL}
+          alt=""
+          width="32"
+          height="32"
+          className="rounded-circle me-2 border border-2 border-white"
+          title={displayName || ""}
+        />
+        <span
+          className={`position-absolute p-1 ${bg} rounded-circle border border-1 border-white`}
+          style={{ bottom: 0, right: 0 }}
+        >
+          <span className="visually-hidden">User state</span>
+        </span>
+      </div>
     );
   }
 

@@ -20,7 +20,7 @@ interface ParticipantStatus {
 }
 
 export interface Participant extends User {
-  online?: boolean;
+  state: string;
   createdAt: string;
   colorScheme: {
     bg: string;
@@ -69,7 +69,7 @@ const useParticipants = (roomId?: string) => {
     // Adicionar o participante atual à sala
     const addParticipantToRoom = async () => {
       await updateDoc(roomRef, {
-        participants: arrayUnion(auth.currentUser?.uid),
+        participants: arrayUnion(auth.currentUser?.uid)
       });
     };
     addParticipantToRoom();
