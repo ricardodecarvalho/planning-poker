@@ -79,7 +79,7 @@ export const getVotingStatus = (
   const hasNotVoted: Participant[] = [];
 
   users.forEach((user) => {
-    const vote = voteMap.get(user.uid);
+    const vote = user.uid ? voteMap.get(user.uid) : undefined;
     if (vote) {
       hasVoted.push({ ...user, vote });
     } else {
