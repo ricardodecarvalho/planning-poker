@@ -152,7 +152,7 @@ const Rooms = () => {
                 </h6>
               </div>
               <div className="card-body">
-                <div className="d-flex">
+                <div className="d-flex justify-content-between">
                   <Link
                     to={`/room/${room.id}`}
                     className="btn btn-secondary"

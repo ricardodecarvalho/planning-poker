@@ -1,13 +1,14 @@
 import styled from "styled-components";
 
 import GitHubLogo from "../assets/images/github-mark.svg";
+import GitHubLogoWhite from "../assets/images/github-mark-white.svg";
+import useThemeContext from "../context/useThemeContext";
 
 const DONATE_LINK = import.meta.env.VITE_DONATE_LINK;
 
 const StyledFooter = styled.footer`
   width: 100%;
   margin: 1rem 0;
-  background-color: #ffffff;
 `;
 
 const FooterContainer = styled.div`
@@ -25,11 +26,16 @@ const GitHub = styled.div`
 const Donate = styled.div``;
 
 const Footer = () => {
+  const { theme } = useThemeContext();
   return (
-    <StyledFooter>
+    <StyledFooter className="mt-5">
       <FooterContainer>
         <GitHub className="mb-3">
-          <img src={GitHubLogo} alt="GitHub Logo" height={24} />
+          <img
+            src={theme === "dark" ? GitHubLogoWhite : GitHubLogo}
+            alt="GitHub Logo"
+            height={24}
+          />
           <a
             target="_blank"
             href="https://github.com/ricardodecarvalho/planning-poker"

@@ -166,6 +166,7 @@ const PokerRoom = () => {
           {votingSystem.map((value) => (
             <Card
               key={value}
+              className="card"
               checked={vote === value}
               onClick={() => handleVote(value)}
               disabled={isShowVotes}
@@ -180,3 +181,15 @@ const PokerRoom = () => {
 };
 
 export default PokerRoom;
+
+/*
+
+<Card
+              key={value}
+              
+              
+              
+            >
+              {value}
+            </Card>
+            */

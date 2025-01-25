@@ -1,19 +1,26 @@
 import { useState } from "react";
-import ContentCopyIcon from "../assets/images/content_copy.svg";
-import CheckIcon from "../assets/images/check.svg";
+import styled from "styled-components";
+
+import ContentCopyIcon from "../assets/images/content_copy.svg?react";
+import CheckIcon from "../assets/images/check.svg?react";
+
+const Button = styled.button`
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+`;
 
 interface ShareProps {
   roomId: string | undefined;
   message?: string;
   label?: string;
-  btnSize?: string;
 }
 
 const Share = ({
   roomId,
   message = "Copy and share this link with your friends",
   label,
-  btnSize = "btn-sm",
 }: ShareProps) => {
   const [copied, setCopied] = useState(false);
 
@@ -24,8 +31,8 @@ const Share = ({
   return (
     <div className="d-flex justify-content-end gap-2">
       <span className="navbar-text">{message}</span>
-      <button
-        className={`btn btn-light ${btnSize}`}
+      <Button
+        title="Copy room URL"
         onClick={() => {
           navigator.clipboard
             .writeText(`${window.location.origin}/room/${roomId}`)
@@ -37,17 +44,14 @@ const Share = ({
       >
         {label && `${label} `}
 
-        {!copied && (
-          <img src={ContentCopyIcon} alt="Share icon" title="Copy room URL" />
-        )}
+        {!copied && <ContentCopyIcon />}
 
         {copied && (
           <>
-            <img src={CheckIcon} alt="Copied icon" />{" "}
-            <span className="text-success">Copied!</span>
+            <CheckIcon /> <span className="text-success">Copied!</span>
           </>
         )}
-      </button>
+      </Button>
     </div>
   );
 };

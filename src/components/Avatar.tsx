@@ -12,7 +12,17 @@ const classes = (colorScheme: UserColorScheme) => {
   return ` ${colorScheme?.bg} ${colorScheme?.text}`;
 };
 
-const Avatar = ({ photoURL, displayName, colorScheme, state }: Participant) => {
+interface AvatarProps extends Participant {
+  isShowState?: boolean;
+}
+
+const Avatar = ({
+  photoURL,
+  displayName,
+  colorScheme,
+  state,
+  isShowState = true,
+}: AvatarProps) => {
   const isOnline = state === "online";
   const bg = isOnline ? "bg-success" : "bg-danger";
 
@@ -28,16 +38,17 @@ const Avatar = ({ photoURL, displayName, colorScheme, state }: Participant) => {
           height: 32,
           fontSize: 12,
           fontWeight: "bold",
-          cursor: "default",
         }}
       >
         {initials(displayName)}
-        <span
-          className={`position-absolute p-1 ${bg} rounded-circle border border-1 border-white`}
-          style={{ bottom: -2, right: -2 }}
-        >
-          <span className="visually-hidden">User state</span>
-        </span>
+        {isShowState && (
+          <span
+            className={`position-absolute p-1 ${bg} rounded-circle border border-1 border-white`}
+            style={{ bottom: -2, right: -2 }}
+          >
+            <span className="visually-hidden">User state</span>
+          </span>
+        )}
       </span>
     );
   }
@@ -51,7 +62,6 @@ const Avatar = ({ photoURL, displayName, colorScheme, state }: Participant) => {
           height: 32,
           fontSize: 12,
           fontWeight: "bold",
-          cursor: "default",
         }}
       >
         <img
@@ -62,12 +72,14 @@ const Avatar = ({ photoURL, displayName, colorScheme, state }: Participant) => {
           className="rounded-circle me-2 border border-2 border-white"
           title={displayName || ""}
         />
-        <span
-          className={`position-absolute p-1 ${bg} rounded-circle border border-1 border-white`}
-          style={{ bottom: 0, right: 0 }}
-        >
-          <span className="visually-hidden">User state</span>
-        </span>
+        {isShowState && (
+          <span
+            className={`position-absolute p-1 ${bg} rounded-circle border border-1 border-white`}
+            style={{ bottom: 0, right: 0 }}
+          >
+            <span className="visually-hidden">User state</span>
+          </span>
+        )}
       </div>
     );
   }

@@ -10,6 +10,8 @@ import { doc, setDoc } from "firebase/firestore";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { randomColorScheme } from "../util";
+import { Participant } from "./useParticipants";
+import useUserContext from "../context/useUserContext";
 
 const useAuth = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -18,6 +20,8 @@ const useAuth = () => {
 
   const navigate = useNavigate();
   const location = useLocation();
+
+  const { setUserContext } = useUserContext();
 
   useEffect(() => {
     setLoadingAuthStateChanged(true);
@@ -39,7 +43,7 @@ const useAuth = () => {
         const user = result.user;
         const userDocRef = doc(firestore, "users", user.uid);
 
-        const userData = {
+        const userData: Participant = {
           displayName: user.displayName,
           email: user.email,
           uid: user.uid,
@@ -48,6 +52,8 @@ const useAuth = () => {
           colorScheme: randomColorScheme(),
           state: "online",
         };
+
+        setUserContext(userData);
 
         await setDoc(userDocRef, userData);
 

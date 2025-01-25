@@ -12,14 +12,9 @@ export const HorizontalContainer = styled.div`
 export const Card = styled.button<{ checked: boolean }>`
   display: flex;
   font-size: 2rem;
-  height: 8rem;
+  height: 4.8rem;
   min-width: 4.8rem;
-  border: 1px solid #ccc;
-  border-radius: 0.375rem;
   cursor: pointer;
-  background-color: #fff;
-  padding: 0.5rem;
-  margin: 0;
   transition: all 0.1s linear;
   align-items: center;
   justify-content: center;

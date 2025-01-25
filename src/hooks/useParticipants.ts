@@ -19,7 +19,7 @@ interface ParticipantStatus {
   [userId: string]: boolean;
 }
 
-export interface Participant extends User {
+export interface Participant extends Partial<User> {
   state: string;
   createdAt: string;
   colorScheme: {

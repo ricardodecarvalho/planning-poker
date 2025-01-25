@@ -1,62 +1,113 @@
-import { useEffect, useState } from "react";
-import { getDownloadURL, ref } from "firebase/storage";
-
-import { auth, storage } from "../firebase";
-import IconLogout from "../assets/images/logout.svg";
+import styled from "styled-components";
 import { Link } from "react-router-dom";
 
-const logoStorage = import.meta.env.VITE_FIREBASE_STORAGE_LOGO;
+import { auth } from "../firebase";
+
+import useIsOpen from "../hooks/useIsOpen";
+import Offcanvas from "./Offcanvas";
+import useUserContext from "../context/useUserContext";
+import Avatar from "./Avatar";
+import useThemeContext from "../context/useThemeContext";
+
+import LogoPPK from "../assets/images/logo-planning-poker.svg?react";
+import LogoPPKWhite from "../assets/images/logo-planning-poker-white.svg?react";
+
+import IconLogout from "../assets/images/logout.svg?react";
+import MoonIcon from "../assets/images/moon.svg?react";
+import SunIcon from "../assets/images/sun.svg?react";
+import GlobeIcon from "../assets/images/globe.svg?react";
+
 const appName = import.meta.env.VITE_APP_NAME;
 
+const AvatarButton = styled.button`
+  background: none;
+  border: none;
+  cursor: pointer !important;
+  padding: 0;
+`;
+
 const Navbar = () => {
-  const [logoUrl, setLogoUrl] = useState("");
-
-  useEffect(() => {
-    const storageRef = ref(storage, logoStorage);
-
-    getDownloadURL(storageRef)
-      .then((url) => {
-        setLogoUrl(url);
-      })
-      .catch((error) => {
-        console.error("Error getting image URL:", error);
-      });
-  }, []);
+  const { isOpen, open, close } = useIsOpen();
+  const { userContext } = useUserContext();
+  const { theme, toggleTheme } = useThemeContext();
 
   const logout = async () => {
     auth.signOut();
   };
 
   return (
-    <nav className="navbar border-bottom sticky-top bg-white mb-md-3 mb-2">
-      <div className="container-fluid">
-        <span className="navbar-brand mb-0 h1">
-          {logoUrl && (
+    <>
+      <nav className={`navbar border-bottom sticky-top mb-md-3 mb-2`}>
+        <div className="container-fluid">
+          <span className="navbar-brand mb-0 h1">
             <Link to="/" title="Go home">
-              <img
-                src={logoUrl}
-                alt="Logo"
-                height="24"
-                className="d-inline-block align-text-top pe-2"
-              />
+              {theme === "light" ? (
+                <LogoPPK width={30} height={24} />
+              ) : (
+                <LogoPPKWhite width={30} height={24} />
+              )}
             </Link>
-          )}
-          <Link to="/" className="navbar-brand" title="Go home">
-            {appName}
-          </Link>
-        </span>
-        <div>
-          {/* <span className="navbar-text me-2">{getDisplayName()}</span> */}
-          <button
-            className="btn btn-light btn-sm"
-            onClick={logout}
-            title="Logout"
-          >
-            <img src={IconLogout} alt="Logout" height="20" />
-          </button>
+            <Link to="/" className="navbar-brand" title="Go home">
+              {appName}
+            </Link>
+          </span>
+          <div className="d-flex text-light">
+            {userContext && (
+              <AvatarButton onClick={open}>
+                <Avatar {...userContext} isShowState={false} />
+              </AvatarButton>
+            )}
+          </div>
         </div>
-      </div>
-    </nav>
+      </nav>
+
+      <Offcanvas {...{ isOpen }} onClose={close}>
+        <ul className="list-group">
+          <button
+            className="list-group-item list-group-item-action disabled"
+            aria-disabled="true"
+          >
+            <div className="d-flex gap-2 align-items-center">
+              <GlobeIcon />
+              <span>Language</span>
+            </div>
+          </button>
+
+          <button
+            className="list-group-item list-group-item-action"
+            onClick={toggleTheme}
+          >
+            <div className="d-flex gap-2 align-items-center">
+              {theme === "light" ? (
+                <>
+                  <MoonIcon />
+                  <span>Enable dark mode</span>
+                </>
+              ) : (
+                <>
+                  <SunIcon />
+                  <span>Enable light mode</span>
+                </>
+              )}
+            </div>
+          </button>
+
+          <button
+            className="list-group-item list-group-item-action"
+            title="Logout"
+            onClick={logout}
+          >
+            <div className="d-flex gap-2 align-items-center">
+              <IconLogout />
+              <span>Logout</span>
+            </div>
+          </button>
+        </ul>
+        <p className="text-center mt-3">
+          <code>Version 1.19.3</code>
+        </p>
+      </Offcanvas>
+    </>
   );
 };
 

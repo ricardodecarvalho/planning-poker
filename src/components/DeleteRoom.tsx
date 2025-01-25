@@ -1,6 +1,14 @@
-import DeleteIcon from "../assets/images/trash.svg";
+import styled from "styled-components";
+import DeleteIcon from "../assets/images/trash.svg?react";
 import useRoom from "../hooks/useRoom";
 import { useModal } from "./Modal";
+
+const Button = styled.button`
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+`;
 
 interface DeleteRoomProps {
   roomId: string;
@@ -12,8 +20,7 @@ interface DeleteRoomProps {
 const DeleteRoom = ({
   roomId,
   label,
-  onDelete,
-  btnSize = "btn-sm",
+  onDelete
 }: DeleteRoomProps) => {
   const { showModal } = useModal();
 
@@ -36,14 +43,10 @@ const DeleteRoom = ({
 
   return (
     <>
-      <button
-        className={`btn btn-light ${btnSize}`}
-        data-bs-toggle="modal"
-        onClick={() => handleDeleteRoom(roomId)}
-      >
+      <Button data-bs-toggle="modal" onClick={() => handleDeleteRoom(roomId)} title="Delete room">
         {label && `${label} `}
-        <img src={DeleteIcon} alt="Delete icon" title="Delete room" />
-      </button>
+        <DeleteIcon />
+      </Button>
     </>
   );
 };

@@ -1,16 +1,9 @@
-import { getDownloadURL, ref } from "firebase/storage";
 import useAuth from "../hooks/useAuth";
-import { storage } from "../firebase";
-import { useEffect, useState } from "react";
 import styled from "styled-components";
 
-const Logo = styled.img`
-  height: 150px;
-
-  @media (min-width: 768px) {
-    height: 250px;
-  }
-`;
+import LogoPPK from "../assets/images/logo-planning-poker.svg?react";
+import LogoPPKWhite from "../assets/images/logo-planning-poker-white.svg?react";
+import useThemeContext from "../context/useThemeContext";
 
 const LoginWithGoogleButton = styled.button`
   width: 100%;
@@ -19,33 +12,21 @@ const LoginWithGoogleButton = styled.button`
     max-width: 350px;
 `;
 
-const logoStorage = import.meta.env.VITE_FIREBASE_STORAGE_LOGO;
 const appName = import.meta.env.VITE_APP_NAME;
 
 const Login = () => {
   const { loginWithGoogle, loadingLoginWithGoogle } = useAuth();
-
-  const [logoUrl, setLogoUrl] = useState("");
-
-  useEffect(() => {
-    const storageRef = ref(storage, logoStorage);
-
-    getDownloadURL(storageRef)
-      .then((url) => {
-        setLogoUrl(url);
-      })
-      .catch((error) => {
-        console.error("Error getting image URL:", error);
-      });
-  }, []);
+  const { theme } = useThemeContext();
 
   return (
     <div className="container">
-      {logoUrl && (
-        <Logo
-          src={logoUrl}
+      {theme === "light" ? (
+        <LogoPPK className="mx-auto d-block mt-5" width={250} height={250} />
+      ) : (
+        <LogoPPKWhite
           className="mx-auto d-block mt-5"
-          alt="Logo planning poker"
+          width={250}
+          height={250}
         />
       )}
       <div className="mt-4 d-flex flex-column align-items-center justify-content-center gap-3">
@@ -54,7 +35,7 @@ const Login = () => {
           <span style={{ whiteSpace: "nowrap" }}>{appName}</span>
         </h1>
         <LoginWithGoogleButton
-          className="btn btn-dark btn-lg"
+          className={`btn btn-${theme === "dark" ? "light" : "dark"} btn-lg`}
           onClick={loginWithGoogle}
           disabled={loadingLoginWithGoogle}
         >
