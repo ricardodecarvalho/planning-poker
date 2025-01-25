@@ -8,6 +8,7 @@ import styled from "styled-components";
 import useRoom from "../hooks/useRoom";
 import LoadingSpinner from "./LoadingSpinner";
 import { useIsMobile } from "../hooks/useIsMobile";
+import useThemeContext from "../context/useThemeContext";
 
 const CreateRoomButton = styled.button`
   width: 100%;
@@ -22,6 +23,8 @@ const Rooms = () => {
   const userId = auth?.currentUser?.uid;
 
   const navigate = useNavigate();
+
+  const { theme } = useThemeContext();
 
   const { getRoomsByUser, rooms, setRooms, loading } = useRoom();
 
@@ -66,7 +69,7 @@ const Rooms = () => {
         <div className="col-md-6 text-end">
           <CreateRoomButton
             onClick={createRoom}
-            className="btn btn-dark btn-lg"
+            className={`btn btn-${theme === "dark" ? "light" : "dark"} btn-lg`}
           >
             Create a Room
           </CreateRoomButton>
@@ -89,9 +92,7 @@ const Rooms = () => {
             <thead>
               <tr>
                 <th>Room ID</th>
-                <th>
-                  Created At
-                </th>
+                <th>Created At</th>
                 <th className="text-end">Actions</th>
               </tr>
             </thead>
