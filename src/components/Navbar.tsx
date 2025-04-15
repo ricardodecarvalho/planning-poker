@@ -19,6 +19,8 @@ import GlobeIcon from "../assets/images/globe.svg?react";
 
 const appName = import.meta.env.VITE_APP_NAME;
 
+const appVersion = import.meta.env.VITE_APP_VERSION;
+
 const AvatarButton = styled.button`
   background: none;
   border: none;
@@ -104,7 +106,7 @@ const Navbar = () => {
           </button>
         </ul>
         <p className="text-center mt-3">
-          <code>Version 1.19.3</code>
+          <code>Version {appVersion}</code>
         </p>
       </Offcanvas>
     </>
