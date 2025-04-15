@@ -29,6 +29,14 @@ cd planning-poker
 yarn
 ```
 
+### Firebase Functions
+To run Firebase Functions in development mode:
+
+```bash
+# cd into the functions folder and run:
+npm run build
+```
+
 ## Usage
 Here are some examples of how to use Planning Poker:
 
@@ -52,7 +60,7 @@ firebase emulators:start
 ```
 [Introduction to Firebase Local Emulator Suite](https://firebase.google.com/docs/emulator-suite)
 
-# Features
+## Features
 * Login with Google
 * Creating Planning Poker sessions.
 * Real-time participation.
@@ -63,7 +71,7 @@ firebase emulators:start
 * TypeScript
 * Firebase
 
-# Contribution
+## Contribution
 If you want to contribute to this project, follow the steps below:
 
 * Fork the project
@@ -72,20 +80,20 @@ If you want to contribute to this project, follow the steps below:
 * Push to the branch (`git push origin feature/new-feature`)
 * Open a Pull Request
 
-## Good First Issues
+### Good First Issues
 * Tests
 * Refactoring
 * PWA
 * Security
 * Remove rooms based on inactivity period
 
-## Doing
+### Doing
 * Sign in anonymously
 * Logint with email and password
 
-## Backlog
+### Backlog
 * Jira Integration
 * PWA to an Android App
 
-# License
+## License
 This project is licensed under the [MIT License](https://mit-license.org/).
