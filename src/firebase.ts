@@ -3,6 +3,7 @@ import { connectAuthEmulator, getAuth } from "firebase/auth";
 import { connectFirestoreEmulator, getFirestore } from "firebase/firestore";
 import { connectDatabaseEmulator, getDatabase } from "firebase/database";
 import { connectStorageEmulator, getStorage } from "firebase/storage";
+import { initializeAppCheck, ReCaptchaV3Provider } from "@firebase/app-check";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -16,6 +17,15 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
+
+// Inicializar App Check em produção
+if (!import.meta.env.DEV) {
+  initializeAppCheck(app, {
+    provider: new ReCaptchaV3Provider(import.meta.env.VITE_RECAPTCHA_SITE_KEY),
+    isTokenAutoRefreshEnabled: true
+  });
+}
+
 export const auth = getAuth(app);
 export const firestore = getFirestore(app);
 export const database = getDatabase(); // Realtime Database

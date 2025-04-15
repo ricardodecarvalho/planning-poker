@@ -3,11 +3,15 @@
     "presence": {
       "$roomId": {
         ".read": "auth != null",
+        ".write": "auth != null",
         "$userId": {
           ".read": "auth != null",
-          ".write": "auth != null && auth.uid === $userId"
+          ".write": "auth != null && auth.uid === $userId",
+          ".validate": "newData.hasChildren(['state', 'last_changed']) && newData.child('state').isString() && (newData.child('state').val() === 'online' || newData.child('state').val() === 'offline')"
         }
       }
-    }
+    },
+    ".read": "false",
+    ".write": "false"
   }
 }
