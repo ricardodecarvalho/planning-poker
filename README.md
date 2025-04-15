@@ -65,7 +65,7 @@ firebase emulators:start
 * Creating Planning Poker sessions.
 * Real-time participation.
 
-# Technologies Used
+## Technologies Used
 * React
 * Vite
 * TypeScript
