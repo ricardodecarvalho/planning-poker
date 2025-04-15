@@ -92,6 +92,7 @@ const Rooms = () => {
             <thead>
               <tr>
                 <th>Room ID</th>
+                <th>Participants</th>
                 <th>Created At</th>
                 <th className="text-end">Actions</th>
               </tr>
@@ -103,6 +104,9 @@ const Rooms = () => {
                     <Link to={`/room/${room.id}`} title="Enter room">
                       {room.id}
                     </Link>
+                  </td>
+                  <td>
+                    {room.participants.length}
                   </td>
                   <td>
                     {new Date(room.createdAt).toLocaleDateString(undefined, {
@@ -151,6 +155,7 @@ const Rooms = () => {
                     {room.id}
                   </Link>
                 </h6>
+                <p>Participants: {room.participants.length}</p>
               </div>
               <div className="card-body">
                 <div className="d-flex justify-content-between">
