@@ -26,7 +26,10 @@ const Offcanvas = ({ children, onClose, isOpen }: OffcanvasProps) => {
         </div>
         <div className="offcanvas-body">{children}</div>
       </div>
-      <div className={`${isOpen ? "offcanvas-backdrop fade show" : ""}`} />
+      <div 
+        className={`${isOpen ? "offcanvas-backdrop fade show" : ""}`} 
+        onClick={onClose}
+      />
     </>
   );
 };
