@@ -3,6 +3,7 @@ import useAuth from "../hooks/useAuth";
 import Navbar from "./Navbar";
 import LoadingSpinner from "./LoadingSpinner";
 import Footer from "./Footer";
+import ConnectionAlert from "./ConnectionAlert";
 
 const Private = () => {
   const { user, loadingAuthStateChanged } = useAuth();
@@ -25,6 +26,7 @@ const Private = () => {
 
   return (
     <>
+      <ConnectionAlert />
       <Navbar />
       <Outlet />
       <Footer />
