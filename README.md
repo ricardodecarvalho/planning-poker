@@ -83,7 +83,6 @@ If you want to contribute to this project, follow the steps below:
 ### Good First Issues
 * Tests
 * Refactoring
-* PWA
 * Security
 * Remove rooms based on inactivity period
 
