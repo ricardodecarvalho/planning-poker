@@ -1,8 +1,8 @@
 import * as admin from "firebase-admin";
 import { onValueDeleted } from "firebase-functions/v2/database";
-import * as functions from "firebase-functions";
+import { onCall, HttpsError } from "firebase-functions/v2/https";
 import { OpenAI } from "openai";
-import dotenv from 'dotenv';
+import dotenv from "dotenv";
 
 dotenv.config();
 admin.initializeApp();
@@ -60,7 +60,7 @@ Seu trabalho é receber um array de votos no formato:
 
 e devolver **uma única frase** em português, curta (até ~20 palavras), com humor leve e sarcástico, comentando o resultado.`;
 
-export const chatAssistant = functions.https.onCall(async ({ data }) => {
+export const chatAssistant = onCall(async ({ data }) => {
   const votes = data;
 
   try {
@@ -73,7 +73,7 @@ export const chatAssistant = functions.https.onCall(async ({ data }) => {
     return response.output_text;
   } catch (error) {
     console.error("Erro ao chamar OpenAI:", error);
-    throw new functions.https.HttpsError(
+    throw new HttpsError(
       "internal",
       "Erro ao processar a solicitação com OpenAI"
     );

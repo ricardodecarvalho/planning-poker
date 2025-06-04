@@ -106,19 +106,19 @@ const PokerRoom = () => {
       return;
     }
 
-    const votesArray = votingStatus.hasVoted.map((vote) => ({
-      name: vote.displayName || "",
-      value: vote.vote.voteValue.toString(),
-    }));
+    // const votesArray = votingStatus.hasVoted.map((vote) => ({
+    //   name: vote.displayName || "",
+    //   value: vote.vote.voteValue.toString(),
+    // }));
 
-    sendToChatAssistant(votesArray)
-      .then((response) => {
-        setChatMessage(response);
-      })
-      .catch((error) => {
-        setChatMessage("Ops, algo deu errado. buguei!");
-        console.error("Error sending votes to chat assistant:", error);
-      });
+    // sendToChatAssistant(votesArray)
+    //   .then((response) => {
+    //     setChatMessage(response);
+    //   })
+    //   .catch((error) => {
+    //     setChatMessage("Ops, algo deu errado. buguei!");
+    //     console.error("Error sending votes to chat assistant:", error);
+    //   });
   };
 
   const handleClearVotes = (roomId: string | undefined) => {
@@ -217,9 +217,9 @@ const PokerRoom = () => {
         </HorizontalContainer>
       </div>
 
-      {isRoomOwner && (
+      {/* {isRoomOwner && (
         <ZeClipado message={chatMessage} isLoading={isLoadingChatAssistant} />
-      )}
+      )} */}
     </div>
   );
 };
