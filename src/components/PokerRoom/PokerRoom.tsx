@@ -13,8 +13,8 @@ import useUserConnection from "../../hooks/useUserConnection";
 import { auth, firestore } from "../../firebase";
 import Avatar from "../Avatar";
 import { collection, doc, onSnapshot, updateDoc } from "firebase/firestore";
-import useChatAssistant from "../../hooks/useChatAssistant";
-import ZeClipado from "./ZeClipado/ZeClipado";
+// import useChatAssistant from "../../hooks/useChatAssistant";
+// import ZeClipado from "./ZeClipado/ZeClipado";
 import { useIsMobile } from "../../hooks/useIsMobile";
 
 const PokerRoom = () => {
@@ -30,7 +30,7 @@ const PokerRoom = () => {
 
   const [users, setUsers] = useState<Participant[]>([]);
 
-  const [chatMessage, setChatMessage] = useState<string>("");
+  //const [chatMessage, setChatMessage] = useState<string>("");
 
   const votingSystem = [0, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, "?", "☕"];
 
@@ -95,14 +95,14 @@ const PokerRoom = () => {
 
   const isRoomOwner = auth.currentUser?.uid === currentRoomOwner;
 
-  const { sendToChatAssistant, loading: isLoadingChatAssistant } =
-    useChatAssistant();
+  // const { sendToChatAssistant, loading: isLoadingChatAssistant } =
+  //   useChatAssistant();
 
   const handleAfterShowVotes = (action: boolean) => {
     handleShowVotes(action);
 
     if (!action || isMobile) {
-      setChatMessage("");
+      //setChatMessage("");
       return;
     }
 
@@ -123,7 +123,7 @@ const PokerRoom = () => {
 
   const handleClearVotes = (roomId: string | undefined) => {
     clearVotes(roomId);
-    setChatMessage("");
+    //setChatMessage("");
   };
 
   return (
