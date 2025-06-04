@@ -13,9 +13,14 @@ import useUserConnection from "../../hooks/useUserConnection";
 import { auth, firestore } from "../../firebase";
 import Avatar from "../Avatar";
 import { collection, doc, onSnapshot, updateDoc } from "firebase/firestore";
+import useChatAssistant from "../../hooks/useChatAssistant";
+import ZeClipado from "./ZeClipado/ZeClipado";
+import { useIsMobile } from "../../hooks/useIsMobile";
 
 const PokerRoom = () => {
   const { roomId } = useParams();
+
+  const isMobile = useIsMobile();
 
   const { checkRoom, currentRoomOwner } = useRoom();
   const { isShowVotes, votes, vote, clearVotes, handleShowVotes, handleVote } =
@@ -24,6 +29,8 @@ const PokerRoom = () => {
   const { participants, fetchUsersByParticipants } = useParticipants(roomId);
 
   const [users, setUsers] = useState<Participant[]>([]);
+
+  const [chatMessage, setChatMessage] = useState<string>("");
 
   const votingSystem = [0, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, "?", "☕"];
 
@@ -86,6 +93,39 @@ const PokerRoom = () => {
 
   const votingStatus = getVotingStatus(users, votes);
 
+  const isRoomOwner = auth.currentUser?.uid === currentRoomOwner;
+
+  const { sendToChatAssistant, loading: isLoadingChatAssistant } =
+    useChatAssistant();
+
+  const handleAfterShowVotes = (action: boolean) => {
+    handleShowVotes(action);
+
+    if (!action || isMobile) {
+      setChatMessage("");
+      return;
+    }
+
+    const votesArray = votingStatus.hasVoted.map((vote) => ({
+      name: vote.displayName || "",
+      value: vote.vote.voteValue.toString(),
+    }));
+
+    sendToChatAssistant(votesArray)
+      .then((response) => {
+        setChatMessage(response);
+      })
+      .catch((error) => {
+        setChatMessage("Ops, algo deu errado. buguei!");
+        console.error("Error sending votes to chat assistant:", error);
+      });
+  };
+
+  const handleClearVotes = (roomId: string | undefined) => {
+    clearVotes(roomId);
+    setChatMessage("");
+  };
+
   return (
     <div className="container">
       <div className="row">
@@ -95,18 +135,18 @@ const PokerRoom = () => {
       </div>
 
       <div className="row">
-        {auth.currentUser?.uid === currentRoomOwner && (
+        {isRoomOwner && (
           <div className="col-md-12 col-lg-3 order-lg-3 order-1 mb-4">
             <div className="d-grid gap-2 d-md-flex justify-content-md-end">
               <button
                 className="btn btn-primary"
-                onClick={() => handleShowVotes(!isShowVotes)}
+                onClick={() => handleAfterShowVotes(!isShowVotes)}
               >
                 {`${isShowVotes ? "Hide votes" : "Show votes"}`}
               </button>
               <button
                 className="btn btn-danger"
-                onClick={() => clearVotes(roomId)}
+                onClick={() => handleClearVotes(roomId)}
               >
                 Clear votes
               </button>
@@ -176,20 +216,12 @@ const PokerRoom = () => {
           ))}
         </HorizontalContainer>
       </div>
+
+      {isRoomOwner && (
+        <ZeClipado message={chatMessage} isLoading={isLoadingChatAssistant} />
+      )}
     </div>
   );
 };
 
 export default PokerRoom;
-
-/*
-
-<Card
-              key={value}
-              
-              
-              
-            >
-              {value}
-            </Card>
-            */

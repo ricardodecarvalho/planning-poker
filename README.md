@@ -61,9 +61,10 @@ firebase emulators:start
 [Introduction to Firebase Local Emulator Suite](https://firebase.google.com/docs/emulator-suite)
 
 ## Features
-* Login with Google
+* Login with Google.
 * Creating Planning Poker sessions.
 * Real-time participation.
+* Chat GPT Assistant.
 
 ## Technologies Used
 * React

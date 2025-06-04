@@ -1,6 +1,10 @@
 import * as admin from "firebase-admin";
 import { onValueDeleted } from "firebase-functions/v2/database";
+import * as functions from "firebase-functions";
+import { OpenAI } from "openai";
+import dotenv from 'dotenv';
 
+dotenv.config();
 admin.initializeApp();
 
 const firestore = admin.firestore();
@@ -25,10 +29,53 @@ export const onUserUpdate = onValueDeleted(
 
       await userDoc.update({
         state: "offline",
-      })
-
+      });
     } catch (error) {
       console.error("Error updating Firestore:", error);
     }
   }
 );
+
+/**
+ * Função para responder perguntas usando OpenAI
+ */
+
+const openaiApiKey = process.env.OPENAI_KEY;
+
+if (!openaiApiKey) {
+  throw new Error("OpenAI API key não está configurada");
+}
+
+const model = process.env.OPENAI_MODEL || "gpt-3.5-turbo";
+
+const openai = new OpenAI({ apiKey: openaiApiKey });
+
+const instructions = `Você é o “Comediante do Planning Poker”.
+Seu trabalho é receber um array de votos no formato:
+[
+  { "name": "Ricardo", "value": 5 },
+  { "name": "Pedro",   "value": 3 },
+  …
+]
+
+e devolver **uma única frase** em português, curta (até ~20 palavras), com humor leve e sarcástico, comentando o resultado.`;
+
+export const chatAssistant = functions.https.onCall(async ({ data }) => {
+  const votes = data;
+
+  try {
+    const response = await openai.responses.create({
+      model,
+      instructions,
+      input: JSON.stringify(votes),
+    });
+
+    return response.output_text;
+  } catch (error) {
+    console.error("Erro ao chamar OpenAI:", error);
+    throw new functions.https.HttpsError(
+      "internal",
+      "Erro ao processar a solicitação com OpenAI"
+    );
+  }
+});
