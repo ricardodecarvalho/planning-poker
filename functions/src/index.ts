@@ -60,22 +60,32 @@ Seu trabalho é receber um array de votos no formato:
 
 e devolver **uma única frase** em português, curta (até ~20 palavras), com humor leve e sarcástico, comentando o resultado.`;
 
-export const chatAssistant = onCall(async ({ data }) => {
-  const votes = data;
+const REGION = "us-central1";
 
-  try {
-    const response = await openai.responses.create({
-      model,
-      instructions,
-      input: JSON.stringify(votes),
-    });
+type Vote = {
+  name: string;
+  value: string;
+};
 
-    return response.output_text;
-  } catch (error) {
-    console.error("Erro ao chamar OpenAI:", error);
-    throw new HttpsError(
-      "internal",
-      "Erro ao processar a solicitação com OpenAI"
-    );
+export const chatAssistant = onCall(
+  { region: REGION },
+  async ({ data }: { data: Vote[] }) => {
+    const votes: Vote[] = data;
+
+    try {
+      const response = await openai.responses.create({
+        model,
+        instructions,
+        input: JSON.stringify(votes),
+      });
+
+      return response.output_text;
+    } catch (error) {
+      console.error("Erro ao chamar OpenAI:", error);
+      throw new HttpsError(
+        "internal",
+        "Erro ao processar a solicitação com OpenAI"
+      );
+    }
   }
-});
+);
