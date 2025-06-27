@@ -8,6 +8,11 @@ const useChatAssistant = () => {
   const [loading, setLoading] = useState(false);
 
   const sendToChatAssistant = useCallback(async (votes: Vote[]) => {
+    if (votes.length === 0) {
+      console.warn("No votes provided to chat assistant");
+      return "";
+    }
+
     setLoading(true);
 
     const callable = httpsCallable<Vote[], string>(

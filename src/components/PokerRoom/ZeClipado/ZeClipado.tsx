@@ -4,18 +4,27 @@ import { useIsMobile } from "../../../hooks/useIsMobile";
 
 type ZeClipadoProps = {
   message: string;
-  isLoading?: boolean;
+  isLoading: boolean;
 };
 
 const Container = styled.div`
-  animation: fade-in 0.5s ease-in-out;
-  padding: 0 30px 50px 0;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+
+  padding: 0 0 50px 0;
   display: flex;
   justify-content: center;
   align-items: center;
+
+  overflow: hidden;
 `;
 
-const StyledImage = styled.img`
+const StyledImage = styled.img<{ $show: boolean }>`
+  transform: translateY(${(p) => (p.$show ? "0" : "100%")});
+  opacity: ${(p) => (p.$show ? 1 : 0)};
+  transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+
   width: 100px;
   z-index: 1000;
 `;
@@ -31,13 +40,10 @@ const ZeClipado = ({ message, isLoading }: ZeClipadoProps) => {
 
   if (isMobile) return null;
 
+  const showZeClipado = isLoading || !!message;
+
   return (
-    <Container className="position-absolute bottom-0 end-0">
-      {isLoading && (
-        <div className="spinner-border" role="status">
-          <span className="visually-hidden">Loading...</span>
-        </div>
-      )}
+    <Container>
       {message && (
         <div
           className="alert alert-light"
@@ -46,7 +52,7 @@ const ZeClipado = ({ message, isLoading }: ZeClipadoProps) => {
           <Message>{message}</Message>
         </div>
       )}
-      <StyledImage src={ZeClipadoPNG} alt="Zé Clipado" />
+      <StyledImage src={ZeClipadoPNG} alt="Zé Clipado" $show={showZeClipado} />
     </Container>
   );
 };
