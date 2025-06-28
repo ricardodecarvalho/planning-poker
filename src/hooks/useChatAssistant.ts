@@ -2,7 +2,12 @@ import { httpsCallable } from "firebase/functions";
 import { useCallback, useState } from "react";
 import { functions } from "../firebase";
 
-type Vote = { name: string; value: string };
+type Language = "pt-BR" | "en-US";
+
+type Vote = {
+  name: string;
+  value: string;
+};
 
 const useChatAssistant = () => {
   const [loading, setLoading] = useState(false);
@@ -15,15 +20,15 @@ const useChatAssistant = () => {
 
     setLoading(true);
 
-    const callable = httpsCallable<Vote[], string>(
-      functions,
-      "chatAssistant"
-    );
+    const callable = httpsCallable<
+      { votes: Vote[]; language: Language },
+      string
+    >(functions, "chatAssistant");
 
-    const result = await callable(votes);
-    
+    const result = await callable({ votes, language: "en-US" });
+
     setLoading(false);
-    return result.data
+    return result.data;
   }, []);
 
   return { sendToChatAssistant, loading };

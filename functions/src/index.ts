@@ -50,17 +50,19 @@ const model = process.env.OPENAI_MODEL || "gpt-3.5-turbo";
 
 const openai = new OpenAI({ apiKey: openaiApiKey });
 
-const instructions = `Você é o “Comediante do Planning Poker”.
-Seu trabalho é receber um array de votos no formato:
-[
-  { "name": "Ricardo", "value": 5 },
-  { "name": "Pedro",   "value": 3 },
-  …
-]
-
-e devolver **uma única frase** em português, curta (até ~20 palavras), com humor leve e sarcástico, comentando o resultado.`;
+const instructions = {
+  "pt-BR": `Você é o “Comediante do Planning Poker”. Seu trabalho é receber um array de votos no formato: [{"name":"Ricardo","value":5},{"name":"Pedro","value":3}, …] e devolver **uma única frase** em português, curta (até ~20 palavras), com humor leve e sarcástico, comentando o resultado.`,
+  "en-US": `You are the "Comedian of Planning Poker". Your job is to receive an array of votes in the format: [{"name":"Ricardo","value":5},{"name":"Pedro","value":3}, …] and return **a single sentence** in English, short (up to ~20 words), with light and sarcastic humor, commenting on the result.`,
+};
 
 const REGION = "us-central1";
+
+type Language = "pt-BR" | "en-US";
+
+type Data = {
+  votes: Vote[];
+  language: Language;
+};
 
 type Vote = {
   name: string;
@@ -69,17 +71,29 @@ type Vote = {
 
 export const chatAssistant = onCall(
   { region: REGION },
-  async ({ data }: { data: Vote[] }) => {
-    const votes: Vote[] = data;
+  async ({ data }: { data: Data }) => {
+    const { votes, language } = data;
+
+    const systemPrompt = instructions[language];
 
     try {
-      const response = await openai.responses.create({
+      const response = await openai.chat.completions.create({
         model,
-        instructions,
-        input: JSON.stringify(votes),
+        messages: [
+          {
+            role: "system",
+            content: systemPrompt,
+          },
+          {
+            role: "user",
+            content: JSON.stringify(votes),
+          },
+        ],
+        max_tokens: 100,
+        temperature: 0.8,
       });
 
-      return response.output_text;
+      return response.choices[0].message.content;
     } catch (error) {
       console.error("Erro ao chamar OpenAI:", error);
       throw new HttpsError(
