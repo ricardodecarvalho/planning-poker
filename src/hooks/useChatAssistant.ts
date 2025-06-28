@@ -4,7 +4,7 @@ import { functions } from "../firebase";
 
 type Language = "pt-BR" | "en-US";
 
-type Vote = {
+export type Vote = {
   name: string;
   value: string;
 };
