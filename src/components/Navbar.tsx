@@ -16,10 +16,14 @@ import IconLogout from "../assets/images/logout.svg?react";
 import MoonIcon from "../assets/images/moon.svg?react";
 import SunIcon from "../assets/images/sun.svg?react";
 import GlobeIcon from "../assets/images/globe.svg?react";
+import GitHubLogo from "../assets/images/github-logo.svg?react";
+import Hand from "../assets/images/hand.svg?react";
 
 const appName = import.meta.env.VITE_APP_NAME;
 
 const appVersion = import.meta.env.VITE_APP_VERSION;
+
+const DONATE_LINK = import.meta.env.VITE_DONATE_LINK;
 
 const AvatarButton = styled.button`
   background: none;
@@ -93,6 +97,28 @@ const Navbar = () => {
               )}
             </div>
           </button>
+
+          <a
+            target="_blank"
+            href="https://github.com/ricardodecarvalho/planning-poker"
+            className="list-group-item list-group-item-action"
+          >
+            <div className="d-flex gap-2 align-items-center">
+              <GitHubLogo />
+              <span>Repository</span>
+            </div>
+          </a>
+
+          <a
+            target="_blank"
+            href={DONATE_LINK}
+            className="list-group-item list-group-item-action"
+          >
+            <div className="d-flex gap-2 align-items-center">
+              <Hand />
+              <span>Donate</span>
+            </div>
+          </a>
 
           <button
             className="list-group-item list-group-item-action"

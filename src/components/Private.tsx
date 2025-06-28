@@ -2,7 +2,6 @@ import { Navigate, Outlet, useParams } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
 import Navbar from "./Navbar";
 import LoadingSpinner from "./LoadingSpinner";
-import Footer from "./Footer";
 import ConnectionAlert from "./ConnectionAlert";
 
 const Private = () => {
@@ -29,7 +28,6 @@ const Private = () => {
       <ConnectionAlert />
       <Navbar />
       <Outlet />
-      <Footer />
     </>
   );
 };
