@@ -3,6 +3,7 @@ import Login from "./Login";
 import Private from "./Private";
 import PokerRoom from "./PokerRoom/PokerRoom";
 import Rooms from "./Rooms";
+import Kanban from "./Kanban/Kanban";
 
 const AppRouter = () => {
   return (
@@ -15,6 +16,9 @@ const AppRouter = () => {
           <Route path="/room/:roomId" element={<PokerRoom />} />
           <Route path="/Rooms" element={<Rooms />} />
           <Route path="/full-room" element={<div>'The room is full :('</div>} />
+
+          <Route path="/kanban" element={<Kanban />} />
+
           <Route path="*" element={<div>404 - Page Not Found</div>} />
         </Route>
       </Routes>
