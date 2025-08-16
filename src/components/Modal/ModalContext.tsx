@@ -1,4 +1,5 @@
 import React, { useState, createContext } from "react";
+import { useTranslation } from "react-i18n-lite";
 
 interface ModalData {
   title: string;
@@ -85,6 +86,8 @@ const Modal: React.FC<ModalProps> = ({
   onCloseButtonText,
   onConfirmButtonText,
 }) => {
+  const { t } = useTranslation();
+
   if (!isOpen) return null;
 
   return (
@@ -114,7 +117,7 @@ const Modal: React.FC<ModalProps> = ({
               className={`btn ${onCloseButtonClass || "btn-secondary"}`}
               onClick={onClose}
             >
-              {onCloseButtonText || "Close"}
+              {onCloseButtonText || t("modal.cancel")}
             </button>
             {onConfirm && (
               <button
@@ -122,7 +125,7 @@ const Modal: React.FC<ModalProps> = ({
                 className={`btn ${onConfirmButtonClass || "btn-primary"}`}
                 onClick={onConfirm}
               >
-                {onConfirmButtonText || "Confirm"}
+                {onConfirmButtonText || t("modal.confirm")}
               </button>
             )}
           </div>

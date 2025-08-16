@@ -3,8 +3,10 @@ import Login from "./Login";
 import Private from "./Private";
 import PokerRoom from "./PokerRoom/PokerRoom";
 import Rooms from "./Rooms";
+import { useTranslation } from "react-i18n-lite";
 
 const AppRouter = () => {
+  const { t } = useTranslation();
   return (
     <Router>
       <Routes>
@@ -14,8 +16,8 @@ const AppRouter = () => {
           <Route path="/create-room" element={<Rooms />} />
           <Route path="/room/:roomId" element={<PokerRoom />} />
           <Route path="/Rooms" element={<Rooms />} />
-          <Route path="/full-room" element={<div>'The room is full :('</div>} />
-          <Route path="*" element={<div>404 - Page Not Found</div>} />
+          <Route path="/full-room" element={<div>{t("pokerRoom.fullRoom")}</div>} />
+          <Route path="*" element={<div>{t("404.pageNotFound")}</div>} />
         </Route>
       </Routes>
     </Router>

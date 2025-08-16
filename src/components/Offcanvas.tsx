@@ -1,3 +1,5 @@
+import { useTranslation } from "react-i18n-lite";
+
 interface OffcanvasProps {
   children: React.ReactNode;
   isOpen: boolean;
@@ -5,6 +7,7 @@ interface OffcanvasProps {
 }
 
 const Offcanvas = ({ children, onClose, isOpen }: OffcanvasProps) => {
+  const { t } = useTranslation();
   return (
     <>
       <div
@@ -14,7 +17,7 @@ const Offcanvas = ({ children, onClose, isOpen }: OffcanvasProps) => {
       >
         <div className="offcanvas-header">
           <h5 className="offcanvas-title" id="offcanvasRightLabel">
-            User Settings
+            {t("navbar.userSettings")}
           </h5>
           <button
             type="button"

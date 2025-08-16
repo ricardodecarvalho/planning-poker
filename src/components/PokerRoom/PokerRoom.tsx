@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { collection, doc, onSnapshot, updateDoc } from "firebase/firestore";
+import { useTranslation } from "react-i18n-lite";
 
 import Share from "./../Share";
 import { Card, HorizontalContainer } from "./PokerRoom.styles";
@@ -17,6 +18,7 @@ import { useIsMobile } from "../../hooks/useIsMobile";
 
 const PokerRoom = () => {
   const { roomId } = useParams();
+  const { t } = useTranslation();
 
   const isMobile = useIsMobile();
 
@@ -112,7 +114,7 @@ const PokerRoom = () => {
     <div className="container">
       <div className="row">
         <div className="col-12 mb-2">
-          <Share {...{ roomId }} message="Copy room URL" />
+          <Share {...{ roomId }} message={t("rooms.copyRoomUrl")} />
         </div>
       </div>
 
@@ -124,13 +126,13 @@ const PokerRoom = () => {
                 className="btn btn-primary"
                 onClick={() => handleAfterShowVotes(!isShowVotes)}
               >
-                {`${isShowVotes ? "Hide votes" : "Show votes"}`}
+                {`${isShowVotes ? t("pokerRoom.hideVotes") : t("pokerRoom.showVotes")}`}
               </button>
               <button
                 className="btn btn-danger"
                 onClick={() => handleClearVotes(roomId)}
               >
-                Clear votes
+                {t("pokerRoom.clearVotes")}
               </button>
             </div>
           </div>
@@ -143,7 +145,7 @@ const PokerRoom = () => {
         <div className="col-md-8 col-lg-6 order-md-2 order-1 mt-md-5">
           {isShowVotes && (
             <div className="d-flex justify-content-center align-items-center flex-column">
-              <h5>Average</h5>
+              <h5>{t("pokerRoom.average")}</h5>
               <div
                 style={{ width: "150px", height: "150px" }}
                 className="d-flex justify-content-center align-items-center border border-4 rounded-circle border-dark-subtle"

@@ -12,11 +12,14 @@ import { toast } from "react-toastify";
 import { randomColorScheme } from "../util";
 import { Participant } from "./useParticipants";
 import useUserContext from "../context/useUserContext";
+import { useTranslation } from "react-i18n-lite";
 
 const useAuth = () => {
   const [user, setUser] = useState<User | null>(null);
   const [loadingAuthStateChanged, setLoadingAuthStateChanged] = useState(true);
   const [loadingLoginWithGoogle, setLoadingLoginWithGoogle] = useState(false);
+
+  const { t } = useTranslation();
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -57,7 +60,7 @@ const useAuth = () => {
 
         await setDoc(userDocRef, userData);
 
-        toast.success("Successfully logged in with Google.");
+        toast.success(t("login.success"));
 
         navigate(location.state?.redirect || "/");
       })
@@ -73,7 +76,7 @@ const useAuth = () => {
         const credential = GoogleAuthProvider.credentialFromError(error);
         console.log(credential);
 
-        toast.error("An error occurred while trying to login with Google.");
+        toast.error(t("login.error"));
       })
       .finally(() => {
         setLoadingLoginWithGoogle(false);

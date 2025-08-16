@@ -1,6 +1,8 @@
+import styled from "styled-components";
+import { useTranslation } from "react-i18n-lite";
+
 import Avatar from "./Avatar";
 import { VotingStatus } from "../util";
-import styled from "styled-components";
 
 const Container = styled.div`
   max-height: 350px;
@@ -17,6 +19,8 @@ interface UserListProps {
 }
 
 const UserList = ({ votingStatus, isShowVotes }: UserListProps) => {
+  const { t } = useTranslation();
+  
   const hasNotVoted = (votingStatus?.hasNotVoted.length ?? 0) > 0;
   const hasVoted = (votingStatus?.hasVoted?.length ?? 0) > 0;
 
@@ -25,7 +29,7 @@ const UserList = ({ votingStatus, isShowVotes }: UserListProps) => {
       {hasNotVoted && (
         <ul className="list-group list-group-flush">
           <li className="list-group-item">
-            <div className="fw-bold">Waiting for vote...</div>
+            <div className="fw-bold">{t("pokerRoom.waitingForVote")}</div>
           </li>
           {votingStatus?.hasNotVoted.map((participant) => {
             return (
@@ -43,7 +47,7 @@ const UserList = ({ votingStatus, isShowVotes }: UserListProps) => {
       {hasVoted && (
         <ul className="list-group list-group-flush">
           <li className="list-group-item">
-            <div className="fw-bold">Voted</div>
+            <div className="fw-bold">{t("pokerRoom.voted")}</div>
           </li>
           {votingStatus?.hasVoted.map((participant) => {
             return (

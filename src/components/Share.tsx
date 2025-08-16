@@ -3,6 +3,7 @@ import styled from "styled-components";
 
 import ContentCopyIcon from "../assets/images/content_copy.svg?react";
 import CheckIcon from "../assets/images/check.svg?react";
+import { useTranslation } from "react-i18n-lite";
 
 const Button = styled.button`
   background: none;
@@ -23,6 +24,7 @@ const Share = ({
   label,
 }: ShareProps) => {
   const [copied, setCopied] = useState(false);
+  const { t } = useTranslation();
 
   if (!roomId) {
     return null;
@@ -32,7 +34,7 @@ const Share = ({
     <div className="d-flex justify-content-end gap-2">
       <span className="navbar-text">{message}</span>
       <Button
-        title="Copy room URL"
+        title={t("rooms.copyRoomUrl")}
         onClick={() => {
           navigator.clipboard
             .writeText(`${window.location.origin}/room/${roomId}`)
@@ -48,7 +50,7 @@ const Share = ({
 
         {copied && (
           <>
-            <CheckIcon /> <span className="text-success">Copied!</span>
+            <CheckIcon /> <span className="text-success">{t("rooms.urlCopied")}</span>
           </>
         )}
       </Button>

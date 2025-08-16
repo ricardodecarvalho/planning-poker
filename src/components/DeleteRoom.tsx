@@ -2,6 +2,7 @@ import styled from "styled-components";
 import DeleteIcon from "../assets/images/trash.svg?react";
 import useRoom from "../hooks/useRoom";
 import { useModal } from "./Modal";
+import { useTranslation } from "react-i18n-lite";
 
 const Button = styled.button`
   background: none;
@@ -17,13 +18,9 @@ interface DeleteRoomProps {
   btnSize?: string;
 }
 
-const DeleteRoom = ({
-  roomId,
-  label,
-  onDelete
-}: DeleteRoomProps) => {
+const DeleteRoom = ({ roomId, label, onDelete }: DeleteRoomProps) => {
   const { showModal } = useModal();
-
+  const { t } = useTranslation();
   const { deleteRoom } = useRoom();
 
   const handleConfirm = (roomId: string) => {
@@ -33,17 +30,22 @@ const DeleteRoom = ({
 
   const handleDeleteRoom = async (roomId: string) => {
     showModal({
-      title: "Delete Room",
-      message: "Are you sure you want to delete this room?",
+      title: t("rooms.deleteRoom"),
+      message: t("rooms.deleteRoomMessage"),
       onConfirm: () => handleConfirm(roomId),
       onConfirmButtonClass: "btn-danger",
-      onCloseButtonText: "Cancel",
+      onCloseButtonText: t("modal.cancel"),
+      onConfirmButtonText: t("modal.confirm"),
     });
   };
 
   return (
     <>
-      <Button data-bs-toggle="modal" onClick={() => handleDeleteRoom(roomId)} title="Delete room">
+      <Button
+        data-bs-toggle="modal"
+        onClick={() => handleDeleteRoom(roomId)}
+        title={t("rooms.deleteRoom")}
+      >
         {label && `${label} `}
         <DeleteIcon />
       </Button>

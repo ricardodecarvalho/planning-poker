@@ -11,6 +11,7 @@ import {
 } from "firebase/firestore";
 import { auth, firestore } from "../firebase";
 import { toast } from "react-toastify";
+import { useTranslation } from "react-i18n-lite";
 
 export interface Vote {
   userId: string;
@@ -23,6 +24,8 @@ const useVotes = (roomId: string | undefined) => {
   const [isShowVotes, setIsShowVotes] = useState(false);
   const [votes, setVotes] = useState<Vote[]>([]);
   const [vote, setVote] = useState<number | string | null>(null);
+
+  const { t } = useTranslation();
 
   // Observar showVotes em tempo real
   useEffect(() => {
@@ -61,7 +64,7 @@ const useVotes = (roomId: string | undefined) => {
   const clearVotes = async (roomId: string | undefined) => {
     if (!roomId) {
       console.error("No room ID provided");
-      toast.error("Error clearing votes, no room ID provided");
+      toast.error(t("votes.errorClearingVotesNoRoomId"));
       return;
     }
 
@@ -79,7 +82,7 @@ const useVotes = (roomId: string | undefined) => {
       handleShowVotes(false);
     } catch (error) {
       console.error("Error clearing votes: ", error);
-      toast.error("Error clearing votes");
+      toast.error(t("votes.errorClearingVotes"));
     }
   };
 
@@ -95,7 +98,7 @@ const useVotes = (roomId: string | undefined) => {
       setIsShowVotes(action);
     } catch (error) {
       console.error("Error updating room: ", error);
-      toast.error("Error updating room");
+      toast.error(t("votes.errorUpdatingRoom"));
     }
   };
 
@@ -111,7 +114,7 @@ const useVotes = (roomId: string | undefined) => {
 
       if (voteSnapshot.exists()) {
         const existingVote = voteSnapshot.data().voteValue;
-  
+
         if (existingVote === voteValue) {
           // Remove vote if the same value is clicked
           await deleteDoc(voteRef);
@@ -131,7 +134,7 @@ const useVotes = (roomId: string | undefined) => {
       setVote(voteValue);
     } catch (error) {
       console.error("Error adding document: ", error);
-      toast.error("Error adding vote");
+      toast.error(t("votes.errorAddingVote"));
     }
   };
 

@@ -1,0 +1,58 @@
+{
+  "login": {
+    "loginWithGoogle": "Login with Google to continue",
+    "welcomeTo": "Welcome to",
+    "success": "Successfully logged in with Google",
+    "error": "An error occurred while trying to login with Google",
+    "language": "Language"
+  },
+  "rooms": {
+    "recentRooms": "Recent Rooms",
+    "createRoom": "Create a Room",
+    "createYourFirstRoom": "Create your first room.",
+    "createdAt": "Created At",
+    "roomId": "Room ID",
+    "participants": "Participants",
+    "copy": "Copy",
+    "delete": "Delete",
+    "enterRoom": "Enter room",
+    "copyRoomUrl": "Copy room URL",
+    "urlCopied": "URL copied!",
+    "deleteRoom": "Delete Room",
+    "deleteRoomMessage": "Are you sure you want to delete this room?",
+    "cancel": "Cancel",
+    "actions": "Actions"
+  },
+  "modal": {
+    "cancel": "Cancel",
+    "confirm": "Confirm"
+  },
+  "navbar": {
+    "goHome": "Go home",
+    "enableDarkMode": "Enable dark mode",
+    "enableLightMode": "Enable light mode",
+    "repository": "Repository",
+    "donate": "Donate",
+    "logout": "Logout",
+    "version": "Version",
+    "userSettings": "User Settings"
+  },
+  "404": {
+    "pageNotFound": "404 - Page Not Found"
+  },
+  "pokerRoom": {
+    "hideVotes": "Hide votes",
+    "showVotes": "Show votes",
+    "clearVotes": "Clear votes",
+    "waitingForVote": "Waiting for vote",
+    "voted": "Voted",
+    "average": "Average",
+    "fullRoom": "The room is full :("
+  },
+  "votes": {
+    "errorClearingVotesNoRoomId": "Error clearing votes, no room ID provided",
+    "errorClearingVotes": "Error clearing votes",
+    "errorUpdatingRoom": "Error updating room",
+    "errorAddingVote": "Error adding vote"
+  } 
+}

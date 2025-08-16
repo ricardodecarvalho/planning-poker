@@ -1,0 +1,58 @@
+{
+    "login": {
+      "loginWithGoogle": "Entrar usando o Google",
+      "welcomeTo": "Bem-vindo ao",
+      "success": "Login com Google realizado com sucesso",
+      "error": "Erro ao realizar login com Google",
+      "language": "Idioma"
+  },
+  "rooms": {
+    "recentRooms": "Salas Recentes",
+    "createRoom": "Criar uma Sala",
+    "createYourFirstRoom": "Crie sua primeira sala.",
+    "createdAt": "Criado em",
+    "roomId": "ID da Sala",
+    "participants": "Participantes",
+    "copy": "Copiar",
+    "delete": "Deletar",
+    "enterRoom": "Entrar na sala",
+    "copyRoomUrl": "Copiar URL da sala",
+    "urlCopied": "URL copiada!",
+    "deleteRoom": "Deletar Sala",
+    "deleteRoomMessage": "Tem certeza que deseja deletar esta sala?",
+    "cancel": "Cancelar",
+    "actions": "Ações"
+  },
+  "modal": {
+    "cancel": "Cancelar",
+    "confirm": "Confirmar"
+  },
+  "navbar": {
+    "goHome": "Ir para a página inicial",
+    "enableDarkMode": "Ativar modo escuro",
+    "enableLightMode": "Ativar modo claro",
+    "repository": "Repositório",
+    "donate": "Doar",
+    "logout": "Sair",
+    "version": "Versão",
+    "userSettings": "Configurações do usuário"
+  },
+  "404": {
+    "pageNotFound": "404 - Página não encontrada"
+  },
+  "pokerRoom": {
+    "hideVotes": "Ocultar votos",
+    "showVotes": "Mostrar votos",
+    "clearVotes": "Limpar votos",
+    "waitingForVote": "Aguardando votação",
+    "voted": "Votou",
+    "average": "Média",
+    "fullRoom": "A sala está cheia :("  
+  },
+  "votes": {
+    "errorClearingVotesNoRoomId": "Erro ao limpar votos, não foi fornecido um ID de sala",
+    "errorClearingVotes": "Erro ao limpar votos",
+    "errorUpdatingRoom": "Erro ao atualizar a sala",
+    "errorAddingVote": "Erro ao adicionar voto"
+  }
+}
