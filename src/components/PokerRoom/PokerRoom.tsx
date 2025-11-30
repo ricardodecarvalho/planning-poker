@@ -105,10 +105,10 @@ const PokerRoom = () => {
     clearVotes(roomId);
   };
 
-  const votesArray = votingStatus.hasVoted.map((vote) => ({
-    name: vote.displayName || "",
-    value: vote.vote.voteValue.toString(),
-  }));
+  // const votesArray = votingStatus.hasVoted.map((vote) => ({
+  //   name: vote.displayName || "",
+  //   value: vote.vote.voteValue.toString(),
+  // }));
 
   return (
     <div className="container">
