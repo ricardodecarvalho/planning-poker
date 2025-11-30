@@ -35,7 +35,7 @@ const REGION = "us-central1";
 if (import.meta.env.DEV) {
   functions = getFunctions(app);
 
-  connectAuthEmulator(auth, "http://127.0.0.1:9099");
+  connectAuthEmulator(auth, "http://127.0.0.1:5005");
   connectFirestoreEmulator(firestore, "localhost", 8080);
   connectDatabaseEmulator(database, "localhost", 9000);
   connectStorageEmulator(storage, "localhost", 9199);

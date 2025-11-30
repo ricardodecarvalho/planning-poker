@@ -13,7 +13,7 @@ import { getUniqueDisplayNames, getVotingStatus } from "../../util";
 import useUserConnection from "../../hooks/useUserConnection";
 import { auth, firestore } from "../../firebase";
 import Avatar from "../Avatar";
-import ZeClipado from "./ZeClipado/ZeClipado";
+// import ZeClipado from "./ZeClipado/ZeClipado";
 import { useIsMobile } from "../../hooks/useIsMobile";
 
 const PokerRoom = () => {
@@ -195,13 +195,15 @@ const PokerRoom = () => {
               onClick={() => handleVote(value)}
               disabled={isShowVotes}
             >
+              <span className="corner-top-left">{value}</span>
               {value}
+              <span className="corner-bottom-right">{value}</span>
             </Card>
           ))}
         </HorizontalContainer>
       </div>
 
-      {isRoomOwner && <ZeClipado votes={votesArray} isShowVotes={isShowVotes} />}
+      {/* {isRoomOwner && <ZeClipado votes={votesArray} isShowVotes={isShowVotes} />} */}
     </div>
   );
 };
