@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from 'styled-components';
 
 export const HorizontalContainer = styled.div`
   display: flex;
@@ -38,7 +38,9 @@ export const Card = styled.button<{ checked: boolean }>`
   position: relative;
   transform: translateY(0);
 
-  ${({ checked }) => checked && `
+  ${({ checked }) =>
+    checked &&
+    `
     background-color: #0056b3;
     color: #fff;
     transform: translateY(-8px);
@@ -46,7 +48,8 @@ export const Card = styled.button<{ checked: boolean }>`
   `}
 
   &:hover:not(:disabled) {
-    background-color: ${({ checked }) => checked ? "#0056b3" : "var(--bs-secondary-bg)"};
+    background-color: ${({ checked }) =>
+      checked ? '#0056b3' : 'var(--bs-secondary-bg)'};
     transform: translateY(-8px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
   }

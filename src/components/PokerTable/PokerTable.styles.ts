@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from 'styled-components';
 
 export const TableContainer = styled.div`
   display: flex;
@@ -29,7 +29,9 @@ export const Table = styled.div`
   border: 15px solid #5c4033;
   border-radius: 200px;
   position: relative;
-  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5), 0 10px 20px rgba(0, 0, 0, 0.3);
+  box-shadow:
+    inset 0 0 20px rgba(0, 0, 0, 0.5),
+    0 10px 20px rgba(0, 0, 0, 0.3);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -48,13 +50,13 @@ export const CenterContent = styled.div`
 `;
 
 export const AverageValue = styled.div`
-  font-size: clamp(2rem, 5vw, 3rem);
+  font-size: clamp(2rem, 5vw, 2.5rem);
   font-weight: bold;
   background: rgba(0, 0, 0, 0.3);
   padding: 1rem;
   border-radius: 50%;
-  width: clamp(80px, 15vw, 100px);
-  height: clamp(80px, 15vw, 100px);
+  width: clamp(80px, 15vw, 140px);
+  height: clamp(80px, 15vw, 140px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -65,7 +67,9 @@ export const Seat = styled.div<{ $angle: number; $distance: number }>`
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%) rotate(${props => props.$angle}deg) translate(${props => props.$distance}px) rotate(-${props => props.$angle}deg);
+  transform: translate(-50%, -50%) rotate(${(props) => props.$angle}deg)
+    translate(${(props) => props.$distance}px)
+    rotate(-${(props) => props.$angle}deg);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -114,7 +118,5 @@ export const VoteValue = styled.div`
   align-items: center;
   font-weight: bold;
   color: #333;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 `;
-
-

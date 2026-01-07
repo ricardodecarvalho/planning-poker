@@ -9,6 +9,7 @@ Planning Poker Agile is a real-time collaborative estimation tool built with Rea
 ## Development Commands
 
 ### Frontend Development
+
 ```bash
 # Install dependencies
 yarn
@@ -27,6 +28,7 @@ yarn preview
 ```
 
 ### Firebase Functions
+
 ```bash
 # Navigate to functions directory and build
 cd functions && npm run build
@@ -42,6 +44,7 @@ npm run logs
 ```
 
 ### Firebase Emulators
+
 ```bash
 # Start all emulators
 firebase emulators:start
@@ -53,6 +56,7 @@ cd functions && npm run serve
 ## Architecture
 
 ### Tech Stack
+
 - **Frontend**: React 18, TypeScript, Vite, Bootstrap 5, Styled Components
 - **Backend**: Firebase (Auth, Firestore, Realtime Database, Functions, Storage)
 - **i18n**: react-i18n-lite (supports pt-BR and en-US)
@@ -61,15 +65,18 @@ cd functions && npm run serve
 ### Firebase Services Usage
 
 **Firestore** (Document Database):
+
 - `rooms` collection: stores room metadata (id, createdBy, createdAt, participants[], showVotes)
 - `rooms/{roomId}/votes` subcollection: stores individual votes
 - `users` collection: stores user profiles with state and colorScheme
 
 **Realtime Database**:
+
 - `presence/{roomId}/{userId}`: tracks online/offline status for real-time presence
 - Used for ephemeral connection status that needs instant updates
 
 **Firebase Functions**:
+
 - `onUserUpdate`: Database trigger that updates Firestore user state when presence changes
 - `chatAssistant`: HTTPS callable function that sends votes to OpenAI and returns humorous commentary
 
@@ -88,11 +95,13 @@ cd functions && npm run serve
 ### Context Architecture
 
 **UserContext** (`src/context/UserContext.tsx`):
+
 - Stores current user data (Participant object)
 - Persisted to localStorage
 - Used for managing user profile across components
 
 **ThemeContext** (`src/context/ThemeContext.tsx`):
+
 - Manages light/dark theme with system preference detection
 - Persisted to localStorage
 - Syncs with Bootstrap's data-bs-theme attribute
@@ -100,29 +109,34 @@ cd functions && npm run serve
 ### Key Custom Hooks
 
 **useParticipants** (`src/hooks/useParticipants.ts`):
+
 - Manages room participants list
 - Handles Firestore's 10-item limit for `in` queries by chunking participant arrays
 - Fetches presence status from Realtime Database
 - Enforces room capacity limits
 
 **useVotes** (`src/hooks/useVotes.ts`):
+
 - Real-time vote synchronization via Firestore listeners
 - Handles vote toggling (clicking same value removes vote)
 - Manages showVotes flag for revealing/hiding votes
 - Clear votes functionality
 
 **useRoom** (`src/hooks/useRoom.ts`):
+
 - Room existence validation
 - Room deletion (owner only)
 - Fetch rooms by user ID
 
 **useAuth** (`src/hooks/useAuth.ts`):
+
 - Google authentication flow
 - User presence management in Realtime Database
 
 ### Environment Configuration
 
 Copy `.env.dist` to `.env.local` and configure:
+
 - Firebase project settings (API key, project ID, etc.)
 - `VITE_RECAPTCHA_SITE_KEY` for production App Check
 - OpenAI API key in `functions/.env` for ChatGPT assistant
@@ -130,6 +144,7 @@ Copy `.env.dist` to `.env.local` and configure:
 ### Development vs Production
 
 **Development mode** (`import.meta.env.DEV`):
+
 - Firebase emulators connected at localhost
 - Auth: 127.0.0.1:5005
 - Firestore: localhost:8080
@@ -138,13 +153,16 @@ Copy `.env.dist` to `.env.local` and configure:
 - Functions: localhost:5001
 
 **Production mode**:
+
 - Uses Firebase App Check with reCAPTCHA v3
 - Functions deployed to us-central1 region
 
 ## Code Patterns
 
 ### Firebase Listeners
+
 Always clean up Firestore listeners in useEffect:
+
 ```typescript
 useEffect(() => {
   const unsubscribe = onSnapshot(docRef, (snapshot) => {
@@ -155,15 +173,18 @@ useEffect(() => {
 ```
 
 ### Firestore Queries with >10 Items
+
 Use chunking pattern from `useParticipants.fetchUsersByParticipants` when querying with `in` operator on arrays >10 items.
 
 ### i18n Usage
+
 ```typescript
 const { t } = useTranslation();
-t("votes.errorClearingVotes"); // Keys defined in src/locales/
+t('votes.errorClearingVotes'); // Keys defined in src/locales/
 ```
 
 ### Styled Components
+
 Component-specific styles in `.styles.ts` files (e.g., `PokerRoom.styles.ts`)
 
 ## Important Notes

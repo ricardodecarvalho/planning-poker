@@ -1,13 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect } from 'react';
 
-export type ViewType = "table" | "list";
+export type ViewType = 'table' | 'list';
 
-const STORAGE_KEY = "poker-room-view-preference";
+const STORAGE_KEY = 'poker-room-view-preference';
 
 export const useViewPreference = () => {
   const [viewType, setViewType] = useState<ViewType>(() => {
     const stored = localStorage.getItem(STORAGE_KEY);
-    return (stored as ViewType) || "table";
+    return (stored as ViewType) || 'table';
   });
 
   useEffect(() => {
@@ -15,7 +15,7 @@ export const useViewPreference = () => {
   }, [viewType]);
 
   const toggleView = () => {
-    setViewType((prev) => (prev === "table" ? "list" : "table"));
+    setViewType((prev) => (prev === 'table' ? 'list' : 'table'));
   };
 
   return { viewType, setViewType, toggleView };

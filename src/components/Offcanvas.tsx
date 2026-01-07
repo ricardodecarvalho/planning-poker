@@ -1,4 +1,4 @@
-import { useTranslation } from "react-i18n-lite";
+import { useTranslation } from 'react-i18n-lite';
 
 interface OffcanvasProps {
   children: React.ReactNode;
@@ -11,13 +11,13 @@ const Offcanvas = ({ children, onClose, isOpen }: OffcanvasProps) => {
   return (
     <>
       <div
-        className={`offcanvas offcanvas-end ${isOpen ? "fade show" : ""}`}
+        className={`offcanvas offcanvas-end ${isOpen ? 'fade show' : ''}`}
         tabIndex={-1}
         aria-labelledby="offcanvasRightLabel"
       >
         <div className="offcanvas-header">
           <h5 className="offcanvas-title" id="offcanvasRightLabel">
-            {t("navbar.userSettings")}
+            {t('navbar.userSettings')}
           </h5>
           <button
             type="button"
@@ -29,8 +29,8 @@ const Offcanvas = ({ children, onClose, isOpen }: OffcanvasProps) => {
         </div>
         <div className="offcanvas-body">{children}</div>
       </div>
-      <div 
-        className={`${isOpen ? "offcanvas-backdrop fade show" : ""}`} 
+      <div
+        className={`${isOpen ? 'offcanvas-backdrop fade show' : ''}`}
         onClick={onClose}
       />
     </>

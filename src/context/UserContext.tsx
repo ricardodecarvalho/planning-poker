@@ -1,5 +1,5 @@
-import React, { createContext, useState, useEffect, ReactNode } from "react";
-import { Participant } from "../hooks/useParticipants";
+import React, { createContext, useState, useEffect, ReactNode } from 'react';
+import { Participant } from '../hooks/useParticipants';
 
 export interface UserContextType {
   userContext: Participant | null;
@@ -7,7 +7,7 @@ export interface UserContextType {
 }
 
 export const UserContext = createContext<UserContextType | undefined>(
-  undefined
+  undefined,
 );
 
 interface UserProviderProps {
@@ -18,17 +18,17 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   // Inicialize o estado com os dados do localStorage
   const [userContext, setUserContextState] = useState<Participant | null>(
     () => {
-      const storedUser = localStorage.getItem("userContext");
+      const storedUser = localStorage.getItem('userContext');
       return storedUser ? JSON.parse(storedUser) : null;
-    }
+    },
   );
 
   // Atualiza o localStorage quando userContext muda
   useEffect(() => {
     if (userContext) {
-      localStorage.setItem("userContext", JSON.stringify(userContext));
+      localStorage.setItem('userContext', JSON.stringify(userContext));
     } else {
-      localStorage.removeItem("userContext");
+      localStorage.removeItem('userContext');
     }
   }, [userContext]);
 

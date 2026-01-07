@@ -1,9 +1,9 @@
-import { useState } from "react";
-import styled from "styled-components";
+import { useState } from 'react';
+import styled from 'styled-components';
 
-import ContentCopyIcon from "../assets/images/content_copy.svg?react";
-import CheckIcon from "../assets/images/check.svg?react";
-import { useTranslation } from "react-i18n-lite";
+import ContentCopyIcon from '../assets/images/content_copy.svg?react';
+import CheckIcon from '../assets/images/check.svg?react';
+import { useTranslation } from 'react-i18n-lite';
 
 const Button = styled.button`
   background: none;
@@ -20,7 +20,7 @@ interface ShareProps {
 
 const Share = ({
   roomId,
-  message = "Copy and share this link with your friends",
+  message = 'Copy and share this link with your friends',
   label,
 }: ShareProps) => {
   const [copied, setCopied] = useState(false);
@@ -34,7 +34,7 @@ const Share = ({
     <div className="d-flex justify-content-end gap-2">
       <span className="navbar-text">{message}</span>
       <Button
-        title={t("rooms.copyRoomUrl")}
+        title={t('rooms.copyRoomUrl')}
         onClick={() => {
           navigator.clipboard
             .writeText(`${window.location.origin}/room/${roomId}`)
@@ -50,7 +50,8 @@ const Share = ({
 
         {copied && (
           <>
-            <CheckIcon /> <span className="text-success">{t("rooms.urlCopied")}</span>
+            <CheckIcon />{' '}
+            <span className="text-success">{t('rooms.urlCopied')}</span>
           </>
         )}
       </Button>

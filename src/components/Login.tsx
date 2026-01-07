@@ -1,12 +1,12 @@
-import useAuth from "../hooks/useAuth";
-import styled from "styled-components";
-import { useTranslation } from "react-i18n-lite";
+import useAuth from '../hooks/useAuth';
+import styled from 'styled-components';
+import { useTranslation } from 'react-i18n-lite';
 
-import LogoPPK from "../assets/images/logo-planning-poker.svg?react";
-import LogoPPKWhite from "../assets/images/logo-planning-poker-white.svg?react";
-import useThemeContext from "../context/useThemeContext";
-import ConnectionAlert from "./ConnectionAlert";
-import ChangeLanguage from "../locales/ChangeLanguage";
+import LogoPPK from '../assets/images/logo-planning-poker.svg?react';
+import LogoPPKWhite from '../assets/images/logo-planning-poker-white.svg?react';
+import useThemeContext from '../context/useThemeContext';
+import ConnectionAlert from './ConnectionAlert';
+import ChangeLanguage from '../locales/ChangeLanguage';
 
 const LoginWithGoogleButton = styled.button`
   width: 100%;
@@ -27,7 +27,7 @@ const Login = () => {
     <>
       <ConnectionAlert />
       <div className="container">
-        {theme === "light" ? (
+        {theme === 'light' ? (
           <LogoPPK className="mx-auto d-block mt-5" width={250} height={250} />
         ) : (
           <LogoPPKWhite
@@ -38,11 +38,11 @@ const Login = () => {
         )}
         <div className="mt-4 d-flex flex-column align-items-center justify-content-center gap-3">
           <h1 className="text-center">
-            <span className="text-body-secondary">{t("login.welcomeTo")}</span>{" "}
-            <span style={{ whiteSpace: "nowrap" }}>{appName}</span>
+            <span className="text-body-secondary">{t('login.welcomeTo')}</span>{' '}
+            <span style={{ whiteSpace: 'nowrap' }}>{appName}</span>
           </h1>
           <LoginWithGoogleButton
-            className={`btn btn-${theme === "dark" ? "light" : "dark"} btn-lg`}
+            className={`btn btn-${theme === 'dark' ? 'light' : 'dark'} btn-lg`}
             onClick={loginWithGoogle}
             disabled={loadingLoginWithGoogle}
           >
@@ -52,11 +52,11 @@ const Login = () => {
                 aria-hidden="true"
               ></span>
             )}
-            {t("login.loginWithGoogle")}
+            {t('login.loginWithGoogle')}
           </LoginWithGoogleButton>
 
           <div className="d-flex gap-2 align-items-center">
-            <span>{t("login.language")}</span>
+            <span>{t('login.language')}</span>
             <ChangeLanguage type="select" />
           </div>
         </div>
