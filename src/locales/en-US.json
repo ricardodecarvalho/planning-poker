@@ -47,6 +47,7 @@
     "waitingForVote": "Waiting for vote",
     "voted": "Voted",
     "average": "Average",
+    "mostCommon": "Most common",
     "fullRoom": "The room is full :("
   },
   "votes": {
@@ -54,5 +55,16 @@
     "errorClearingVotes": "Error clearing votes",
     "errorUpdatingRoom": "Error updating room",
     "errorAddingVote": "Error adding vote"
-  } 
+  },
+  "votingSystem": {
+    "changed": "Voting system changed successfully",
+    "errorChanging": "Error changing voting system",
+    "cannotChangeWithActiveVotes": "Cannot change voting system while votes are active. Clear votes first."
+  },
+  "viewToggle": {
+    "table": "Table",
+    "list": "List",
+    "tableView": "Table view",
+    "listView": "List view"
+  }
 }

@@ -64,6 +64,7 @@ export interface VotingStatus {
   hasVoted: Array<Participant & { vote: Vote }>;
   hasNotVoted: Participant[];
   average: number;
+  mostCommon: string | number | null;
   votesGrouped: VotesGrouped;
 }
 
@@ -98,15 +99,32 @@ export const getVotingStatus = (
 
   const average = validVotes.length ? totalVotes / validVotes.length : 0;
 
-  const votesGrouped = validVotes.reduce<VotesGrouped>((acc, user) => {
-    const voteValue = user.vote.voteValue;
-    if (!acc[voteValue]) {
-      acc[voteValue] = [];
+  // Group all votes (including non-numeric like T-shirt sizes)
+  const votesGrouped = hasVoted
+    .filter((user) => {
+      const value = String(user.vote.voteValue);
+      return value !== "?" && value !== "☕";
+    })
+    .reduce<VotesGrouped>((acc, user) => {
+      const voteValue = user.vote.voteValue;
+      if (!acc[voteValue]) {
+        acc[voteValue] = [];
+      }
+
+      acc[voteValue].push(user);
+      return acc;
+    }, {});
+
+  // Find most common vote (mode)
+  let mostCommon: string | number | null = null;
+  let maxCount = 0;
+
+  Object.entries(votesGrouped).forEach(([value, voters]) => {
+    if (voters.length > maxCount) {
+      maxCount = voters.length;
+      mostCommon = isNaN(Number(value)) ? value : Number(value);
     }
+  });
 
-    acc[voteValue].push(user);
-    return acc;
-  }, {});
-
-  return { hasVoted, hasNotVoted, average, votesGrouped };
+  return { hasVoted, hasNotVoted, average, mostCommon, votesGrouped };
 };

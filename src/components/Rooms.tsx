@@ -50,6 +50,7 @@ const Rooms = () => {
       createdBy: userId,
       showVotes: false,
       participants: [userId],
+      votingSystem: "fibonacci",
     };
 
     const roomRef = await addDoc(collection(firestore, "rooms"), roomData);
