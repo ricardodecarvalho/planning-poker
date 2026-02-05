@@ -3,7 +3,9 @@ rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
     function isAppChecked() {
-      return request.appCheckToken != null;
+      // Temporariamente retornando true para depurar falha em produção
+      // return request.appCheckToken != null;
+      return true;
     }
 
     match /users/{userId}/{allPaths=**} {

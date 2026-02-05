@@ -3,7 +3,7 @@ import { connectAuthEmulator, getAuth } from 'firebase/auth';
 import { connectFirestoreEmulator, getFirestore } from 'firebase/firestore';
 import { connectDatabaseEmulator, getDatabase } from 'firebase/database';
 import { connectStorageEmulator, getStorage } from 'firebase/storage';
-import { initializeAppCheck, ReCaptchaV3Provider } from '@firebase/app-check';
+import { initializeAppCheck, ReCaptchaV3Provider } from 'firebase/app-check';
 import {
   connectFunctionsEmulator,
   Functions,
@@ -48,9 +48,11 @@ if (import.meta.env.DEV) {
   functions = getFunctions(app, REGION);
 }
 
+console.log('Initializing App Check with key:', import.meta.env.VITE_RECAPTCHA_SITE_KEY ? 'Present' : 'Missing');
+
 initializeAppCheck(app, {
   provider: new ReCaptchaV3Provider(
-    import.meta.env.VITE_RECAPTCHA_SITE_KEY || '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI', // Site key de teste se não houver no .env
+    import.meta.env.VITE_RECAPTCHA_SITE_KEY || '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI',
   ),
   isTokenAutoRefreshEnabled: true,
 });
