@@ -1,15 +1,15 @@
-import { useEffect } from "react";
-import { auth, firestore } from "../firebase";
-import { addDoc, collection } from "firebase/firestore";
-import { Link, useNavigate } from "react-router-dom";
-import Share from "./Share";
-import DeleteRoom from "./DeleteRoom";
-import styled from "styled-components";
-import useRoom from "../hooks/useRoom";
-import LoadingSpinner from "./LoadingSpinner";
-import { useIsMobile } from "../hooks/useIsMobile";
-import useThemeContext from "../context/useThemeContext";
-import { useTranslation } from "react-i18n-lite";
+import { useEffect } from 'react';
+import { auth, firestore } from '../firebase';
+import { addDoc, collection } from 'firebase/firestore';
+import { Link, useNavigate } from 'react-router-dom';
+import Share from './Share';
+import DeleteRoom from './DeleteRoom';
+import styled from 'styled-components';
+import useRoom from '../hooks/useRoom';
+import LoadingSpinner from './LoadingSpinner';
+import { useIsMobile } from '../hooks/useIsMobile';
+import useThemeContext from '../context/useThemeContext';
+import { useTranslation } from 'react-i18n-lite';
 
 const CreateRoomButton = styled.button`
   width: 100%;
@@ -39,7 +39,7 @@ const Rooms = () => {
 
   const createRoom = async () => {
     if (!auth.currentUser) {
-      console.error("User not authenticated");
+      console.error('User not authenticated');
       return;
     }
 
@@ -52,7 +52,7 @@ const Rooms = () => {
       participants: [userId],
     };
 
-    const roomRef = await addDoc(collection(firestore, "rooms"), roomData);
+    const roomRef = await addDoc(collection(firestore, 'rooms'), roomData);
 
     navigate(`/room/${roomRef.id}`);
   };
@@ -67,15 +67,15 @@ const Rooms = () => {
     <div className="container">
       <div className="row">
         <div className="col-md-6">
-          <h2>{t("rooms.recentRooms")}</h2>
+          <h2>{t('rooms.recentRooms')}</h2>
         </div>
         <div className="col-md-6 text-end">
           <CreateRoomButton
             onClick={createRoom}
-            className={`btn btn-${theme === "dark" ? "light" : "dark"} btn-lg`}
-            title={t("rooms.createRoom")}
+            className={`btn btn-${theme === 'dark' ? 'light' : 'dark'} btn-lg`}
+            title={t('rooms.createRoom')}
           >
-            {t("rooms.createRoom")}
+            {t('rooms.createRoom')}
           </CreateRoomButton>
         </div>
       </div>
@@ -86,7 +86,7 @@ const Rooms = () => {
 
       {!loading && rooms && rooms?.length === 0 && (
         <div className="alert alert-primary" role="alert">
-          {t("rooms.createYourFirstRoom")}
+          {t('rooms.createYourFirstRoom')}
         </div>
       )}
 
@@ -95,30 +95,28 @@ const Rooms = () => {
           <table className="table table-hover table-sm align-middle">
             <thead>
               <tr>
-                <th>{t("rooms.roomId")}</th>
-                <th>{t("rooms.participants")}</th>
-                <th>{t("rooms.createdAt")}</th>
-                <th className="text-end">{t("rooms.actions")}</th>
+                <th>{t('rooms.roomId')}</th>
+                <th>{t('rooms.participants')}</th>
+                <th>{t('rooms.createdAt')}</th>
+                <th className="text-end">{t('rooms.actions')}</th>
               </tr>
             </thead>
             <tbody className="table-group-divider">
               {rooms?.map((room) => (
                 <tr key={room.id}>
                   <td>
-                    <Link to={`/room/${room.id}`} title={t("rooms.enterRoom")}>
+                    <Link to={`/room/${room.id}`} title={t('rooms.enterRoom')}>
                       {room.id}
                     </Link>
                   </td>
-                  <td>
-                    {room.participants.length}
-                  </td>
+                  <td>{room.participants.length}</td>
                   <td>
                     {new Date(room.createdAt).toLocaleDateString(language, {
-                      year: "2-digit",
-                      month: "2-digit",
-                      day: "2-digit",
-                      hour: "2-digit",
-                      minute: "2-digit",
+                      year: '2-digit',
+                      month: '2-digit',
+                      day: '2-digit',
+                      hour: '2-digit',
+                      minute: '2-digit',
                     })}
                   </td>
                   <td>
@@ -143,38 +141,40 @@ const Rooms = () => {
             <div key={room.id} className="card mb-3">
               <div className="card-body">
                 <h5 className="card-title">
-                  {t("rooms.createdAt")}:{" "}
+                  {t('rooms.createdAt')}:{' '}
                   {new Date(room.createdAt).toLocaleDateString(language, {
-                    year: "2-digit",
-                    month: "2-digit",
-                    day: "2-digit",
-                    hour: "2-digit",
-                    minute: "2-digit",
+                    year: '2-digit',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
                   })}
                 </h5>
 
                 <h6 className="card-subtitle mb-2 text-body-secondary">
-                  {t("rooms.roomId")}:{" "}
-                  <Link to={`/room/${room.id}`} title={t("rooms.enterRoom")}>
+                  {t('rooms.roomId')}:{' '}
+                  <Link to={`/room/${room.id}`} title={t('rooms.enterRoom')}>
                     {room.id}
                   </Link>
                 </h6>
-                <p>{t("rooms.participants")}: {room.participants.length}</p>
+                <p>
+                  {t('rooms.participants')}: {room.participants.length}
+                </p>
               </div>
               <div className="card-body">
                 <div className="d-flex justify-content-between">
                   <Link
                     to={`/room/${room.id}`}
                     className="btn btn-secondary"
-                    title={t("rooms.enterRoom")}
+                    title={t('rooms.enterRoom')}
                   >
-                    {t("rooms.enterRoom")}
+                    {t('rooms.enterRoom')}
                   </Link>
-                  <Share roomId={room.id} message="" label={t("rooms.copy")} />
+                  <Share roomId={room.id} message="" label={t('rooms.copy')} />
                   <DeleteRoom
                     roomId={room.id}
                     onDelete={() => handleDeleteRoom(room.id)}
-                    label={t("rooms.delete")}
+                    label={t('rooms.delete')}
                   />
                 </div>
               </div>

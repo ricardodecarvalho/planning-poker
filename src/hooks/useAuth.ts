@@ -3,16 +3,16 @@ import {
   onAuthStateChanged,
   signInWithPopup,
   User,
-} from "firebase/auth";
-import { auth, firestore } from "../firebase";
-import { useEffect, useState } from "react";
-import { doc, setDoc } from "firebase/firestore";
-import { useLocation, useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
-import { randomColorScheme } from "../util";
-import { Participant } from "./useParticipants";
-import useUserContext from "../context/useUserContext";
-import { useTranslation } from "react-i18n-lite";
+} from 'firebase/auth';
+import { auth, firestore } from '../firebase';
+import { useEffect, useState } from 'react';
+import { doc, setDoc } from 'firebase/firestore';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import { randomColorScheme } from '../util';
+import { Participant } from './useParticipants';
+import useUserContext from '../context/useUserContext';
+import { useTranslation } from 'react-i18n-lite';
 
 const useAuth = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -44,7 +44,7 @@ const useAuth = () => {
     signInWithPopup(auth, provider)
       .then(async (result) => {
         const user = result.user;
-        const userDocRef = doc(firestore, "users", user.uid);
+        const userDocRef = doc(firestore, 'users', user.uid);
 
         const userData: Participant = {
           displayName: user.displayName,
@@ -53,16 +53,16 @@ const useAuth = () => {
           createdAt: new Date().toISOString(),
           photoURL: user?.photoURL,
           colorScheme: randomColorScheme(),
-          state: "online",
+          state: 'online',
         };
 
         setUserContext(userData);
 
         await setDoc(userDocRef, userData);
 
-        toast.success(t("login.success"));
+        toast.success(t('login.success'));
 
-        navigate(location.state?.redirect || "/");
+        navigate(location.state?.redirect || '/');
       })
       .catch((error) => {
         const errorCode = error.code;
@@ -76,7 +76,7 @@ const useAuth = () => {
         const credential = GoogleAuthProvider.credentialFromError(error);
         console.log(credential);
 
-        toast.error(t("login.error"));
+        toast.error(t('login.error'));
       })
       .finally(() => {
         setLoadingLoginWithGoogle(false);
@@ -85,9 +85,9 @@ const useAuth = () => {
 
   const getDisplayName = () => {
     if (auth.currentUser?.displayName) {
-      return auth.currentUser.displayName.split(" ")[0];
+      return auth.currentUser.displayName.split(' ')[0];
     }
-    return auth.currentUser?.email?.split("@")[0];
+    return auth.currentUser?.email?.split('@')[0];
   };
 
   return {

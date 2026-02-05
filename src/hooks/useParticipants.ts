@@ -8,12 +8,12 @@ import {
   query,
   updateDoc,
   where,
-} from "firebase/firestore";
-import { useCallback, useEffect, useState } from "react";
-import { auth, database, firestore } from "../firebase";
-import { User } from "firebase/auth";
-import { child, get, ref } from "firebase/database";
-import { useNavigate } from "react-router-dom";
+} from 'firebase/firestore';
+import { useCallback, useEffect, useState } from 'react';
+import { auth, database, firestore } from '../firebase';
+import { User } from 'firebase/auth';
+import { child, get, ref } from 'firebase/database';
+import { useNavigate } from 'react-router-dom';
 
 interface ParticipantStatus {
   [userId: string]: boolean;
@@ -36,19 +36,19 @@ const useParticipants = (roomId?: string) => {
   const checkRoomCapacity = async (roomId: string) => {
     if (!roomId) return;
 
-    const roomRef = doc(firestore, "rooms", roomId);
+    const roomRef = doc(firestore, 'rooms', roomId);
 
     const roomSnapshot = await getDoc(roomRef);
 
     // Definir a capacidade máxima da sala
     const maxParticipants = 2;
 
-    console.log("roomSnapshot: ", roomSnapshot);
+    console.log('roomSnapshot: ', roomSnapshot);
 
     const roomData = roomSnapshot.data();
 
     if (roomData?.participants.length >= maxParticipants) {
-      navigate("/full-room");
+      navigate('/full-room');
       return;
     }
   };
@@ -57,7 +57,7 @@ const useParticipants = (roomId?: string) => {
   useEffect(() => {
     if (!roomId) return;
 
-    const roomRef = doc(firestore, "rooms", roomId);
+    const roomRef = doc(firestore, 'rooms', roomId);
 
     const unsubscribeRoom = onSnapshot(roomRef, (docSnapshot) => {
       const roomData = docSnapshot.data();
@@ -69,7 +69,7 @@ const useParticipants = (roomId?: string) => {
     // Adicionar o participante atual à sala
     const addParticipantToRoom = async () => {
       await updateDoc(roomRef, {
-        participants: arrayUnion(auth.currentUser?.uid)
+        participants: arrayUnion(auth.currentUser?.uid),
       });
     };
     addParticipantToRoom();
@@ -86,11 +86,11 @@ const useParticipants = (roomId?: string) => {
       if (snapshot.exists()) {
         const data = snapshot.val() || {};
         Object.keys(data).forEach((userId) => {
-          parsedData[userId] = data[userId].state === "online";
+          parsedData[userId] = data[userId].state === 'online';
         });
       }
     } catch (error) {
-      console.error("Error fetching participant status: ", error);
+      console.error('Error fetching participant status: ', error);
     }
 
     return parsedData;
@@ -100,7 +100,7 @@ const useParticipants = (roomId?: string) => {
   const fetchUsersByParticipants = useCallback(
     async (participants: string[], roomId: string | undefined) => {
       try {
-        const usersRef = collection(firestore, "users");
+        const usersRef = collection(firestore, 'users');
 
         // Dividir a lista de participants em chunks de no máximo 10
         const chunkedParticipants = [];
@@ -112,7 +112,7 @@ const useParticipants = (roomId?: string) => {
 
         // Executar uma consulta para cada chunk de até 10 participantes
         for (const chunk of chunkedParticipants) {
-          const usersQuery = query(usersRef, where("uid", "in", chunk));
+          const usersQuery = query(usersRef, where('uid', 'in', chunk));
           const querySnapshot = await getDocs(usersQuery);
 
           querySnapshot.docs.forEach((doc) => {
@@ -125,11 +125,11 @@ const useParticipants = (roomId?: string) => {
 
         return users;
       } catch (error) {
-        console.error("Error fetching users: ", error);
+        console.error('Error fetching users: ', error);
         return [];
       }
     },
-    []
+    [],
   );
 
   return {

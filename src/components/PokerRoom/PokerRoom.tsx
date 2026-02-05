@@ -1,20 +1,20 @@
-import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { collection, doc, onSnapshot, updateDoc } from "firebase/firestore";
-import { useTranslation } from "react-i18n-lite";
+import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { collection, doc, onSnapshot, updateDoc } from 'firebase/firestore';
+import { useTranslation } from 'react-i18n-lite';
 
-import Share from "./../Share";
-import { Card, HorizontalContainer } from "./PokerRoom.styles";
-import useRoom from "../../hooks/useRoom";
-import useVotes from "../../hooks/useVotes";
-import useParticipants, { Participant } from "../../hooks/useParticipants";
-import UserList from "../UserList";
-import { getUniqueDisplayNames, getVotingStatus } from "../../util";
-import useUserConnection from "../../hooks/useUserConnection";
-import { auth, firestore } from "../../firebase";
-import Avatar from "../Avatar";
+import Share from './../Share';
+import { Card, HorizontalContainer } from './PokerRoom.styles';
+import useRoom from '../../hooks/useRoom';
+import useVotes from '../../hooks/useVotes';
+import useParticipants, { Participant } from '../../hooks/useParticipants';
+import UserList from '../UserList';
+import { getUniqueDisplayNames, getVotingStatus } from '../../util';
+import useUserConnection from '../../hooks/useUserConnection';
+import { auth, firestore } from '../../firebase';
+import Avatar from '../Avatar';
 // import ZeClipado from "./ZeClipado/ZeClipado";
-import { useIsMobile } from "../../hooks/useIsMobile";
+import { useIsMobile } from '../../hooks/useIsMobile';
 
 const PokerRoom = () => {
   const { roomId } = useParams();
@@ -30,7 +30,7 @@ const PokerRoom = () => {
 
   const [users, setUsers] = useState<Participant[]>([]);
 
-  const votingSystem = [0, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, "?", "☕"];
+  const votingSystem = [0, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, '?', '☕'];
 
   const { enterRoom } = useUserConnection();
 
@@ -40,15 +40,17 @@ const PokerRoom = () => {
   useEffect(() => {
     if (!userId) return;
 
-    const usersRef = collection(firestore, "users");
+    const usersRef = collection(firestore, 'users');
 
     const unsubscribe = onSnapshot(usersRef, (docSnapshot) => {
       docSnapshot.docChanges().forEach((change) => {
-        if (change.type === "modified") {
+        if (change.type === 'modified') {
           const modifiedUser = change.doc.data();
 
           const userExists = users.map((user) =>
-            user.uid === modifiedUser.uid ? (modifiedUser as Participant) : user
+            user.uid === modifiedUser.uid
+              ? (modifiedUser as Participant)
+              : user,
           );
 
           setUsers(getUniqueDisplayNames(userExists));
@@ -57,9 +59,9 @@ const PokerRoom = () => {
     });
 
     const updateUser = async () => {
-      const userDocRef = doc(firestore, "users", userId);
+      const userDocRef = doc(firestore, 'users', userId);
       const userData = {
-        state: "online",
+        state: 'online',
       };
 
       await updateDoc(userDocRef, userData);
@@ -114,7 +116,7 @@ const PokerRoom = () => {
     <div className="container">
       <div className="row">
         <div className="col-12 mb-2">
-          <Share {...{ roomId }} message={t("rooms.copyRoomUrl")} />
+          <Share {...{ roomId }} message={t('rooms.copyRoomUrl')} />
         </div>
       </div>
 
@@ -126,13 +128,13 @@ const PokerRoom = () => {
                 className="btn btn-primary"
                 onClick={() => handleAfterShowVotes(!isShowVotes)}
               >
-                {`${isShowVotes ? t("pokerRoom.hideVotes") : t("pokerRoom.showVotes")}`}
+                {`${isShowVotes ? t('pokerRoom.hideVotes') : t('pokerRoom.showVotes')}`}
               </button>
               <button
                 className="btn btn-danger"
                 onClick={() => handleClearVotes(roomId)}
               >
-                {t("pokerRoom.clearVotes")}
+                {t('pokerRoom.clearVotes')}
               </button>
             </div>
           </div>
@@ -145,9 +147,9 @@ const PokerRoom = () => {
         <div className="col-md-8 col-lg-6 order-md-2 order-1 mt-md-5">
           {isShowVotes && (
             <div className="d-flex justify-content-center align-items-center flex-column">
-              <h5>{t("pokerRoom.average")}</h5>
+              <h5>{t('pokerRoom.average')}</h5>
               <div
-                style={{ width: "150px", height: "150px" }}
+                style={{ width: '150px', height: '150px' }}
                 className="d-flex justify-content-center align-items-center border border-4 rounded-circle border-dark-subtle"
               >
                 <p className="fw-bolder fs-2 m-0">
@@ -163,14 +165,14 @@ const PokerRoom = () => {
                         {votingStatus.votesGrouped[vote].map((participant) => (
                           <div
                             key={participant.uid}
-                            style={{ marginLeft: "-15px" }}
+                            style={{ marginLeft: '-15px' }}
                           >
                             <Avatar {...participant} />
                           </div>
                         ))}
                         <span
                           className="d-flex justify-content-center align-items-center rounded-2 text-bg-light fs-6 mb-0 border border-secondary"
-                          style={{ width: "32px", height: "32px" }}
+                          style={{ width: '32px', height: '32px' }}
                         >
                           {vote}
                         </span>

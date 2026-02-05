@@ -463,7 +463,12 @@
       "short_name": "New Game",
       "description": "Start a new planning poker game",
       "url": "/",
-      "icons": [{ "src": "/icons/android/android-launchericon-96-96.png", "sizes": "96x96" }]
+      "icons": [
+        {
+          "src": "/icons/android/android-launchericon-96-96.png",
+          "sizes": "96x96"
+        }
+      ]
     }
   ],
   "categories": ["productivity", "business", "utilities"],
@@ -497,4 +502,4 @@
       "label": "Planning Poker Mobile Game Session"
     }
   ]
-} 
+}

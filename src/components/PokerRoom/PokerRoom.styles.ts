@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from 'styled-components';
 
 export const HorizontalContainer = styled.div`
   display: flex;
@@ -20,7 +20,7 @@ export const Card = styled.button<{ checked: boolean }>`
   justify-content: center;
   position: relative;
 
-  ${({ checked }) => checked && "background-color: #007bff; color: #fff;"}
+  ${({ checked }) => checked && 'background-color: #007bff; color: #fff;'}
 
   .corner-top-left {
     position: absolute;
