@@ -42,7 +42,6 @@ service cloud.firestore {
 
     // Regras para usuários
     match /users/{userId} {
-      // Permitimos leitura apenas com Auth para evitar race conditions no login
       allow read: if isAuthenticated();
       allow create: if isAuthenticated() && isAppChecked() && isOwner(userId) && isValidUserData();
       allow update: if isAuthenticated() && isAppChecked() && isOwner(userId) && isValidUserData();
@@ -51,7 +50,7 @@ service cloud.firestore {
 
     // Regras para salas
     match /rooms/{roomId} {
-      allow read: if isAuthenticated() && isAppChecked();
+      allow read: if isAuthenticated();
       allow create: if isAuthenticated() && isAppChecked() && isValidRoomData() && isOwner(request.resource.data.createdBy);
       allow update: if isAuthenticated() && isAppChecked() && 
         (isOwner(resource.data.createdBy) || 
@@ -60,7 +59,7 @@ service cloud.firestore {
       
       // Regras para votos
       match /votes/{voteId} {
-        allow read: if isAuthenticated() && isAppChecked();
+        allow read: if isAuthenticated();
         allow create: if isAuthenticated() && isAppChecked() && 
           request.resource.data.keys().hasAll(['userId', 'voteValue', 'votedAt', 'roomId']) &&
           request.resource.data.userId == request.auth.uid &&
