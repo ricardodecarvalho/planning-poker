@@ -6,6 +6,10 @@ service cloud.firestore {
     function isAuthenticated() {
       return request.auth != null;
     }
+
+    function isAppChecked() {
+      return request.appCheckToken != null;
+    }
     
     function isOwner(userId) {
       return request.auth.uid == userId;
@@ -38,37 +42,37 @@ service cloud.firestore {
 
     // Regras para usuários
     match /users/{userId} {
-      allow read: if isAuthenticated();
-      allow create: if isAuthenticated() && isOwner(userId) && isValidUserData();
-      allow update: if isAuthenticated() && isOwner(userId) && isValidUserData();
+      allow read: if isAuthenticated() && isAppChecked();
+      allow create: if isAuthenticated() && isAppChecked() && isOwner(userId) && isValidUserData();
+      allow update: if isAuthenticated() && isAppChecked() && isOwner(userId) && isValidUserData();
       allow delete: if false;
     }
 
     // Regras para salas
     match /rooms/{roomId} {
-      allow read: if isAuthenticated();
-      allow create: if isAuthenticated() && isValidRoomData() && isOwner(request.resource.data.createdBy);
-      allow update: if isAuthenticated() && 
+      allow read: if isAuthenticated() && isAppChecked();
+      allow create: if isAuthenticated() && isAppChecked() && isValidRoomData() && isOwner(request.resource.data.createdBy);
+      allow update: if isAuthenticated() && isAppChecked() && 
         (isOwner(resource.data.createdBy) || 
          (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['showVotes', 'participants']) && isAuthenticated()));
-      allow delete: if isAuthenticated() && isOwner(resource.data.createdBy);
+      allow delete: if isAuthenticated() && isAppChecked() && isOwner(resource.data.createdBy);
       
       // Regras para votos
       match /votes/{voteId} {
-        allow read: if isAuthenticated();
-        allow create: if isAuthenticated() && 
+        allow read: if isAuthenticated() && isAppChecked();
+        allow create: if isAuthenticated() && isAppChecked() && 
           request.resource.data.keys().hasAll(['userId', 'voteValue', 'votedAt', 'roomId']) &&
           request.resource.data.userId == request.auth.uid &&
           request.resource.data.roomId == roomId;
-        allow update: if isAuthenticated() && resource.data.userId == request.auth.uid;
-        allow delete: if isAuthenticated() && 
+        allow update: if isAuthenticated() && isAppChecked() && resource.data.userId == request.auth.uid;
+        allow delete: if isAuthenticated() && isAppChecked() && 
           (resource.data.userId == request.auth.uid || isRoomOwner(roomId));
       }
     }
 
     // Regras para consultas de salas
     match /rooms/{document=**} {
-      allow list: if isAuthenticated() && 
+      allow list: if isAuthenticated() && isAppChecked() && 
         (request.query.limit <= 20) && 
         (request.query.orderBy == "createdAt" || !request.query.orderBy) &&
         (request.query.where == "createdBy" || !request.query.where);

@@ -40,11 +40,17 @@ if (import.meta.env.DEV) {
   connectDatabaseEmulator(database, 'localhost', 9000);
   connectStorageEmulator(storage, 'localhost', 9199);
   connectFunctionsEmulator(functions, 'localhost', 5001);
+
+  // Habilita o App Check Debug Token localmente
+  // @ts-ignore
+  self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
 } else {
   functions = getFunctions(app, REGION);
-
-  initializeAppCheck(app, {
-    provider: new ReCaptchaV3Provider(import.meta.env.VITE_RECAPTCHA_SITE_KEY),
-    isTokenAutoRefreshEnabled: true,
-  });
 }
+
+initializeAppCheck(app, {
+  provider: new ReCaptchaV3Provider(
+    import.meta.env.VITE_RECAPTCHA_SITE_KEY || '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI', // Site key de teste se não houver no .env
+  ),
+  isTokenAutoRefreshEnabled: true,
+});

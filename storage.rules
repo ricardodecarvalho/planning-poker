@@ -2,19 +2,23 @@ rules_version = '2';
 
 service firebase.storage {
   match /b/{bucket}/o {
+    function isAppChecked() {
+      return request.appCheckToken != null;
+    }
+
     match /users/{userId}/{allPaths=**} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null && request.auth.uid == userId;
+      allow read: if request.auth != null && isAppChecked();
+      allow write: if request.auth != null && request.auth.uid == userId && isAppChecked();
     }
 
     match /rooms/{roomId}/{allPaths=**} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null;
+      allow read: if request.auth != null && isAppChecked();
+      allow write: if request.auth != null && isAppChecked();
     }
 
     match /public/{allPaths=**} {
-      allow read: if true;
-      allow write: if request.auth != null;
+      allow read: if isAppChecked();
+      allow write: if request.auth != null && isAppChecked();
     }
 
     match /{allPaths=**} {
