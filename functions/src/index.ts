@@ -70,10 +70,7 @@ type Vote = {
 };
 
 export const chatAssistant = onCall(
-  {
-    region: REGION,
-    enforceAppCheck: true, // Garante que a chamada venha de um app verificado
-  },
+  { region: REGION },
   async ({ data }: { data: Data }) => {
     const { votes, language } = data;
 
