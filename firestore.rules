@@ -8,9 +8,7 @@ service cloud.firestore {
     }
 
     function isAppChecked() {
-      // Temporariamente retornando true para depurar falha em produção
-      // return request.appCheckToken != null;
-      return true;
+      return request.appCheckToken != null;
     }
     
     function isOwner(userId) {

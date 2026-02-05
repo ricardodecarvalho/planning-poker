@@ -48,8 +48,6 @@ if (import.meta.env.DEV) {
   functions = getFunctions(app, REGION);
 }
 
-console.log('Initializing App Check with key:', import.meta.env.VITE_RECAPTCHA_SITE_KEY ? 'Present' : 'Missing');
-
 initializeAppCheck(app, {
   provider: new ReCaptchaV3Provider(
     import.meta.env.VITE_RECAPTCHA_SITE_KEY || '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI',
