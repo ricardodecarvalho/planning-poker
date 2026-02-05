@@ -69,37 +69,42 @@ type Vote = {
   value: string;
 };
 
-export const chatAssistant = onCall(
-  { region: REGION },
-  async ({ data }: { data: Data }) => {
-    const { votes, language } = data;
+export const chatAssistant = onCall({ region: REGION }, async (request) => {
+  // Verificar App Check
+  if (!request.app) {
+    throw new HttpsError(
+      'failed-precondition',
+      'The function must be called from an App Check verified app.',
+    );
+  }
 
-    const systemPrompt = instructions[language];
+  const { votes, language } = request.data as Data;
 
-    try {
-      const response = await openai.chat.completions.create({
-        model,
-        messages: [
-          {
-            role: 'system',
-            content: systemPrompt,
-          },
-          {
-            role: 'user',
-            content: JSON.stringify(votes),
-          },
-        ],
-        max_tokens: 100,
-        temperature: 0.8,
-      });
+  const systemPrompt = instructions[language];
 
-      return response.choices[0].message.content;
-    } catch (error) {
-      console.error('Erro ao chamar OpenAI:', error);
-      throw new HttpsError(
-        'internal',
-        'Erro ao processar a solicitação com OpenAI',
-      );
-    }
-  },
-);
+  try {
+    const response = await openai.chat.completions.create({
+      model,
+      messages: [
+        {
+          role: 'system',
+          content: systemPrompt,
+        },
+        {
+          role: 'user',
+          content: JSON.stringify(votes),
+        },
+      ],
+      max_tokens: 100,
+      temperature: 0.8,
+    });
+
+    return response.choices[0].message.content;
+  } catch (error) {
+    console.error('Erro ao chamar OpenAI:', error);
+    throw new HttpsError(
+      'internal',
+      'Erro ao processar a solicitação com OpenAI',
+    );
+  }
+});
