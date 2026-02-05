@@ -24,8 +24,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 
 export const auth = getAuth(app);
-// Evita problemas de COOP em alguns ambientes
-auth.config.stopNextCheck = true; 
 
 export const firestore = getFirestore(app);
 export const database = getDatabase(); // Realtime Database
