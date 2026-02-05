@@ -19,6 +19,16 @@ export const onUserUpdate = onValueDeleted(
     try {
       console.log(`User ${userId} updated from room ${roomId}`);
 
+      // Verify if user is still online in Realtime Database
+      const db = admin.database();
+      const presenceRef = db.ref(`presence/${roomId}/${userId}`);
+      const snapshot = await presenceRef.once('value');
+
+      if (snapshot.exists()) {
+        console.log(`User ${userId} is still online. Aborting offline update.`);
+        return;
+      }
+
       const userDoc = firestore.collection('users').doc(userId);
       const userSnapshot = await userDoc.get();
 
