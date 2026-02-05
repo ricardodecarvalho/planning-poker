@@ -1,10 +1,10 @@
 {
-  "login": {
-    "loginWithGoogle": "Entrar usando o Google",
-    "welcomeTo": "Bem-vindo ao",
-    "success": "Login com Google realizado com sucesso",
-    "error": "Erro ao realizar login com Google",
-    "language": "Idioma"
+    "login": {
+      "loginWithGoogle": "Entrar usando o Google",
+      "welcomeTo": "Bem-vindo ao",
+      "success": "Login com Google realizado com sucesso",
+      "error": "Erro ao realizar login com Google",
+      "language": "Idioma"
   },
   "rooms": {
     "recentRooms": "Salas Recentes",
@@ -47,24 +47,12 @@
     "waitingForVote": "Aguardando votação",
     "voted": "Votou",
     "average": "Média",
-    "mostCommon": "Mais comum",
-    "fullRoom": "A sala está cheia :("
+    "fullRoom": "A sala está cheia :("  
   },
   "votes": {
     "errorClearingVotesNoRoomId": "Erro ao limpar votos, não foi fornecido um ID de sala",
     "errorClearingVotes": "Erro ao limpar votos",
     "errorUpdatingRoom": "Erro ao atualizar a sala",
     "errorAddingVote": "Erro ao adicionar voto"
-  },
-  "votingSystem": {
-    "changed": "Sistema de votação alterado com sucesso",
-    "errorChanging": "Erro ao alterar sistema de votação",
-    "cannotChangeWithActiveVotes": "Não é possível alterar o sistema enquanto houver votos ativos. Limpe os votos primeiro."
-  },
-  "viewToggle": {
-    "table": "Mesa",
-    "list": "Lista",
-    "tableView": "Visualização de mesa",
-    "listView": "Visualização de lista"
   }
 }

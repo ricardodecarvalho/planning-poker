@@ -1,11 +1,11 @@
-import { Participant } from '../hooks/useParticipants';
-import { UserColorScheme } from '../util';
+import { Participant } from "../hooks/useParticipants";
+import { UserColorScheme } from "../util";
 
 const initials = (displayName: string) => {
   return displayName
-    .split(' ')
+    .split(" ")
     .map((name) => name[0])
-    .join('');
+    .join("");
 };
 
 const classes = (colorScheme: UserColorScheme) => {
@@ -23,21 +23,21 @@ const Avatar = ({
   state,
   isShowState = true,
 }: AvatarProps) => {
-  const isOnline = state === 'online';
-  const bg = isOnline ? 'bg-success' : 'bg-danger';
+  const isOnline = state === "online";
+  const bg = isOnline ? "bg-success" : "bg-danger";
 
   if (!photoURL && displayName) {
     return (
       <span
-        title={displayName || ''}
+        title={displayName || ""}
         className={`rounded-circle me-2 border border-2 border-white ${classes(
-          colorScheme,
+          colorScheme
         )} d-flex justify-content-center align-items-center position-relative`}
         style={{
           width: 32,
           height: 32,
           fontSize: 12,
-          fontWeight: 'bold',
+          fontWeight: "bold",
         }}
       >
         {initials(displayName)}
@@ -61,7 +61,7 @@ const Avatar = ({
           width: 32,
           height: 32,
           fontSize: 12,
-          fontWeight: 'bold',
+          fontWeight: "bold",
         }}
       >
         <img
@@ -70,7 +70,7 @@ const Avatar = ({
           width="32"
           height="32"
           className="rounded-circle me-2 border border-2 border-white"
-          title={displayName || ''}
+          title={displayName || ""}
         />
         {isShowState && (
           <span

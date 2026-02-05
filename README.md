@@ -16,7 +16,6 @@ A Planning Poker tool to help agile teams estimate the development effort of tas
 - [License](#license)
 
 ## Installation
-
 Follow these steps to install the project locally:
 
 ```bash
@@ -31,7 +30,6 @@ yarn
 ```
 
 ### Firebase Functions
-
 To run Firebase Functions in development mode:
 
 ```bash
@@ -40,7 +38,6 @@ npm run build
 ```
 
 ## Usage
-
 Here are some examples of how to use Planning Poker:
 
 ```bash
@@ -52,7 +49,6 @@ http://localhost:5173/
 ```
 
 ## Firebase Emulator
-
 Accurately emulate Firebase services behavior.
 
 ```bash
@@ -62,50 +58,42 @@ firebase init emulators
 # Start the emulator
 firebase emulators:start
 ```
-
 [Introduction to Firebase Local Emulator Suite](https://firebase.google.com/docs/emulator-suite)
 
 ## Features
-
-- Login with Google.
-- Creating Planning Poker sessions.
-- Real-time participation.
-- Chat GPT Assistant.
+* Login with Google.
+* Creating Planning Poker sessions.
+* Real-time participation.
+* Chat GPT Assistant.
 
 ## Technologies Used
-
-- React
-- Vite
-- TypeScript
-- Firebase
+* React
+* Vite
+* TypeScript
+* Firebase
 
 ## Contribution
-
 If you want to contribute to this project, follow the steps below:
 
-- Fork the project
-- Create a branch for your feature (`git checkout -b feature/new-feature`)
-- Commit your changes (`git commit -am 'Add new feature'`)
-- Push to the branch (`git push origin feature/new-feature`)
-- Open a Pull Request
+* Fork the project
+* Create a branch for your feature (`git checkout -b feature/new-feature`)
+* Commit your changes (`git commit -am 'Add new feature'`)
+* Push to the branch (`git push origin feature/new-feature`)
+* Open a Pull Request
 
 ### Good First Issues
-
-- Tests
-- Refactoring
-- Security
-- Remove rooms based on inactivity period
+* Tests
+* Refactoring
+* Security
+* Remove rooms based on inactivity period
 
 ### Doing
-
-- Sign in anonymously
-- Logint with email and password
+* Sign in anonymously
+* Logint with email and password
 
 ### Backlog
-
-- Jira Integration
-- PWA to an Android App
+* Jira Integration
+* PWA to an Android App
 
 ## License
-
 This project is licensed under the [MIT License](https://mit-license.org/).

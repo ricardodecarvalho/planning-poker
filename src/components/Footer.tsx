@@ -1,9 +1,9 @@
-import styled from 'styled-components';
+import styled from "styled-components";
 
-import GitHubLogo from '../assets/images/github-mark.svg';
-import GitHubLogoWhite from '../assets/images/github-mark-white.svg';
-import useThemeContext from '../context/useThemeContext';
-import { useTranslation } from 'react-i18n-lite';
+import GitHubLogo from "../assets/images/github-mark.svg";
+import GitHubLogoWhite from "../assets/images/github-mark-white.svg";
+import useThemeContext from "../context/useThemeContext";
+import { useTranslation } from "react-i18n-lite";
 
 const DONATE_LINK = import.meta.env.VITE_DONATE_LINK;
 
@@ -34,21 +34,21 @@ const Footer = () => {
       <FooterContainer>
         <GitHub className="mb-3">
           <img
-            src={theme === 'dark' ? GitHubLogoWhite : GitHubLogo}
-            alt={t('navbar.repository')}
+            src={theme === "dark" ? GitHubLogoWhite : GitHubLogo}
+            alt={t("navbar.repository")}
             height={24}
           />
           <a
             target="_blank"
             href="https://github.com/ricardodecarvalho/planning-poker"
           >
-            {t('navbar.repository')}
+            {t("navbar.repository")}
           </a>
         </GitHub>
-        {' | '}
+        {" | "}
         <Donate>
           <a target="_blank" href={DONATE_LINK}>
-            {t('navbar.donate')}
+            {t("navbar.donate")}
           </a>
         </Donate>
       </FooterContainer>

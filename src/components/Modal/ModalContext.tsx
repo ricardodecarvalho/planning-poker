@@ -1,5 +1,5 @@
-import React, { useState, createContext } from 'react';
-import { useTranslation } from 'react-i18n-lite';
+import React, { useState, createContext } from "react";
+import { useTranslation } from "react-i18n-lite";
 
 interface ModalData {
   title: string;
@@ -22,7 +22,7 @@ interface ModalProviderProps {
 }
 
 export const ModalContext = createContext<ModalContextProps | undefined>(
-  undefined,
+  undefined
 );
 
 const ModalProvider = ({ children }: ModalProviderProps) => {
@@ -50,8 +50,8 @@ const ModalProvider = ({ children }: ModalProviderProps) => {
       {children}
       <Modal
         isOpen={isModalOpen}
-        title={modalData?.title || ''}
-        message={modalData?.message || ''}
+        title={modalData?.title || ""}
+        message={modalData?.message || ""}
         onConfirm={handleConfirm}
         onClose={closeModal}
         onConfirmButtonClass={modalData?.onConfirmButtonClass}
@@ -94,7 +94,7 @@ const Modal: React.FC<ModalProps> = ({
     <div
       className="modal"
       tabIndex={-1}
-      style={{ display: 'block', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
+      style={{ display: "block", backgroundColor: "rgba(0, 0, 0, 0.5)" }}
     >
       <div className="modal-dialog">
         <div className="modal-content">
@@ -114,18 +114,18 @@ const Modal: React.FC<ModalProps> = ({
           <div className="modal-footer">
             <button
               type="button"
-              className={`btn ${onCloseButtonClass || 'btn-secondary'}`}
+              className={`btn ${onCloseButtonClass || "btn-secondary"}`}
               onClick={onClose}
             >
-              {onCloseButtonText || t('modal.cancel')}
+              {onCloseButtonText || t("modal.cancel")}
             </button>
             {onConfirm && (
               <button
                 type="button"
-                className={`btn ${onConfirmButtonClass || 'btn-primary'}`}
+                className={`btn ${onConfirmButtonClass || "btn-primary"}`}
                 onClick={onConfirm}
               >
-                {onConfirmButtonText || t('modal.confirm')}
+                {onConfirmButtonText || t("modal.confirm")}
               </button>
             )}
           </div>

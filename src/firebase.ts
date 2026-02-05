@@ -1,14 +1,14 @@
-import { initializeApp } from 'firebase/app';
-import { connectAuthEmulator, getAuth } from 'firebase/auth';
-import { connectFirestoreEmulator, getFirestore } from 'firebase/firestore';
-import { connectDatabaseEmulator, getDatabase } from 'firebase/database';
-import { connectStorageEmulator, getStorage } from 'firebase/storage';
-import { initializeAppCheck, ReCaptchaV3Provider } from '@firebase/app-check';
+import { initializeApp } from "firebase/app";
+import { connectAuthEmulator, getAuth } from "firebase/auth";
+import { connectFirestoreEmulator, getFirestore } from "firebase/firestore";
+import { connectDatabaseEmulator, getDatabase } from "firebase/database";
+import { connectStorageEmulator, getStorage } from "firebase/storage";
+import { initializeAppCheck, ReCaptchaV3Provider } from "@firebase/app-check";
 import {
   connectFunctionsEmulator,
   Functions,
   getFunctions,
-} from 'firebase/functions';
+} from "firebase/functions";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -30,16 +30,16 @@ export const storage = getStorage(app);
 
 export let functions: Functions;
 
-const REGION = 'us-central1';
+const REGION = "us-central1";
 
 if (import.meta.env.DEV) {
   functions = getFunctions(app);
 
-  connectAuthEmulator(auth, 'http://127.0.0.1:5005');
-  connectFirestoreEmulator(firestore, 'localhost', 8080);
-  connectDatabaseEmulator(database, 'localhost', 9000);
-  connectStorageEmulator(storage, 'localhost', 9199);
-  connectFunctionsEmulator(functions, 'localhost', 5001);
+  connectAuthEmulator(auth, "http://127.0.0.1:5005");
+  connectFirestoreEmulator(firestore, "localhost", 8080);
+  connectDatabaseEmulator(database, "localhost", 9000);
+  connectStorageEmulator(storage, "localhost", 9199);
+  connectFunctionsEmulator(functions, "localhost", 5001);
 } else {
   functions = getFunctions(app, REGION);
 

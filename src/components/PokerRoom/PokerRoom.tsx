@@ -1,30 +1,20 @@
-import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { collection, doc, onSnapshot, updateDoc } from 'firebase/firestore';
-import { useTranslation } from 'react-i18n-lite';
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { collection, doc, onSnapshot, updateDoc } from "firebase/firestore";
+import { useTranslation } from "react-i18n-lite";
 
-import Share from './../Share';
-import {
-  Card,
-  CardContainer,
-  HorizontalContainer,
-  PokerTableContainer,
-} from './PokerRoom.styles';
-import useRoom from '../../hooks/useRoom';
-import useVotes from '../../hooks/useVotes';
-import useParticipants, { Participant } from '../../hooks/useParticipants';
-import UserList from '../UserList';
-import { getUniqueDisplayNames, getVotingStatus } from '../../util';
-import useUserConnection from '../../hooks/useUserConnection';
-import { auth, firestore } from '../../firebase';
-import Avatar from '../Avatar';
-import PokerTable from '../PokerTable/PokerTable';
+import Share from "./../Share";
+import { Card, HorizontalContainer } from "./PokerRoom.styles";
+import useRoom from "../../hooks/useRoom";
+import useVotes from "../../hooks/useVotes";
+import useParticipants, { Participant } from "../../hooks/useParticipants";
+import UserList from "../UserList";
+import { getUniqueDisplayNames, getVotingStatus } from "../../util";
+import useUserConnection from "../../hooks/useUserConnection";
+import { auth, firestore } from "../../firebase";
+import Avatar from "../Avatar";
 // import ZeClipado from "./ZeClipado/ZeClipado";
-import { useIsMobile } from '../../hooks/useIsMobile';
-import { VOTING_SYSTEMS, VotingSystemType } from '../../types/votingSystems';
-import VotingSystemSelector from '../VotingSystemSelector';
-import { useViewPreference } from '../../hooks/useViewPreference';
-import ViewToggle from '../ViewToggle';
+import { useIsMobile } from "../../hooks/useIsMobile";
 
 const PokerRoom = () => {
   const { roomId } = useParams();
@@ -39,12 +29,8 @@ const PokerRoom = () => {
   const { participants, fetchUsersByParticipants } = useParticipants(roomId);
 
   const [users, setUsers] = useState<Participant[]>([]);
-  const [votingSystemType, setVotingSystemType] =
-    useState<VotingSystemType>('fibonacci');
 
-  const votingSystem = VOTING_SYSTEMS[votingSystemType].values;
-
-  const { viewType, toggleView } = useViewPreference();
+  const votingSystem = [0, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, "?", "☕"];
 
   const { enterRoom } = useUserConnection();
 
@@ -54,17 +40,15 @@ const PokerRoom = () => {
   useEffect(() => {
     if (!userId) return;
 
-    const usersRef = collection(firestore, 'users');
+    const usersRef = collection(firestore, "users");
 
     const unsubscribe = onSnapshot(usersRef, (docSnapshot) => {
       docSnapshot.docChanges().forEach((change) => {
-        if (change.type === 'modified') {
+        if (change.type === "modified") {
           const modifiedUser = change.doc.data();
 
           const userExists = users.map((user) =>
-            user.uid === modifiedUser.uid
-              ? (modifiedUser as Participant)
-              : user,
+            user.uid === modifiedUser.uid ? (modifiedUser as Participant) : user
           );
 
           setUsers(getUniqueDisplayNames(userExists));
@@ -73,9 +57,9 @@ const PokerRoom = () => {
     });
 
     const updateUser = async () => {
-      const userDocRef = doc(firestore, 'users', userId);
+      const userDocRef = doc(firestore, "users", userId);
       const userData = {
-        state: 'online',
+        state: "online",
       };
 
       await updateDoc(userDocRef, userData);
@@ -95,22 +79,6 @@ const PokerRoom = () => {
     if (!roomId) return;
     checkRoom({ roomId });
   }, [checkRoom, roomId]);
-
-  // Sincronizar o sistema de votação em tempo real
-  useEffect(() => {
-    if (!roomId) return;
-
-    const roomRef = doc(firestore, 'rooms', roomId);
-
-    const unsubscribe = onSnapshot(roomRef, (docSnapshot) => {
-      const roomData = docSnapshot.data();
-      if (roomData?.votingSystem) {
-        setVotingSystemType(roomData.votingSystem as VotingSystemType);
-      }
-    });
-
-    return () => unsubscribe();
-  }, [roomId]);
 
   // Buscar os usuários pelos IDs dos participantes
   useEffect(() => {
@@ -143,107 +111,81 @@ const PokerRoom = () => {
   // }));
 
   return (
-    <div className="container" style={{ paddingBottom: '150px' }}>
+    <div className="container">
       <div className="row">
         <div className="col-12 mb-2">
-          <Share {...{ roomId }} message={t('rooms.copyRoomUrl')} />
+          <Share {...{ roomId }} message={t("rooms.copyRoomUrl")} />
         </div>
       </div>
 
       <div className="row">
-        <div className="col-md-4 col-lg-3 order-md-1 order-2 mt-1 mt-md-3">
-          {isRoomOwner && (
-            <>
-              <div className="mb-3">
-                <VotingSystemSelector
-                  roomId={roomId || ''}
-                  currentSystem={votingSystemType}
-                  hasActiveVotes={votes.length > 0}
-                />
-              </div>
-              <div className="d-grid gap-2 d-md-flex mb-3">
-                <button
-                  className="btn btn-primary"
-                  onClick={() => handleAfterShowVotes(!isShowVotes)}
-                >
-                  {`${isShowVotes ? t('pokerRoom.hideVotes') : t('pokerRoom.showVotes')}`}
-                </button>
-                <button
-                  className="btn btn-danger"
-                  onClick={() => handleClearVotes(roomId)}
-                >
-                  {t('pokerRoom.clearVotes')}
-                </button>
-              </div>
-            </>
-          )}
-          <div className="mb-3">
-            <ViewToggle viewType={viewType} onToggle={toggleView} />
+        {isRoomOwner && (
+          <div className="col-md-12 col-lg-3 order-lg-3 order-1 mb-4">
+            <div className="d-grid gap-2 d-md-flex justify-content-md-end">
+              <button
+                className="btn btn-primary"
+                onClick={() => handleAfterShowVotes(!isShowVotes)}
+              >
+                {`${isShowVotes ? t("pokerRoom.hideVotes") : t("pokerRoom.showVotes")}`}
+              </button>
+              <button
+                className="btn btn-danger"
+                onClick={() => handleClearVotes(roomId)}
+              >
+                {t("pokerRoom.clearVotes")}
+              </button>
+            </div>
           </div>
+        )}
+
+        <div className="col-md-4 col-lg-3 order-md-1 order-2 mt-1 mt-md-3">
           <UserList {...{ votingStatus, isShowVotes }} />
         </div>
 
-        <PokerTableContainer className="col-md-8 order-md-2 order-1 mt-md-5">
-          {viewType === 'table' ? (
-            <PokerTable
-              votingStatus={votingStatus}
-              isShowVotes={isShowVotes}
-              users={users}
-              votingSystemType={votingSystemType}
-            />
-          ) : (
-            isShowVotes && (
-              <div className="d-flex justify-content-center align-items-center flex-column mt-4">
-                <h5>
-                  {votingSystemType !== 't-shirt'
-                    ? t('pokerRoom.average')
-                    : t('pokerRoom.mostCommon')}
-                </h5>
-                <div
-                  style={{ width: '150px', height: '150px' }}
-                  className="d-flex justify-content-center align-items-center border border-4 rounded-circle border-dark-subtle"
-                >
-                  <p className="fw-bolder fs-2 m-0">
-                    {votingSystemType !== 't-shirt'
-                      ? votingStatus.average.toFixed(2)
-                      : votingStatus.mostCommon || '-'}
-                  </p>
-                </div>
-
-                <div className="mt-3 mt-md-3">
-                  <ul className="list-group list-group-flush">
-                    {Object.keys(votingStatus.votesGrouped).map((vote) => (
-                      <li key={vote} className="list-group-item ps-5 pe-5">
-                        <div className="d-flex justify-content-end align-items-center">
-                          {votingStatus.votesGrouped[vote].map(
-                            (participant) => (
-                              <div
-                                key={participant.uid}
-                                style={{ marginLeft: '-15px' }}
-                              >
-                                <Avatar {...participant} />
-                              </div>
-                            ),
-                          )}
-                          <span
-                            className="d-flex justify-content-center align-items-center rounded-2 text-bg-light fs-6 mb-0 border border-secondary"
-                            style={{ width: '32px', height: '32px' }}
-                          >
-                            {vote}
-                          </span>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+        <div className="col-md-8 col-lg-6 order-md-2 order-1 mt-md-5">
+          {isShowVotes && (
+            <div className="d-flex justify-content-center align-items-center flex-column">
+              <h5>{t("pokerRoom.average")}</h5>
+              <div
+                style={{ width: "150px", height: "150px" }}
+                className="d-flex justify-content-center align-items-center border border-4 rounded-circle border-dark-subtle"
+              >
+                <p className="fw-bolder fs-2 m-0">
+                  {votingStatus.average.toFixed(2)}
+                </p>
               </div>
-            )
+
+              <div className="mt-3 mt-md-3">
+                <ul className="list-group list-group-flush">
+                  {Object.keys(votingStatus.votesGrouped).map((vote) => (
+                    <li key={vote} className="list-group-item ps-5 pe-5">
+                      <div className="d-flex justify-content-end align-items-center">
+                        {votingStatus.votesGrouped[vote].map((participant) => (
+                          <div
+                            key={participant.uid}
+                            style={{ marginLeft: "-15px" }}
+                          >
+                            <Avatar {...participant} />
+                          </div>
+                        ))}
+                        <span
+                          className="d-flex justify-content-center align-items-center rounded-2 text-bg-light fs-6 mb-0 border border-secondary"
+                          style={{ width: "32px", height: "32px" }}
+                        >
+                          {vote}
+                        </span>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
           )}
-        </PokerTableContainer>
+        </div>
       </div>
 
       {/* Cards */}
-      <CardContainer>
+      <div className="mt-5">
         <HorizontalContainer>
           {votingSystem.map((value) => (
             <Card
@@ -259,7 +201,7 @@ const PokerRoom = () => {
             </Card>
           ))}
         </HorizontalContainer>
-      </CardContainer>
+      </div>
 
       {/* {isRoomOwner && <ZeClipado votes={votesArray} isShowVotes={isShowVotes} />} */}
     </div>

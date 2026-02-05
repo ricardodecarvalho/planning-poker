@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 import {
   collection,
   deleteDoc,
@@ -8,10 +8,10 @@ import {
   onSnapshot,
   setDoc,
   updateDoc,
-} from 'firebase/firestore';
-import { auth, firestore } from '../firebase';
-import { toast } from 'react-toastify';
-import { useTranslation } from 'react-i18n-lite';
+} from "firebase/firestore";
+import { auth, firestore } from "../firebase";
+import { toast } from "react-toastify";
+import { useTranslation } from "react-i18n-lite";
 
 export interface Vote {
   userId: string;
@@ -31,7 +31,7 @@ const useVotes = (roomId: string | undefined) => {
   useEffect(() => {
     if (!roomId) return;
 
-    const roomRef = doc(firestore, 'rooms', roomId);
+    const roomRef = doc(firestore, "rooms", roomId);
 
     const unsubscribeRoom = onSnapshot(roomRef, (docSnapshot) => {
       const roomData = docSnapshot.data();
@@ -63,8 +63,8 @@ const useVotes = (roomId: string | undefined) => {
 
   const clearVotes = async (roomId: string | undefined) => {
     if (!roomId) {
-      console.error('No room ID provided');
-      toast.error(t('votes.errorClearingVotesNoRoomId'));
+      console.error("No room ID provided");
+      toast.error(t("votes.errorClearingVotesNoRoomId"));
       return;
     }
 
@@ -81,8 +81,8 @@ const useVotes = (roomId: string | undefined) => {
       setVote(null);
       handleShowVotes(false);
     } catch (error) {
-      console.error('Error clearing votes: ', error);
-      toast.error(t('votes.errorClearingVotes'));
+      console.error("Error clearing votes: ", error);
+      toast.error(t("votes.errorClearingVotes"));
     }
   };
 
@@ -90,15 +90,15 @@ const useVotes = (roomId: string | undefined) => {
     if (!roomId) return;
 
     try {
-      const roomRef = doc(firestore, 'rooms', roomId);
+      const roomRef = doc(firestore, "rooms", roomId);
 
       await updateDoc(roomRef, {
         showVotes: action,
       });
       setIsShowVotes(action);
     } catch (error) {
-      console.error('Error updating room: ', error);
-      toast.error(t('votes.errorUpdatingRoom'));
+      console.error("Error updating room: ", error);
+      toast.error(t("votes.errorUpdatingRoom"));
     }
   };
 
@@ -107,7 +107,7 @@ const useVotes = (roomId: string | undefined) => {
       const userId = auth.currentUser?.uid;
       const voteRef = doc(
         collection(firestore, `rooms/${roomId}/votes`),
-        userId,
+        userId
       );
 
       const voteSnapshot = await getDoc(voteRef);
@@ -133,8 +133,8 @@ const useVotes = (roomId: string | undefined) => {
       await setDoc(voteRef, voteData);
       setVote(voteValue);
     } catch (error) {
-      console.error('Error adding document: ', error);
-      toast.error(t('votes.errorAddingVote'));
+      console.error("Error adding document: ", error);
+      toast.error(t("votes.errorAddingVote"));
     }
   };
 

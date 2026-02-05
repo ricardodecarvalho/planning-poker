@@ -1,8 +1,8 @@
-import styled from 'styled-components';
-import ZeClipadoPNG from './assets/ze-clipado.png';
-import { useIsMobile } from '../../../hooks/useIsMobile';
-import useChatAssistant, { Vote } from '../../../hooks/useChatAssistant';
-import { useEffect, useState } from 'react';
+import styled from "styled-components";
+import ZeClipadoPNG from "./assets/ze-clipado.png";
+import { useIsMobile } from "../../../hooks/useIsMobile";
+import useChatAssistant, { Vote } from "../../../hooks/useChatAssistant";
+import { useEffect, useState } from "react";
 
 type ZeClipadoProps = {
   votes: Vote[];
@@ -34,11 +34,9 @@ const Message = styled.p`
 `;
 
 const StyledButton = styled.button<{ $show: boolean }>`
-  transform: translateY(${(p) => (p.$show ? '0' : '100%')});
+  transform: translateY(${(p) => (p.$show ? "0" : "100%")});
   opacity: ${(p) => (p.$show ? 1 : 0)};
-  transition:
-    transform 0.3s ease-in-out,
-    opacity 0.3s ease-in-out;
+  transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
 
   background: none;
   border: none;
@@ -47,14 +45,14 @@ const StyledButton = styled.button<{ $show: boolean }>`
 `;
 
 const ZeClipado = ({ votes, isShowVotes }: ZeClipadoProps) => {
-  const [message, setMessage] = useState<string>('');
+  const [message, setMessage] = useState<string>("");
 
   const { sendToChatAssistant, loading: isLoadingChatAssistant } =
     useChatAssistant();
 
   useEffect(() => {
     if (votes.length === 0 || !isShowVotes) {
-      setMessage('');
+      setMessage("");
     }
   }, [votes, isShowVotes]);
 
@@ -73,8 +71,8 @@ const ZeClipado = ({ votes, isShowVotes }: ZeClipadoProps) => {
         setMessage(response);
       })
       .catch((error) => {
-        setMessage('Ops, algo deu errado. buguei!');
-        console.error('Error sending votes to chat assistant:', error);
+        setMessage("Ops, algo deu errado. buguei!");
+        console.error("Error sending votes to chat assistant:", error);
       });
   };
 
@@ -89,7 +87,7 @@ const ZeClipado = ({ votes, isShowVotes }: ZeClipadoProps) => {
       {message && (
         <div
           className="alert alert-light"
-          style={{ margin: 0, marginRight: '-40px' }}
+          style={{ margin: 0, marginRight: "-40px" }}
         >
           <Message>{message}</Message>
         </div>

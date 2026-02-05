@@ -1,5 +1,5 @@
-import { Participant } from './hooks/useParticipants';
-import { Vote } from './hooks/useVotes';
+import { Participant } from "./hooks/useParticipants";
+import { Vote } from "./hooks/useVotes";
 
 export const getUniqueDisplayNames = (users: Participant[]) => {
   const nameOccurrences: Record<string, number> = {};
@@ -10,7 +10,7 @@ export const getUniqueDisplayNames = (users: Participant[]) => {
 
     // Verifica se displayName existe e tenta extrair nome e inicial do sobrenome
     if (user.displayName) {
-      const nameParts = user.displayName.split(' ');
+      const nameParts = user.displayName.split(" ");
       baseName = nameParts[0];
 
       // Adiciona a inicial do sobrenome se houver mais de uma parte no nome
@@ -19,7 +19,7 @@ export const getUniqueDisplayNames = (users: Participant[]) => {
       }
     } else {
       // Se não houver displayName, usa a parte antes do "@" no email ou "User" como fallback
-      baseName = user.email?.split('@')[0] || 'User';
+      baseName = user.email?.split("@")[0] || "User";
     }
 
     // Se o nome gerado já foi usado, incrementa o contador e anexa um número ao final
@@ -44,14 +44,14 @@ export interface UserColorScheme {
 }
 
 const colors = [
-  { bg: 'bg-primary', text: 'text-light' },
-  { bg: 'bg-secondary', text: 'text-light' },
-  { bg: 'bg-success', text: 'text-light' },
-  { bg: 'bg-danger', text: 'text-light' },
-  { bg: 'bg-warning', text: 'text-dark' },
-  { bg: 'bg-info', text: 'text-dark' },
-  { bg: 'bg-light', text: 'text-dark' },
-  { bg: 'bg-dark', text: 'text-light' },
+  { bg: "bg-primary", text: "text-light" },
+  { bg: "bg-secondary", text: "text-light" },
+  { bg: "bg-success", text: "text-light" },
+  { bg: "bg-danger", text: "text-light" },
+  { bg: "bg-warning", text: "text-dark" },
+  { bg: "bg-info", text: "text-dark" },
+  { bg: "bg-light", text: "text-dark" },
+  { bg: "bg-dark", text: "text-light" },
 ];
 
 export const randomColorScheme = () => {
@@ -64,16 +64,15 @@ export interface VotingStatus {
   hasVoted: Array<Participant & { vote: Vote }>;
   hasNotVoted: Participant[];
   average: number;
-  mostCommon: string | number | null;
   votesGrouped: VotesGrouped;
 }
 
 export const getVotingStatus = (
   users: Participant[],
-  votes: Vote[],
+  votes: Vote[]
 ): VotingStatus => {
   const voteMap = new Map<string, Vote>(
-    votes.map((vote) => [vote.userId, vote]),
+    votes.map((vote) => [vote.userId, vote])
   );
 
   const hasVoted: Array<Participant & { vote: Vote }> = [];
@@ -89,42 +88,25 @@ export const getVotingStatus = (
   });
 
   const validVotes = hasVoted.filter(
-    (user) => typeof user.vote.voteValue === 'number',
+    (user) => typeof user.vote.voteValue === "number"
   );
 
   const totalVotes: number = validVotes.reduce(
     (acc, user) => acc + (user.vote.voteValue || 0),
-    0,
+    0
   );
 
   const average = validVotes.length ? totalVotes / validVotes.length : 0;
 
-  // Group all votes (including non-numeric like T-shirt sizes)
-  const votesGrouped = hasVoted
-    .filter((user) => {
-      const value = String(user.vote.voteValue);
-      return value !== '?' && value !== '☕';
-    })
-    .reduce<VotesGrouped>((acc, user) => {
-      const voteValue = user.vote.voteValue;
-      if (!acc[voteValue]) {
-        acc[voteValue] = [];
-      }
-
-      acc[voteValue].push(user);
-      return acc;
-    }, {});
-
-  // Find most common vote (mode)
-  let mostCommon: string | number | null = null;
-  let maxCount = 0;
-
-  Object.entries(votesGrouped).forEach(([value, voters]) => {
-    if (voters.length > maxCount) {
-      maxCount = voters.length;
-      mostCommon = isNaN(Number(value)) ? value : Number(value);
+  const votesGrouped = validVotes.reduce<VotesGrouped>((acc, user) => {
+    const voteValue = user.vote.voteValue;
+    if (!acc[voteValue]) {
+      acc[voteValue] = [];
     }
-  });
 
-  return { hasVoted, hasNotVoted, average, mostCommon, votesGrouped };
+    acc[voteValue].push(user);
+    return acc;
+  }, {});
+
+  return { hasVoted, hasNotVoted, average, votesGrouped };
 };
