@@ -3,7 +3,7 @@ import { connectAuthEmulator, getAuth } from 'firebase/auth';
 import { connectFirestoreEmulator, getFirestore } from 'firebase/firestore';
 import { connectDatabaseEmulator, getDatabase } from 'firebase/database';
 import { connectStorageEmulator, getStorage } from 'firebase/storage';
-import { initializeAppCheck, ReCaptchaV3Provider } from '@firebase/app-check';
+import { initializeAppCheck, ReCaptchaV3Provider } from 'firebase/app-check';
 import {
   connectFunctionsEmulator,
   Functions,
@@ -33,7 +33,7 @@ export let functions: Functions;
 const REGION = 'us-central1';
 
 // Enable App Check Debug Token in Dev or if explicitly set
-if (import.meta.env.DEV || import.meta.env.VITE_APP_CHECK_DEBUG_TOKEN) {
+if (import.meta.env.DEV) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (self as any).FIREBASE_APPCHECK_DEBUG_TOKEN =
     import.meta.env.VITE_APP_CHECK_DEBUG_TOKEN === 'true'

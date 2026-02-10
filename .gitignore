@@ -23,5 +23,11 @@ dist-ssr
 *.sln
 *.sw?
 
+# Build artifacts
+*.tsbuildinfo
+
+# npm (project uses yarn)
+package-lock.json
+
 # Yarn
 .yarn/install-state.gz
