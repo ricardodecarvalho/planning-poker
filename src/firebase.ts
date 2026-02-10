@@ -43,6 +43,12 @@ if (import.meta.env.DEV) {
 } else {
   functions = getFunctions(app, REGION);
 
+  if (import.meta.env.VITE_APP_CHECK_DEBUG_TOKEN) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (self as any).FIREBASE_APPCHECK_DEBUG_TOKEN =
+      import.meta.env.VITE_APP_CHECK_DEBUG_TOKEN;
+  }
+
   initializeAppCheck(app, {
     provider: new ReCaptchaV3Provider(import.meta.env.VITE_RECAPTCHA_SITE_KEY),
     isTokenAutoRefreshEnabled: true,

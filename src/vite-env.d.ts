@@ -10,6 +10,13 @@ interface ImportMetaEnv {
   readonly VITE_FIREBASE_MESSAGING_SENDER_ID: string;
   readonly VITE_FIREBASE_APP_ID: string;
   readonly VITE_FIREBASE_MEASUREMENT_ID: string;
+  readonly VITE_FIREBASE_STORAGE_LOGO: string;
+  readonly VITE_APP_NAME: string;
+  readonly VITE_FIREBASE_DATABASE_URL: string;
+  readonly VITE_DONATE_LINK: string;
+  readonly VITE_RECAPTCHA_SITE_KEY: string;
+  readonly VITE_APP_VERSION: string;
+  readonly VITE_APP_CHECK_DEBUG_TOKEN?: string;
 }
 
 interface ImportMeta {
