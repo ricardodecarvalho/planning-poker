@@ -32,6 +32,20 @@ export let functions: Functions;
 
 const REGION = 'us-central1';
 
+// Enable App Check Debug Token in Dev or if explicitly set
+if (import.meta.env.DEV || import.meta.env.VITE_APP_CHECK_DEBUG_TOKEN) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (self as any).FIREBASE_APPCHECK_DEBUG_TOKEN =
+    import.meta.env.VITE_APP_CHECK_DEBUG_TOKEN === 'true'
+      ? true
+      : import.meta.env.VITE_APP_CHECK_DEBUG_TOKEN || true; // Default to true in DEV if not specified
+}
+
+initializeAppCheck(app, {
+  provider: new ReCaptchaV3Provider(import.meta.env.VITE_RECAPTCHA_SITE_KEY),
+  isTokenAutoRefreshEnabled: true,
+});
+
 if (import.meta.env.DEV) {
   functions = getFunctions(app);
 
@@ -42,15 +56,4 @@ if (import.meta.env.DEV) {
   connectFunctionsEmulator(functions, 'localhost', 5001);
 } else {
   functions = getFunctions(app, REGION);
-
-  if (import.meta.env.VITE_APP_CHECK_DEBUG_TOKEN) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (self as any).FIREBASE_APPCHECK_DEBUG_TOKEN =
-      import.meta.env.VITE_APP_CHECK_DEBUG_TOKEN;
-  }
-
-  initializeAppCheck(app, {
-    provider: new ReCaptchaV3Provider(import.meta.env.VITE_RECAPTCHA_SITE_KEY),
-    isTokenAutoRefreshEnabled: true,
-  });
 }
