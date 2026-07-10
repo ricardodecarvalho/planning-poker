@@ -1,0 +1,317 @@
+/* ============================================================
+   SKAPTAIN — DESIGN SYSTEM TOKENS (imported from the
+   "Redesign Skaptain Planning Poker" Claude Design project).
+   Single entry point: colors, typography, fonts, spacing,
+   effects, base resets and the app keyframes.
+   Loaded AFTER Bootstrap so these tokens/resets win where the
+   redesigned screens rely on them.
+   ============================================================ */
+
+/* Webfonts — Space Grotesk (display), Manrope (body/UI), JetBrains Mono (data).
+   NOTE: @import must be the first statement in the file. */
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+/* ============================================================
+   COLOR TOKENS
+   ============================================================ */
+:root {
+  /* --- Brand green (primary) --- */
+  --green-50:  #E8F9EE;
+  --green-100: #C6F0D4;
+  --green-200: #92E3AE;
+  --green-300: #56D183;
+  --green-400: #22BE5E;
+  --green-500: #12A84B;
+  --green-600: #0C8C3D;
+  --green-700: #0A6F31;
+  --green-800: #0B5628;
+  --green-900: #0A4321;
+
+  /* --- Coral (snake body — accent / danger) --- */
+  --coral-50:  #FDECE8;
+  --coral-100: #FBD3C8;
+  --coral-200: #F5A491;
+  --coral-300: #EF7659;
+  --coral-400: #EA5836;
+  --coral-500: #E5482C;
+  --coral-600: #C83A20;
+  --coral-700: #A02D18;
+  --coral-800: #7A2313;
+  --coral-900: #5B1A0F;
+
+  /* --- Amber (scale markings — warning) --- */
+  --amber-50:  #FEF6E0;
+  --amber-100: #FCE9B4;
+  --amber-300: #F7CE5C;
+  --amber-400: #F3BC2E;
+  --amber-500: #E8A50E;
+  --amber-600: #C1850A;
+
+  /* --- Blue (background wash — info) --- */
+  --blue-50:  #E9F0FD;
+  --blue-100: #C9DBFA;
+  --blue-300: #7CA3F0;
+  --blue-400: #4E7DE8;
+  --blue-500: #3B6FE0;
+  --blue-600: #2B57C0;
+
+  /* --- Neutrals (green-tinted slate) --- */
+  --neutral-0:   #FFFFFF;
+  --neutral-50:  #F6F8F7;
+  --neutral-100: #ECF0EE;
+  --neutral-200: #DCE3E0;
+  --neutral-300: #C2CCC8;
+  --neutral-400: #97A5A0;
+  --neutral-500: #6C7B76;
+  --neutral-600: #4E5B57;
+  --neutral-700: #384340;
+  --neutral-800: #232B29;
+  --neutral-900: #151A18;
+  --neutral-950: #0C100F;
+
+  /* --- Fixed brand references --- */
+  --brand-primary: var(--green-500);
+  --brand-primary-hover: var(--green-600);
+  --brand-primary-active: var(--green-700);
+  --brand-on-primary: #FFFFFF;
+  --brand-accent: var(--coral-500);
+}
+
+/* SEMANTIC ALIASES — LIGHT (default) */
+:root,
+[data-theme='light'] {
+  color-scheme: light;
+
+  --surface-base:    var(--neutral-50);
+  --surface-card:    var(--neutral-0);
+  --surface-raised:  var(--neutral-0);
+  --surface-sunken:  var(--neutral-100);
+  --surface-inset:   var(--neutral-100);
+  --surface-overlay: rgba(12, 16, 15, 0.45);
+
+  --text-primary:   var(--neutral-900);
+  --text-secondary: var(--neutral-600);
+  --text-muted:     var(--neutral-500);
+  --text-inverse:   var(--neutral-0);
+  --text-on-accent: #FFFFFF;
+
+  --border-subtle: var(--neutral-200);
+  --border:        var(--neutral-300);
+  --border-strong: var(--neutral-400);
+  --border-focus:  var(--green-500);
+
+  --ring: color-mix(in oklch, var(--green-500) 40%, transparent);
+
+  /* semantic status */
+  --success:      var(--green-600);
+  --success-bg:   var(--green-50);
+  --success-border: var(--green-200);
+  --danger:       var(--coral-600);
+  --danger-bg:    var(--coral-50);
+  --danger-border: var(--coral-200);
+  --warning:      var(--amber-600);
+  --warning-bg:   var(--amber-50);
+  --warning-border: var(--amber-100);
+  --info:         var(--blue-600);
+  --info-bg:      var(--blue-50);
+  --info-border:  var(--blue-100);
+
+  /* interactive fills over surfaces */
+  --fill-hover:  color-mix(in oklch, var(--neutral-900) 5%, transparent);
+  --fill-active: color-mix(in oklch, var(--neutral-900) 9%, transparent);
+}
+
+/* SEMANTIC ALIASES — DARK */
+[data-theme='dark'] {
+  color-scheme: dark;
+
+  --surface-base:    var(--neutral-950);
+  --surface-card:    var(--neutral-900);
+  --surface-raised:  #1C2321;
+  --surface-sunken:  #090C0B;
+  --surface-inset:   #090C0B;
+  --surface-overlay: rgba(0, 0, 0, 0.6);
+
+  --text-primary:   var(--neutral-50);
+  --text-secondary: var(--neutral-300);
+  --text-muted:     var(--neutral-400);
+  --text-inverse:   var(--neutral-950);
+  --text-on-accent: #FFFFFF;
+
+  --border-subtle: #232B29;
+  --border:        #2E3835;
+  --border-strong: var(--neutral-700);
+  --border-focus:  var(--green-400);
+
+  --ring: color-mix(in oklch, var(--green-400) 45%, transparent);
+
+  --brand-primary: var(--green-400);
+  --brand-primary-hover: var(--green-300);
+  --brand-primary-active: var(--green-500);
+  --brand-on-primary: #06210F;
+
+  --success:      var(--green-400);
+  --success-bg:   color-mix(in oklch, var(--green-500) 16%, var(--neutral-950));
+  --success-border: color-mix(in oklch, var(--green-500) 32%, var(--neutral-950));
+  --danger:       var(--coral-400);
+  --danger-bg:    color-mix(in oklch, var(--coral-500) 16%, var(--neutral-950));
+  --danger-border: color-mix(in oklch, var(--coral-500) 32%, var(--neutral-950));
+  --warning:      var(--amber-400);
+  --warning-bg:   color-mix(in oklch, var(--amber-500) 15%, var(--neutral-950));
+  --warning-border: color-mix(in oklch, var(--amber-500) 30%, var(--neutral-950));
+  --info:         var(--blue-400);
+  --info-bg:      color-mix(in oklch, var(--blue-500) 16%, var(--neutral-950));
+  --info-border:  color-mix(in oklch, var(--blue-500) 32%, var(--neutral-950));
+
+  --fill-hover:  color-mix(in oklch, var(--neutral-0) 7%, transparent);
+  --fill-active: color-mix(in oklch, var(--neutral-0) 12%, transparent);
+}
+
+/* ============================================================
+   TYPOGRAPHY TOKENS
+   ============================================================ */
+:root {
+  --font-display: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+  --font-body:    'Manrope', ui-sans-serif, system-ui, sans-serif;
+  --font-mono:    'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  --text-2xs: 0.6875rem;
+  --text-xs:  0.75rem;
+  --text-sm:  0.875rem;
+  --text-base:1rem;
+  --text-lg:  1.125rem;
+  --text-xl:  1.375rem;
+  --text-2xl: 1.75rem;
+  --text-3xl: 2.25rem;
+  --text-4xl: 3rem;
+  --text-5xl: 4rem;
+
+  --weight-regular:  400;
+  --weight-medium:   500;
+  --weight-semibold: 600;
+  --weight-bold:     700;
+  --weight-extrabold:800;
+
+  --leading-tight:   1.1;
+  --leading-snug:    1.25;
+  --leading-normal:  1.5;
+  --leading-relaxed: 1.7;
+
+  --tracking-tight:  -0.02em;
+  --tracking-snug:   -0.01em;
+  --tracking-normal: 0;
+  --tracking-wide:   0.02em;
+  --tracking-caps:   0.08em;
+
+  --font-heading: var(--font-display);
+  --font-text:    var(--font-body);
+}
+
+/* ============================================================
+   SPACING & SIZING TOKENS — 4px base grid
+   ============================================================ */
+:root {
+  --space-0:  0;
+  --space-1:  0.25rem;
+  --space-2:  0.5rem;
+  --space-3:  0.75rem;
+  --space-4:  1rem;
+  --space-5:  1.25rem;
+  --space-6:  1.5rem;
+  --space-8:  2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+
+  --control-sm: 2rem;
+  --control-md: 2.5rem;
+  --control-lg: 3rem;
+
+  --container-sm: 640px;
+  --container-md: 768px;
+  --container-lg: 1024px;
+  --container-xl: 1280px;
+  --sidebar-w:    264px;
+}
+
+/* ============================================================
+   EFFECTS: RADII, SHADOWS, BORDERS, MOTION
+   ============================================================ */
+:root {
+  --radius-xs:   4px;
+  --radius-sm:   6px;
+  --radius-md:   10px;
+  --radius-lg:   14px;
+  --radius-xl:   20px;
+  --radius-2xl:  28px;
+  --radius-full: 999px;
+
+  --border-width: 1px;
+  --border-width-strong: 1.5px;
+
+  --shadow-xs: 0 1px 2px rgba(12, 24, 18, 0.06);
+  --shadow-sm: 0 1px 3px rgba(12, 24, 18, 0.08), 0 1px 2px rgba(12, 24, 18, 0.06);
+  --shadow-md: 0 4px 12px rgba(12, 24, 18, 0.08), 0 2px 4px rgba(12, 24, 18, 0.05);
+  --shadow-lg: 0 12px 28px rgba(12, 24, 18, 0.12), 0 4px 8px rgba(12, 24, 18, 0.06);
+  --shadow-xl: 0 24px 48px rgba(12, 24, 18, 0.16), 0 8px 16px rgba(12, 24, 18, 0.08);
+  --shadow-focus: 0 0 0 3px var(--ring);
+
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-out:      cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-fast: 120ms;
+  --duration-base: 180ms;
+  --duration-slow: 280ms;
+  --transition-colors: color var(--duration-fast) var(--ease-standard),
+                       background-color var(--duration-fast) var(--ease-standard),
+                       border-color var(--duration-fast) var(--ease-standard);
+}
+
+[data-theme='dark'] {
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5), 0 2px 4px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 12px 28px rgba(0, 0, 0, 0.6), 0 4px 8px rgba(0, 0, 0, 0.4);
+  --shadow-xl: 0 24px 48px rgba(0, 0, 0, 0.7), 0 8px 16px rgba(0, 0, 0, 0.5);
+}
+
+/* ============================================================
+   BASE RESET & ELEMENT DEFAULTS
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  color: var(--text-primary);
+  background: var(--surface-base);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: color-mix(in oklch, var(--green-500) 28%, transparent);
+}
+
+/* ============================================================
+   APP KEYFRAMES & UTILITIES (from the prototype)
+   ============================================================ */
+@keyframes ppSlideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+@keyframes ppFade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes ppRise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes ppSpin { to { transform: rotate(360deg); } }
+
+.pp-scroll::-webkit-scrollbar { height: 8px; width: 8px; }
+.pp-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 999px; }
+.pp-scroll::-webkit-scrollbar-track { background: transparent; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

@@ -1,24 +1,34 @@
 import styled from 'styled-components';
-import DeleteIcon from '../assets/images/trash.svg?react';
+import { Trash2 } from 'lucide-react';
 import useRoom from '../hooks/useRoom';
 import { useModal } from './Modal';
 import { useTranslation } from 'react-i18n-lite';
 
-const Button = styled.button`
+const IconButton = styled.button`
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
   background: none;
-  border: none;
+  color: var(--text-secondary);
   cursor: pointer;
-  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition-colors);
+
+  &:hover {
+    background: var(--danger-bg);
+    color: var(--danger);
+  }
 `;
 
 interface DeleteRoomProps {
   roomId: string;
   onDelete?: () => void;
-  label?: string;
-  btnSize?: string;
 }
 
-const DeleteRoom = ({ roomId, label, onDelete }: DeleteRoomProps) => {
+const DeleteRoom = ({ roomId, onDelete }: DeleteRoomProps) => {
   const { showModal } = useModal();
   const { t } = useTranslation();
   const { deleteRoom } = useRoom();
@@ -40,16 +50,12 @@ const DeleteRoom = ({ roomId, label, onDelete }: DeleteRoomProps) => {
   };
 
   return (
-    <>
-      <Button
-        data-bs-toggle="modal"
-        onClick={() => handleDeleteRoom(roomId)}
-        title={t('rooms.deleteRoom')}
-      >
-        {label && `${label} `}
-        <DeleteIcon />
-      </Button>
-    </>
+    <IconButton
+      onClick={() => handleDeleteRoom(roomId)}
+      title={t('rooms.deleteRoom')}
+    >
+      <Trash2 size={17} />
+    </IconButton>
   );
 };
 
