@@ -28,30 +28,14 @@ export interface Participant extends Partial<User> {
   };
 }
 
+// Maximum number of participants allowed in a room. Kept in sync with the
+// same limit enforced server-side in firestore.rules (withinParticipantLimit).
+export const MAX_PARTICIPANTS = 15;
+
 const useParticipants = (roomId?: string) => {
   const [participants, setParticipants] = useState<string[]>([]);
 
   const navigate = useNavigate();
-
-  const checkRoomCapacity = async (roomId: string) => {
-    if (!roomId) return;
-
-    const roomRef = doc(firestore, 'rooms', roomId);
-
-    const roomSnapshot = await getDoc(roomRef);
-
-    // Definir a capacidade máxima da sala
-    const maxParticipants = 2;
-
-    console.log('roomSnapshot: ', roomSnapshot);
-
-    const roomData = roomSnapshot.data();
-
-    if (roomData?.participants.length >= maxParticipants) {
-      navigate('/full-room');
-      return;
-    }
-  };
 
   // Observar os participantes em tempo real
   useEffect(() => {
@@ -66,10 +50,24 @@ const useParticipants = (roomId?: string) => {
       }
     });
 
-    // Adicionar o participante atual à sala
+    // Adicionar o participante atual à sala (respeitando o limite de lotação)
     const addParticipantToRoom = async () => {
+      const uid = auth.currentUser?.uid;
+      if (!uid) return;
+
+      const snapshot = await getDoc(roomRef);
+      const current: string[] = snapshot.data()?.participants ?? [];
+
+      // Bloqueia apenas usuários novos quando a sala está cheia; quem já é
+      // participante sempre consegue reentrar (mantém retrocompatibilidade
+      // com salas que já estejam acima do limite).
+      if (!current.includes(uid) && current.length >= MAX_PARTICIPANTS) {
+        navigate('/full-room');
+        return;
+      }
+
       await updateDoc(roomRef, {
-        participants: arrayUnion(auth.currentUser?.uid),
+        participants: arrayUnion(uid),
       });
     };
     addParticipantToRoom();
@@ -136,7 +134,6 @@ const useParticipants = (roomId?: string) => {
     participants,
     fetchUsersByParticipants,
     fetchParticipantStatus,
-    checkRoomCapacity,
   };
 };
 
