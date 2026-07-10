@@ -27,6 +27,69 @@ export const Toolbar = styled.div`
   }
 `;
 
+export const TitleRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+
+  h1 {
+    min-width: 0;
+  }
+`;
+
+export const TitleEditRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+`;
+
+export const NameInput = styled.input`
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(20px, 2.4vw, 26px);
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  background: var(--surface-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 4px 10px;
+  min-width: 0;
+  width: min(420px, 60vw);
+
+  &:focus-visible {
+    outline: none;
+    border-color: var(--border-focus);
+    box-shadow: var(--shadow-focus);
+  }
+`;
+
+export const TitleIconButton = styled.button<{ $tone?: 'save' }>`
+  flex: none;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  background: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition-colors);
+
+  &:hover {
+    background: var(--fill-hover);
+    color: ${({ $tone }) =>
+      $tone === 'save' ? 'var(--success)' : 'var(--text-primary)'};
+  }
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-focus);
+  }
+`;
+
 export const CopyButton = styled.button`
   margin-top: 6px;
   display: inline-flex;

@@ -21,6 +21,7 @@ interface Room {
   createdAt: string;
   createdBy: string;
   id: string;
+  name?: string;
   participants: string[];
   showVotes: boolean;
 }
