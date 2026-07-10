@@ -1,5 +1,8 @@
 import React, { useState, createContext } from 'react';
+import styled from 'styled-components';
+import { X } from 'lucide-react';
 import { useTranslation } from 'react-i18n-lite';
+import Button from '../ui/Button';
 
 interface ModalData {
   title: string;
@@ -55,7 +58,6 @@ const ModalProvider = ({ children }: ModalProviderProps) => {
         onConfirm={handleConfirm}
         onClose={closeModal}
         onConfirmButtonClass={modalData?.onConfirmButtonClass}
-        onCloseButtonClass={modalData?.onCloseButtonClass}
         onConfirmButtonText={modalData?.onConfirmButtonText}
         onCloseButtonText={modalData?.onCloseButtonText}
       />
@@ -63,13 +65,86 @@ const ModalProvider = ({ children }: ModalProviderProps) => {
   );
 };
 
+const Overlay = styled.div`
+  position: fixed;
+  inset: 0;
+  z-index: 1080;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: var(--surface-overlay);
+  backdrop-filter: blur(2px);
+  animation: ppFade var(--duration-base) var(--ease-out);
+`;
+
+const Dialog = styled.div`
+  width: 100%;
+  max-width: 440px;
+  background: var(--surface-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xl);
+  animation: ppRise var(--duration-base) var(--ease-out);
+`;
+
+const Head = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 20px 22px;
+  border-bottom: 1px solid var(--border-subtle);
+
+  h2 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: -0.01em;
+  }
+`;
+
+const CloseButton = styled.button`
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-md);
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition-colors);
+
+  &:hover {
+    background: var(--fill-hover);
+    color: var(--text-primary);
+  }
+`;
+
+const Body = styled.div`
+  padding: 22px;
+  color: var(--text-secondary);
+  font-size: 15px;
+  line-height: 1.55;
+`;
+
+const Foot = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 16px 22px;
+  border-top: 1px solid var(--border-subtle);
+`;
+
 interface ModalProps {
   isOpen: boolean;
   title: string;
   message: string;
   onClose: () => void;
   onConfirm?: () => void;
-  onCloseButtonClass?: string;
   onConfirmButtonClass?: string;
   onCloseButtonText?: string;
   onConfirmButtonText?: string;
@@ -81,7 +156,6 @@ const Modal: React.FC<ModalProps> = ({
   message,
   onClose,
   onConfirm,
-  onCloseButtonClass,
   onConfirmButtonClass,
   onCloseButtonText,
   onConfirmButtonText,
@@ -90,48 +164,32 @@ const Modal: React.FC<ModalProps> = ({
 
   if (!isOpen) return null;
 
+  const confirmVariant = onConfirmButtonClass?.includes('danger')
+    ? 'danger'
+    : 'primary';
+
   return (
-    <div
-      className="modal"
-      tabIndex={-1}
-      style={{ display: 'block', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
-    >
-      <div className="modal-dialog">
-        <div className="modal-content">
-          <div className="modal-header">
-            <h5 className="modal-title">{title}</h5>
-            <button
-              type="button"
-              className="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-              onClick={onClose}
-            ></button>
-          </div>
-          <div className="modal-body">
-            <p>{message}</p>
-          </div>
-          <div className="modal-footer">
-            <button
-              type="button"
-              className={`btn ${onCloseButtonClass || 'btn-secondary'}`}
-              onClick={onClose}
-            >
-              {onCloseButtonText || t('modal.cancel')}
-            </button>
-            {onConfirm && (
-              <button
-                type="button"
-                className={`btn ${onConfirmButtonClass || 'btn-primary'}`}
-                onClick={onConfirm}
-              >
-                {onConfirmButtonText || t('modal.confirm')}
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
+    <Overlay onClick={onClose}>
+      <Dialog onClick={(e) => e.stopPropagation()}>
+        <Head>
+          <h2>{title}</h2>
+          <CloseButton onClick={onClose} aria-label="Close">
+            <X size={20} />
+          </CloseButton>
+        </Head>
+        <Body>{message}</Body>
+        <Foot>
+          <Button variant="secondary" onClick={onClose}>
+            {onCloseButtonText || t('modal.cancel')}
+          </Button>
+          {onConfirm && (
+            <Button variant={confirmVariant} onClick={onConfirm}>
+              {onConfirmButtonText || t('modal.confirm')}
+            </Button>
+          )}
+        </Foot>
+      </Dialog>
+    </Overlay>
   );
 };
 

@@ -2,134 +2,99 @@ import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18n-lite';
 
-import { auth } from '../firebase';
 import useIsOpen from '../hooks/useIsOpen';
-import Offcanvas from './Offcanvas';
 import useUserContext from '../context/useUserContext';
-import Avatar from './Avatar';
 import useThemeContext from '../context/useThemeContext';
-import ChangeLanguage from '../locales/ChangeLanguage';
-
-import LogoPPK from '../assets/images/logo-planning-poker.svg?react';
-import LogoPPKWhite from '../assets/images/logo-planning-poker-white.svg?react';
-import IconLogout from '../assets/images/logout.svg?react';
-import MoonIcon from '../assets/images/moon.svg?react';
-import SunIcon from '../assets/images/sun.svg?react';
-import GitHubLogo from '../assets/images/github-logo.svg?react';
-import Hand from '../assets/images/hand.svg?react';
-import GlobeIcon from '../assets/images/globe.svg?react';
+import Avatar from './Avatar';
+import SettingsDrawer from './SettingsDrawer';
+import logoColored from '../assets/images/logo-planning-poker.svg';
+import logoWhite from '../assets/images/logo-planning-poker-white.svg';
 
 const appName = import.meta.env.VITE_APP_NAME;
 
-const DONATE_LINK = import.meta.env.VITE_DONATE_LINK;
+const Header = styled.header`
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  padding: 0 clamp(16px, 4vw, 28px);
+  background: var(--surface-card);
+  border-bottom: 1px solid var(--border-subtle);
+`;
 
-const REPOSITORY_LINK = 'https://github.com/ricardodecarvalho/planning-poker';
+const Brand = styled(Link)`
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  color: var(--text-primary);
+  text-decoration: none;
+
+  &:hover,
+  &:focus {
+    color: var(--text-primary);
+    text-decoration: none;
+  }
+
+  img {
+    object-fit: contain;
+    flex: none;
+  }
+
+  span {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: -0.02em;
+  }
+`;
 
 const AvatarButton = styled.button`
   background: none;
   border: none;
-  cursor: pointer !important;
+  cursor: pointer;
   padding: 0;
+  border-radius: var(--radius-full);
+  display: flex;
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-focus);
+  }
 `;
 
 const Navbar = () => {
   const { isOpen, open, close } = useIsOpen();
   const { userContext } = useUserContext();
-  const { theme, toggleTheme } = useThemeContext();
+  const { theme } = useThemeContext();
   const { t } = useTranslation();
-
-  const logout = async () => {
-    auth.signOut();
-  };
 
   return (
     <>
-      <nav className={`navbar border-bottom sticky-top mb-md-3 mb-2`}>
-        <div className="container-fluid">
-          <span className="navbar-brand mb-0 h1">
-            <Link to="/" title={t('navbar.goHome')}>
-              {theme === 'light' ? (
-                <LogoPPK width={30} height={24} />
-              ) : (
-                <LogoPPKWhite width={30} height={24} />
-              )}
-            </Link>
-            <Link to="/" className="navbar-brand" title={t('navbar.goHome')}>
-              {appName}
-            </Link>
-          </span>
-          <div className="d-flex text-light">
-            {userContext && (
-              <AvatarButton onClick={open}>
-                <Avatar {...userContext} isShowState={false} />
-              </AvatarButton>
-            )}
-          </div>
-        </div>
-      </nav>
+      <Header>
+        <Brand to="/" title={t('navbar.goHome')}>
+          <img
+            src={theme === 'light' ? logoColored : logoWhite}
+            width={36}
+            height={36}
+            alt={appName}
+          />
+          <span>{appName}</span>
+        </Brand>
+        {userContext && (
+          <AvatarButton onClick={open} title={t('navbar.userSettings')}>
+            <Avatar {...userContext} size={38} />
+          </AvatarButton>
+        )}
+      </Header>
 
-      <Offcanvas {...{ isOpen }} onClose={close}>
-        <ul className="list-group">
-          <li className="list-group-item list-group-item-action">
-            <div className="d-flex gap-2 align-items-center">
-              <GlobeIcon />
-              <ChangeLanguage type="select" />
-            </div>
-          </li>
-
-          <button
-            className="list-group-item list-group-item-action"
-            onClick={toggleTheme}
-          >
-            <div className="d-flex gap-2 align-items-center">
-              {theme === 'light' ? (
-                <>
-                  <MoonIcon />
-                  <span>{t('navbar.enableDarkMode')}</span>
-                </>
-              ) : (
-                <>
-                  <SunIcon />
-                  <span>{t('navbar.enableLightMode')}</span>
-                </>
-              )}
-            </div>
-          </button>
-
-          <a
-            target="_blank"
-            href={REPOSITORY_LINK}
-            className="list-group-item list-group-item-action"
-          >
-            <div className="d-flex gap-2 align-items-center">
-              <GitHubLogo />
-              <span>{t('navbar.repository')}</span>
-            </div>
-          </a>
-
-          <a
-            target="_blank"
-            href={DONATE_LINK}
-            className="list-group-item list-group-item-action"
-          >
-            <div className="d-flex gap-2 align-items-center">
-              <Hand />
-              <span>{t('navbar.donate')}</span>
-            </div>
-          </a>
-
-          <button
-            className="list-group-item list-group-item-action"
-            title={t('navbar.logout')}
-            onClick={logout}
-          >
-            <div className="d-flex gap-2 align-items-center">
-              <IconLogout />
-              <span>{t('navbar.logout')}</span>
-            </div>
-          </button>
-        </ul>
-      </Offcanvas>
+      <SettingsDrawer isOpen={isOpen} onClose={close} />
     </>
   );
 };
