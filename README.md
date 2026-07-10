@@ -3,7 +3,7 @@
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](/LICENSE)
 ![GitHub contributors](https://img.shields.io/github/contributors/ricardodecarvalho/planning-poker)
 
-# [Planning Poker Agile](https://planning-poker.skapitao.com)
+# [Skaptain Planning Poker](https://planning-poker.skapitao.com)
 
 A Planning Poker tool to help agile teams estimate the development effort of tasks.
 

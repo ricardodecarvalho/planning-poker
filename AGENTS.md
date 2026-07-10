@@ -4,7 +4,7 @@ This file provides guidance to AI coding assistants when working with code in th
 
 ## Project Overview
 
-Planning Poker Agile is a real-time collaborative estimation tool built with React, TypeScript, and Firebase. Users authenticate via Google, create poker planning sessions, and vote on story points in real-time. The application includes a ChatGPT-powered assistant that provides humorous commentary on voting results.
+Skaptain Planning Poker is a real-time collaborative estimation tool built with React, TypeScript, and Firebase. Users authenticate via Google, create poker planning sessions, and vote on story points in real-time. The application includes a ChatGPT-powered assistant that provides humorous commentary on voting results.
 
 ## Development Commands
 
