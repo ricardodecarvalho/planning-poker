@@ -8,7 +8,8 @@
     "tagline": "Estimativas ágeis, em tempo real.",
     "brandSubtitle": "Reúna o time, revele os votos juntos e chegue a um número que todos comprem.",
     "description": "Entre com a sua conta Google para acessar suas salas.",
-    "terms": "Ao continuar, você concorda com os termos de uso do Skaptain."
+    "terms": "Ao continuar, você concorda com os {terms} do Skaptain.",
+    "termsLinkLabel": "termos de uso"
   },
   "rooms": {
     "recentRooms": "Salas recentes",
