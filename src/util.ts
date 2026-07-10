@@ -110,3 +110,24 @@ export const getVotingStatus = (
 
   return { hasVoted, hasNotVoted, average, votesGrouped };
 };
+
+/**
+ * Returns the numeric card from `deck` closest to `average`. Ties round up
+ * (favor the larger card). Non-numeric cards (e.g. '?', '☕') are ignored.
+ * Used to suggest an estimate to apply after the votes are revealed.
+ */
+export const nearestCard = (
+  average: number,
+  deck: (number | string)[],
+): number => {
+  const numeric = deck.filter((v): v is number => typeof v === 'number');
+  if (numeric.length === 0) return 0;
+
+  return numeric.reduce((best, card) => {
+    const distBest = Math.abs(best - average);
+    const distCard = Math.abs(card - average);
+    if (distCard < distBest) return card;
+    if (distCard === distBest) return Math.max(best, card);
+    return best;
+  }, numeric[0]);
+};

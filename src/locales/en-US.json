@@ -79,7 +79,26 @@
     "linkCopied": "Link copied!",
     "revealHint": "reveal when you're ready",
     "revealHintTeam": "reveal when the team is ready",
-    "fullRoom": "The room is full :("
+    "fullRoom": "The room is full :(",
+    "history": "History",
+    "applyEstimate": "Apply {points} pts",
+    "estimating": "Estimating",
+    "backlogDone": "The whole backlog is estimated. Nice work!"
+  },
+  "backlog": {
+    "title": "Backlog",
+    "empty": "No items yet.",
+    "emptyOwner": "Add a topic below to start estimating.",
+    "addPlaceholder": "New topic…",
+    "addItem": "Add",
+    "delete": "Remove item"
+  },
+  "history": {
+    "title": "Voting history",
+    "empty": "No rounds recorded yet. Reveal the votes and apply an estimate to save it here.",
+    "votes": "{count} votes",
+    "pts": "pts",
+    "untitled": "Untitled"
   },
   "votes": {
     "errorClearingVotesNoRoomId": "Error clearing votes, no room ID provided",

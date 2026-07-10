@@ -2,14 +2,24 @@ import { CSSProperties, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { collection, doc, onSnapshot, updateDoc } from 'firebase/firestore';
 import { useTranslation } from 'react-i18n-lite';
-import { Check, Eye, EyeOff, Link2, RotateCcw } from 'lucide-react';
+import { Check, Eye, EyeOff, History, Link2, RotateCcw } from 'lucide-react';
 
 import useRoom from '../../hooks/useRoom';
 import useRoomName from '../../hooks/useRoomName';
 import useVotes from '../../hooks/useVotes';
 import useParticipants, { Participant } from '../../hooks/useParticipants';
+import useItems from '../../hooks/useItems';
+import useHistory from '../../hooks/useHistory';
 import RoomTitle from './RoomTitle';
-import { getUniqueDisplayNames, getVotingStatus } from '../../util';
+import BacklogRail from './BacklogRail';
+import ActiveItemBanner from './ActiveItemBanner';
+import ApplyEstimate from './ApplyEstimate';
+import HistoryDrawer from './HistoryDrawer';
+import {
+  getUniqueDisplayNames,
+  getVotingStatus,
+  nearestCard,
+} from '../../util';
 import useUserConnection from '../../hooks/useUserConnection';
 import { auth, firestore } from '../../firebase';
 import Avatar from '../Avatar';
@@ -18,7 +28,19 @@ import { useIsMobile } from '../../hooks/useIsMobile';
 import * as S from './PokerRoom.styles';
 
 const votingSystem: (number | string)[] = [
-  0, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, '?', '☕',
+  0,
+  1,
+  2,
+  3,
+  5,
+  8,
+  13,
+  21,
+  34,
+  55,
+  89,
+  '?',
+  '☕',
 ];
 
 const seatStyle = (i: number, n: number): CSSProperties => {
@@ -68,9 +90,19 @@ const PokerRoom = () => {
   const { isShowVotes, votes, clearVotes, handleShowVotes, handleVote } =
     useVotes(roomId);
   const { participants, fetchUsersByParticipants } = useParticipants(roomId);
+  const {
+    items,
+    activeItemId,
+    addItem,
+    deleteItem,
+    setActiveItem,
+    markEstimated,
+  } = useItems(roomId);
+  const { history, historyCount, saveRound } = useHistory(roomId);
 
   const [users, setUsers] = useState<Participant[]>([]);
   const [copied, setCopied] = useState(false);
+  const [historyOpen, setHistoryOpen] = useState(false);
 
   const { enterRoom } = useUserConnection();
   const userId = auth.currentUser?.uid;
@@ -127,8 +159,51 @@ const PokerRoom = () => {
   const votingStatus = getVotingStatus(users, votes);
   const isRoomOwner = auth.currentUser?.uid === currentRoomOwner;
 
+  const activeItem = items.find((item) => item.id === activeItemId);
+  const allEstimated =
+    items.length > 0 && items.every((item) => item.estimated);
+  // Só mostramos a trilha de backlog para o dono (que a gerencia) ou quando já
+  // existem itens — assim salas sem backlog mantêm a mesa em largura cheia.
+  const showBacklog = isRoomOwner || items.length > 0;
+  const suggestedEstimate = nearestCard(votingStatus.average, votingSystem);
+  const canApply =
+    isRoomOwner && isShowVotes && !!activeItem && !activeItem.estimated;
+
   const toggleReveal = () => handleShowVotes(!isShowVotes);
   const newRound = () => clearVotes(roomId);
+
+  // Dono seleciona um item do backlog para estimar (inicia uma rodada limpa).
+  const selectItem = async (itemId: string) => {
+    if (itemId === activeItemId) return;
+    await setActiveItem(itemId);
+    await clearVotes(roomId);
+  };
+
+  // Dono aplica a estimativa sugerida: registra a rodada no histórico, marca o
+  // item como estimado, limpa os votos e avança para o próximo item pendente.
+  const applyEstimate = async () => {
+    if (!roomId || !activeItem) return;
+
+    const votesSnapshot = votingStatus.hasVoted.map((u) => ({
+      name: u.displayName || '',
+      value: u.vote.voteValue,
+    }));
+
+    await saveRound({
+      itemKey: activeItem.key ?? null,
+      itemSummary: activeItem.summary ?? null,
+      source: activeItem.source ?? 'manual',
+      votes: votesSnapshot,
+      average: votingStatus.average,
+      points: suggestedEstimate,
+    });
+
+    await markEstimated(activeItem.id, suggestedEstimate);
+    await clearVotes(roomId);
+
+    const next = items.find((i) => !i.estimated && i.id !== activeItem.id);
+    await setActiveItem(next?.id);
+  };
 
   const copyLink = () => {
     if (!roomId) return;
@@ -171,8 +246,7 @@ const PokerRoom = () => {
   const hasNumeric = numericVotes.length > 0;
   const avgText = hasNumeric ? votingStatus.average.toFixed(2) : '—';
   const consensus =
-    hasNumeric &&
-    new Set(numericVotes.map((u) => u.vote.voteValue)).size === 1;
+    hasNumeric && new Set(numericVotes.map((u) => u.vote.voteValue)).size === 1;
   const consensusText = hasNumeric
     ? consensus
       ? t('pokerRoom.consensus')
@@ -351,125 +425,163 @@ const PokerRoom = () => {
             </span>
           </S.CopyButton>
         </div>
-        {isRoomOwner && (
-          <S.ToolbarActions>
-            <Button
-              variant="ghost"
-              onClick={newRound}
-              iconLeft={<RotateCcw size={17} />}
-            >
-              {t('pokerRoom.newRound')}
-            </Button>
-            <Button
-              variant="primary"
-              onClick={toggleReveal}
-              iconLeft={
-                isShowVotes ? <EyeOff size={17} /> : <Eye size={17} />
-              }
-            >
-              {isShowVotes ? t('pokerRoom.hideVotes') : t('pokerRoom.showVotes')}
-            </Button>
-          </S.ToolbarActions>
-        )}
+        <S.ToolbarActions>
+          <S.HistoryButton
+            onClick={() => setHistoryOpen(true)}
+            title={t('history.title')}
+          >
+            <History size={17} />
+            <span>{t('pokerRoom.history')}</span>
+            <span className="count">{historyCount}</span>
+          </S.HistoryButton>
+          {isRoomOwner && (
+            <>
+              <Button
+                variant="ghost"
+                onClick={newRound}
+                iconLeft={<RotateCcw size={17} />}
+              >
+                {t('pokerRoom.newRound')}
+              </Button>
+              <Button
+                variant="primary"
+                onClick={toggleReveal}
+                iconLeft={
+                  isShowVotes ? <EyeOff size={17} /> : <Eye size={17} />
+                }
+              >
+                {isShowVotes
+                  ? t('pokerRoom.hideVotes')
+                  : t('pokerRoom.showVotes')}
+              </Button>
+            </>
+          )}
+        </S.ToolbarActions>
       </S.Toolbar>
 
       {/* ---------- DESKTOP ---------- */}
       {!isMobile && (
-        <S.TableStage>
-          <S.TableWrap>
-            <S.Felt>
-              <S.CenterPot>
-                {isShowVotes ? (
-                  <S.PotRevealed>
-                    <span className="label">{t('pokerRoom.average')}</span>
-                    <span className="value">{avgText}</span>
-                    <span className="sub">{consensusText}</span>
-                  </S.PotRevealed>
-                ) : (
-                  <S.PotHidden>
-                    <span className="value">{votedFraction}</span>
-                    <span className="sub">
-                      {t('pokerRoom.votedCount')}
-                      <br />
-                      {t('pokerRoom.revealHint')}
-                    </span>
-                  </S.PotHidden>
-                )}
-              </S.CenterPot>
+        <S.DesktopSplit>
+          {showBacklog && (
+            <BacklogRail
+              items={items}
+              activeItemId={activeItemId}
+              isOwner={isRoomOwner}
+              onSelect={selectItem}
+              onAdd={addItem}
+              onDelete={deleteItem}
+            />
+          )}
+          <S.TableStage>
+            <ActiveItemBanner item={activeItem} allEstimated={allEstimated} />
+            <S.TableWrap>
+              <S.Felt>
+                <S.CenterPot>
+                  {isShowVotes ? (
+                    <S.PotRevealed>
+                      <span className="label">{t('pokerRoom.average')}</span>
+                      <span className="value">{avgText}</span>
+                      <span className="sub">{consensusText}</span>
+                    </S.PotRevealed>
+                  ) : (
+                    <S.PotHidden>
+                      <span className="value">{votedFraction}</span>
+                      <span className="sub">
+                        {t('pokerRoom.votedCount')}
+                        <br />
+                        {t('pokerRoom.revealHint')}
+                      </span>
+                    </S.PotHidden>
+                  )}
+                </S.CenterPot>
 
-              {seats.map((seat, i) => (
-                <div key={seat.key} style={seatStyle(i, seats.length)}>
-                  <div
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      gap: 7,
-                    }}
-                  >
-                    {desktopSeatCard(seat)}
+                {seats.map((seat, i) => (
+                  <div key={seat.key} style={seatStyle(i, seats.length)}>
                     <div
                       style={{
                         display: 'flex',
+                        flexDirection: 'column',
                         alignItems: 'center',
-                        gap: 6,
-                        padding: '3px 10px 3px 3px',
-                        borderRadius: 'var(--radius-full)',
-                        background: seat.you
-                          ? 'rgba(18,168,75,.9)'
-                          : 'rgba(0,0,0,.35)',
+                        gap: 7,
                       }}
                     >
-                      <Avatar
-                        displayName={seat.name}
-                        state={seat.state}
-                        size={30}
-                      />
-                      <S.SeatName>{seat.name}</S.SeatName>
+                      {desktopSeatCard(seat)}
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 6,
+                          padding: '3px 10px 3px 3px',
+                          borderRadius: 'var(--radius-full)',
+                          background: seat.you
+                            ? 'rgba(18,168,75,.9)'
+                            : 'rgba(0,0,0,.35)',
+                        }}
+                      >
+                        <Avatar
+                          displayName={seat.name}
+                          state={seat.state}
+                          size={30}
+                        />
+                        <S.SeatName>{seat.name}</S.SeatName>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </S.Felt>
-          </S.TableWrap>
+                ))}
+              </S.Felt>
+            </S.TableWrap>
 
-          {/* distribution */}
-          {isShowVotes && distribution.length > 0 && (
-            <S.Distribution>
-              <span className="caption">{t('pokerRoom.distribution')}</span>
-              {distribution.map((d) => (
-                <S.DistChip key={d.value}>
-                  <span className="value">{d.value}</span>
-                  <span className="count">{d.count}</span>
-                </S.DistChip>
-              ))}
-            </S.Distribution>
-          )}
+            {/* distribution */}
+            {isShowVotes && distribution.length > 0 && (
+              <S.Distribution>
+                <span className="caption">{t('pokerRoom.distribution')}</span>
+                {distribution.map((d) => (
+                  <S.DistChip key={d.value}>
+                    <span className="value">{d.value}</span>
+                    <span className="count">{d.count}</span>
+                  </S.DistChip>
+                ))}
+              </S.Distribution>
+            )}
 
-          {/* hand */}
-          <S.HandSection>
-            <S.Eyebrow>{t('pokerRoom.yourHand')}</S.Eyebrow>
-            <S.Hand className="pp-scroll">
-              {votingSystem.map((value) => (
-                <S.HandCard
-                  key={String(value)}
-                  $selected={value === myVoteValue && !isShowVotes}
-                  disabled={isShowVotes}
-                  onClick={() => handleVote(value)}
-                >
-                  <span className="corner tl">{value}</span>
-                  {value}
-                  <span className="corner br">{value}</span>
-                </S.HandCard>
-              ))}
-            </S.Hand>
-          </S.HandSection>
-        </S.TableStage>
+            {canApply && (
+              <ApplyEstimate
+                points={suggestedEstimate}
+                onApply={applyEstimate}
+              />
+            )}
+
+            {/* hand */}
+            <S.HandSection>
+              <S.Eyebrow>{t('pokerRoom.yourHand')}</S.Eyebrow>
+              <S.Hand className="pp-scroll">
+                {votingSystem.map((value) => (
+                  <S.HandCard
+                    key={String(value)}
+                    $selected={value === myVoteValue && !isShowVotes}
+                    disabled={isShowVotes}
+                    onClick={() => handleVote(value)}
+                  >
+                    <span className="corner tl">{value}</span>
+                    {value}
+                    <span className="corner br">{value}</span>
+                  </S.HandCard>
+                ))}
+              </S.Hand>
+            </S.HandSection>
+          </S.TableStage>
+        </S.DesktopSplit>
       )}
 
       {/* ---------- MOBILE ---------- */}
       {isMobile && (
         <S.MobileWrap>
+          <ActiveItemBanner
+            item={activeItem}
+            allEstimated={allEstimated}
+            mobile
+          />
+
           {/* participant strip */}
           <div>
             <S.StripHeader>
@@ -527,6 +639,13 @@ const PokerRoom = () => {
                   </div>
                 </>
               )}
+              {canApply && (
+                <ApplyEstimate
+                  points={suggestedEstimate}
+                  onApply={applyEstimate}
+                  block
+                />
+              )}
             </S.StatusCard>
           ) : (
             <S.StatusWaiting>
@@ -555,8 +674,26 @@ const PokerRoom = () => {
               ))}
             </S.CardGrid>
           </div>
+
+          {showBacklog && (
+            <BacklogRail
+              items={items}
+              activeItemId={activeItemId}
+              isOwner={isRoomOwner}
+              onSelect={selectItem}
+              onAdd={addItem}
+              onDelete={deleteItem}
+              mobile
+            />
+          )}
         </S.MobileWrap>
       )}
+
+      <HistoryDrawer
+        open={historyOpen}
+        onClose={() => setHistoryOpen(false)}
+        history={history}
+      />
     </S.Content>
   );
 };
