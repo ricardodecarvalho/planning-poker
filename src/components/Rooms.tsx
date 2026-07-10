@@ -317,7 +317,7 @@ const Rooms = () => {
             <RoomCard key={room.id}>
               <div className="top">
                 <div style={{ minWidth: 0 }}>
-                  <h3>{room.id}</h3>
+                  <h3>{room.name?.trim() || t('rooms.untitledRoom')}</h3>
                   <div className="when">
                     <Clock size={13} />
                     <span>{formatDate(room.createdAt)}</span>

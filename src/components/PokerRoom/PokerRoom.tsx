@@ -5,8 +5,10 @@ import { useTranslation } from 'react-i18n-lite';
 import { Check, Eye, EyeOff, Link2, RotateCcw } from 'lucide-react';
 
 import useRoom from '../../hooks/useRoom';
+import useRoomName from '../../hooks/useRoomName';
 import useVotes from '../../hooks/useVotes';
 import useParticipants, { Participant } from '../../hooks/useParticipants';
+import RoomTitle from './RoomTitle';
 import { getUniqueDisplayNames, getVotingStatus } from '../../util';
 import useUserConnection from '../../hooks/useUserConnection';
 import { auth, firestore } from '../../firebase';
@@ -62,6 +64,7 @@ const PokerRoom = () => {
   const isMobile = useIsMobile();
 
   const { checkRoom, currentRoomOwner } = useRoom();
+  const { roomName, renameRoom } = useRoomName(roomId);
   const { isShowVotes, votes, clearVotes, handleShowVotes, handleVote } =
     useVotes(roomId);
   const { participants, fetchUsersByParticipants } = useParticipants(roomId);
@@ -336,7 +339,11 @@ const PokerRoom = () => {
       {/* toolbar */}
       <S.Toolbar>
         <div style={{ minWidth: 0 }}>
-          <h1>{roomId}</h1>
+          <RoomTitle
+            name={roomName}
+            canEdit={isRoomOwner}
+            onSave={renameRoom}
+          />
           <S.CopyButton onClick={copyLink} title={t('rooms.copyRoomUrl')}>
             {copied ? <Check size={15} /> : <Link2 size={15} />}
             <span>
