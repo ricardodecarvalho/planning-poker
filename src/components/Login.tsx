@@ -8,6 +8,8 @@ import logoWhite from '../assets/images/logo-planning-poker-white.svg';
 
 const appName = import.meta.env.VITE_APP_NAME;
 
+const TERMS_URL = 'https://skapitao.com/web-planning-poker/terms-of-use';
+
 const Page = styled.div`
   min-height: 100vh;
   display: flex;
@@ -192,6 +194,14 @@ const Terms = styled.p`
   color: var(--text-muted);
   font-size: 12.5px;
   line-height: 1.5;
+
+  a {
+    color: var(--brand-primary);
+    text-decoration: underline;
+  }
+  a:hover {
+    color: var(--brand-primary-hover);
+  }
 `;
 
 const Spinner = styled.span`
@@ -232,6 +242,11 @@ const Login = () => {
     { label: 'Português', value: 'pt-BR' },
     { label: 'English', value: 'en-US' },
   ];
+
+  const termsText = t('login.terms');
+  const [termsBefore, termsAfter] = termsText.includes('{terms}')
+    ? termsText.split('{terms}')
+    : [termsText, null];
 
   return (
     <>
@@ -277,7 +292,17 @@ const Login = () => {
               />
             </LangRow>
 
-            <Terms>{t('login.terms')}</Terms>
+            <Terms>
+              {termsBefore}
+              {termsAfter !== null && (
+                <>
+                  <a href={TERMS_URL} target="_blank" rel="noreferrer">
+                    {t('login.termsLinkLabel')}
+                  </a>
+                  {termsAfter}
+                </>
+              )}
+            </Terms>
           </Form>
         </Card>
       </Page>

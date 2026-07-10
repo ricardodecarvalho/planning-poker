@@ -8,7 +8,8 @@
     "tagline": "Agile estimates, in real time.",
     "brandSubtitle": "Gather the team, reveal votes together, and land on a number everyone buys into.",
     "description": "Sign in with your Google account to access your rooms.",
-    "terms": "By continuing, you agree to Skaptain's terms of use."
+    "terms": "By continuing, you agree to Skaptain's {terms}.",
+    "termsLinkLabel": "terms of use"
   },
   "rooms": {
     "recentRooms": "Recent rooms",
