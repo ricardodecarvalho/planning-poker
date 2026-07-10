@@ -10,11 +10,13 @@ import useVotes from '../../hooks/useVotes';
 import useParticipants, { Participant } from '../../hooks/useParticipants';
 import useItems from '../../hooks/useItems';
 import useHistory from '../../hooks/useHistory';
+import useJira from '../../hooks/useJira';
 import RoomTitle from './RoomTitle';
 import BacklogRail from './BacklogRail';
 import ActiveItemBanner from './ActiveItemBanner';
 import ApplyEstimate from './ApplyEstimate';
 import HistoryDrawer from './HistoryDrawer';
+import JiraConnectModal from './JiraConnectModal';
 import {
   getUniqueDisplayNames,
   getVotingStatus,
@@ -103,6 +105,7 @@ const PokerRoom = () => {
   const [users, setUsers] = useState<Participant[]>([]);
   const [copied, setCopied] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
+  const [jiraModalOpen, setJiraModalOpen] = useState(false);
 
   const { enterRoom } = useUserConnection();
   const userId = auth.currentUser?.uid;
@@ -158,6 +161,7 @@ const PokerRoom = () => {
 
   const votingStatus = getVotingStatus(users, votes);
   const isRoomOwner = auth.currentUser?.uid === currentRoomOwner;
+  const jira = useJira(roomId, isRoomOwner);
 
   const activeItem = items.find((item) => item.id === activeItemId);
   const allEstimated =
@@ -165,6 +169,15 @@ const PokerRoom = () => {
   // Só mostramos a trilha de backlog para o dono (que a gerencia) ou quando já
   // existem itens — assim salas sem backlog mantêm a mesa em largura cheia.
   const showBacklog = isRoomOwner || items.length > 0;
+  // Controles do Jira aparecem só para o dono (quem detém o token/conexão).
+  const backlogJira = isRoomOwner
+    ? {
+        connected: jira.connected,
+        syncing: jira.syncing,
+        onOpenConnect: () => setJiraModalOpen(true),
+        onSync: jira.sync,
+      }
+    : undefined;
   const suggestedEstimate = nearestCard(votingStatus.average, votingSystem);
   const canApply =
     isRoomOwner && isShowVotes && !!activeItem && !activeItem.estimated;
@@ -197,6 +210,11 @@ const PokerRoom = () => {
       average: votingStatus.average,
       points: suggestedEstimate,
     });
+
+    // Envia a estimativa de volta ao Jira quando o item veio de lá.
+    if (activeItem.source === 'jira') {
+      await jira.applyToJira(activeItem, suggestedEstimate);
+    }
 
     await markEstimated(activeItem.id, suggestedEstimate);
     await clearVotes(roomId);
@@ -470,6 +488,7 @@ const PokerRoom = () => {
               onSelect={selectItem}
               onAdd={addItem}
               onDelete={deleteItem}
+              jira={backlogJira}
             />
           )}
           <S.TableStage>
@@ -683,6 +702,7 @@ const PokerRoom = () => {
               onSelect={selectItem}
               onAdd={addItem}
               onDelete={deleteItem}
+              jira={backlogJira}
               mobile
             />
           )}
@@ -693,6 +713,13 @@ const PokerRoom = () => {
         open={historyOpen}
         onClose={() => setHistoryOpen(false)}
         history={history}
+      />
+
+      <JiraConnectModal
+        open={jiraModalOpen}
+        initial={jira.config}
+        onClose={() => setJiraModalOpen(false)}
+        onConnect={jira.connect}
       />
     </S.Content>
   );

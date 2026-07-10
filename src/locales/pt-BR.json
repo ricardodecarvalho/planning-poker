@@ -100,6 +100,28 @@
     "pts": "pts",
     "untitled": "Sem título"
   },
+  "jira": {
+    "connect": "Conectar Jira",
+    "adjustConnection": "Ajustar conexão",
+    "sync": "Sincronizar",
+    "syncing": "Sincronizando…",
+    "connected": "Jira conectado",
+    "connectTitle": "Conectar ao Jira",
+    "connectSubtitle": "Só o dono da sala configura a conexão. As tarefas do backlog aparecem para todo o time.",
+    "domain": "Domínio Atlassian",
+    "email": "E-mail da conta",
+    "token": "API token",
+    "tokenPlaceholder": "Cole seu token aqui",
+    "tokenHint": "Gere em id.atlassian.com › Segurança › Tokens de API",
+    "jql": "Filtro JQL (opcional)",
+    "fieldId": "ID do campo de story points (opcional)",
+    "fieldIdHint": "Deixe em branco para detectar automaticamente.",
+    "secureNote": "Seu token não é salvo em nossos servidores: fica só no seu navegador e é usado apenas para buscar as tarefas.",
+    "cancel": "Cancelar",
+    "ownerOnly": "Só o dono da sala pode conectar.",
+    "syncError": "Não foi possível buscar as tarefas do Jira. Verifique os dados e tente novamente.",
+    "applyError": "Não foi possível enviar a estimativa ao Jira."
+  },
   "votes": {
     "errorClearingVotesNoRoomId": "Erro ao limpar votos, não foi fornecido um ID de sala",
     "errorClearingVotes": "Erro ao limpar votos",
