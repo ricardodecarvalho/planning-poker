@@ -4,7 +4,6 @@ import {
   ArrowUpRight,
   FileText,
   Globe,
-  Heart,
   LogOut,
   Moon,
   Sun,
@@ -21,7 +20,6 @@ import GithubIcon from './ui/GithubIcon';
 
 const appName = import.meta.env.VITE_APP_NAME;
 const appVersion = import.meta.env.VITE_APP_VERSION;
-const donateLink = import.meta.env.VITE_DONATE_LINK;
 const REPOSITORY_LINK = 'https://github.com/ricardodecarvalho/planning-poker';
 const TERMS_LINK = 'https://skaptain.com/web-planning-poker/terms-of-use';
 
@@ -306,12 +304,6 @@ const SettingsDrawer = ({ isOpen, onClose }: SettingsDrawerProps) => {
                 style={{ marginLeft: 'auto' }}
               />
             </LinkItem>
-            {donateLink && (
-              <LinkItem href={donateLink} target="_blank" rel="noreferrer">
-                <Heart size={19} color="var(--coral-500)" />
-                <span>{t('navbar.donate')}</span>
-              </LinkItem>
-            )}
             <LogoutButton onClick={logout}>
               <LogOut size={19} />
               <span>{t('navbar.logout')}</span>

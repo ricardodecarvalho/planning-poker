@@ -5,8 +5,6 @@ import GitHubLogoWhite from '../assets/images/github-mark-white.svg';
 import useThemeContext from '../context/useThemeContext';
 import { useTranslation } from 'react-i18n-lite';
 
-const DONATE_LINK = import.meta.env.VITE_DONATE_LINK;
-
 const StyledFooter = styled.footer`
   width: 100%;
   margin: 1rem 0;
@@ -23,8 +21,6 @@ const GitHub = styled.div`
   display: flex;
   gap: 0.5rem;
 `;
-
-const Donate = styled.div``;
 
 const Footer = () => {
   const { theme } = useThemeContext();
@@ -45,12 +41,6 @@ const Footer = () => {
             {t('navbar.repository')}
           </a>
         </GitHub>
-        {' | '}
-        <Donate>
-          <a target="_blank" href={DONATE_LINK}>
-            {t('navbar.donate')}
-          </a>
-        </Donate>
       </FooterContainer>
     </StyledFooter>
   );
