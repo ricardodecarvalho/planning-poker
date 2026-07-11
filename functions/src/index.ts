@@ -4,6 +4,9 @@ import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { OpenAI } from 'openai';
 import dotenv from 'dotenv';
 
+// Jira Cloud proxy callables (token is passed per-request, never persisted).
+export { jiraSearch, jiraSetEstimate } from './jira';
+
 dotenv.config();
 admin.initializeApp();
 

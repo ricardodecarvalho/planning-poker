@@ -100,6 +100,28 @@
     "pts": "pts",
     "untitled": "Untitled"
   },
+  "jira": {
+    "connect": "Connect Jira",
+    "adjustConnection": "Adjust connection",
+    "sync": "Sync",
+    "syncing": "Syncing…",
+    "connected": "Jira connected",
+    "connectTitle": "Connect to Jira",
+    "connectSubtitle": "Only the room owner sets up the connection. Backlog tasks appear for the whole team.",
+    "domain": "Atlassian domain",
+    "email": "Account email",
+    "token": "API token",
+    "tokenPlaceholder": "Paste your token here",
+    "tokenHint": "Generate it at id.atlassian.com › Security › API tokens",
+    "jql": "JQL filter (optional)",
+    "fieldId": "Story points field ID (optional)",
+    "fieldIdHint": "Leave blank to auto-detect.",
+    "secureNote": "Your token is not saved on our servers: it stays only in your browser and is used only to fetch the tasks.",
+    "cancel": "Cancel",
+    "ownerOnly": "Only the room owner can connect.",
+    "syncError": "Couldn't fetch Jira tasks. Check the details and try again.",
+    "applyError": "Couldn't send the estimate to Jira."
+  },
   "votes": {
     "errorClearingVotesNoRoomId": "Error clearing votes, no room ID provided",
     "errorClearingVotes": "Error clearing votes",

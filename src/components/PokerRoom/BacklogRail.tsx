@@ -1,7 +1,14 @@
 import { useState } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18n-lite';
-import { FileText, Layers, Plus, Trash2 } from 'lucide-react';
+import {
+  FileText,
+  Layers,
+  PlugZap,
+  Plus,
+  RefreshCw,
+  Trash2,
+} from 'lucide-react';
 
 import { Item } from '../../hooks/useItems';
 
@@ -212,6 +219,58 @@ const AddRow = styled.form`
   }
 `;
 
+const JiraBar = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-top: 1px solid var(--border-subtle);
+
+  button {
+    flex: 1;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    background: none;
+    color: var(--text-secondary);
+    font-family: var(--font-body);
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition-colors);
+  }
+  button:hover:not(:disabled) {
+    background: var(--fill-hover);
+  }
+  button:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+  .spin {
+    animation: ppSpin 0.8s linear infinite;
+  }
+`;
+
+const ConnectedDot = styled.span`
+  flex: none;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--success);
+  box-shadow: 0 0 0 3px var(--success-bg);
+`;
+
+export interface BacklogJira {
+  connected: boolean;
+  syncing: boolean;
+  onOpenConnect: () => void;
+  onSync: () => void;
+}
+
 interface BacklogRailProps {
   items: Item[];
   activeItemId?: string;
@@ -219,6 +278,7 @@ interface BacklogRailProps {
   onSelect: (id: string) => void;
   onAdd: (summary: string) => void;
   onDelete: (id: string) => void;
+  jira?: BacklogJira;
   mobile?: boolean;
 }
 
@@ -229,6 +289,7 @@ const BacklogRail = ({
   onSelect,
   onAdd,
   onDelete,
+  jira,
   mobile,
 }: BacklogRailProps) => {
   const { t } = useTranslation();
@@ -246,7 +307,10 @@ const BacklogRail = ({
     <Aside $mobile={mobile}>
       <RailHeader>
         <span className="title">{t('backlog.title')}</span>
-        {items.length > 0 && <span className="count">{items.length}</span>}
+        <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          {jira?.connected && <ConnectedDot title={t('jira.connected')} />}
+          {items.length > 0 && <span className="count">{items.length}</span>}
+        </span>
       </RailHeader>
 
       {items.length === 0 ? (
@@ -308,6 +372,29 @@ const BacklogRail = ({
             <Plus size={18} />
           </button>
         </AddRow>
+      )}
+
+      {isOwner && jira && (
+        <JiraBar>
+          <button type="button" onClick={jira.onOpenConnect}>
+            <PlugZap size={15} />
+            {jira.connected ? t('jira.adjustConnection') : t('jira.connect')}
+          </button>
+          {jira.connected && (
+            <button
+              type="button"
+              onClick={jira.onSync}
+              disabled={jira.syncing}
+              title={t('jira.sync')}
+            >
+              <RefreshCw
+                size={15}
+                className={jira.syncing ? 'spin' : undefined}
+              />
+              {jira.syncing ? t('jira.syncing') : t('jira.sync')}
+            </button>
+          )}
+        </JiraBar>
       )}
     </Aside>
   );
