@@ -123,6 +123,8 @@ const mapIssue = (issue: any, spField?: string) => ({
   key: issue.key,
   summary: issue.fields?.summary ?? '',
   type: issue.fields?.issuetype?.name ?? '',
+  status: issue.fields?.status?.name ?? null,
+  statusCategory: issue.fields?.status?.statusCategory?.key ?? null,
   points: spField ? (issue.fields?.[spField] ?? null) : null,
 });
 
@@ -241,6 +243,7 @@ export const jiraBoardIssues = onCall({ region: REGION }, async (request) => {
     const fieldsParam = [
       'summary',
       'issuetype',
+      'status',
       ...(spField ? [spField] : []),
     ].join(',');
     const jql = d.jql?.trim() || 'statusCategory != Done';
@@ -299,7 +302,12 @@ export const jiraSearch = onCall({ region: REGION }, async (request) => {
         // so the fallback is time-bounded.
         jql: d.jql?.trim() || 'updated >= -30d ORDER BY updated DESC',
         maxResults: 50,
-        fields: ['summary', 'issuetype', ...(spField ? [spField] : [])],
+        fields: [
+          'summary',
+          'issuetype',
+          'status',
+          ...(spField ? [spField] : []),
+        ],
       }),
     });
 
@@ -323,24 +331,40 @@ export const jiraSearch = onCall({ region: REGION }, async (request) => {
   }
 });
 
-/** Write a story-point estimate back to a Jira issue. */
+/**
+ * Write the estimate back to a Jira issue. The owner chooses which fields:
+ * a numeric Story Points field (storyPointsFieldId) and/or the time-tracking
+ * Original Estimate (written in hours, e.g. 5 -> "5h").
+ */
 export const jiraSetEstimate = onCall({ region: REGION }, async (request) => {
   requireAppCheck(request);
   const d = request.data as Creds & {
     issueId: string;
     points: number;
-    fieldId: string;
+    storyPointsFieldId?: string;
+    originalEstimate?: boolean;
   };
   requireCreds(d);
-  if (!d.issueId || !d.fieldId) {
-    throw new HttpsError('invalid-argument', 'Missing Jira parameters.');
+  if (!d.issueId) {
+    throw new HttpsError('invalid-argument', 'Missing Jira issue.');
   }
+
+  const fields: Record<string, unknown> = {};
+  if (d.storyPointsFieldId) {
+    fields[d.storyPointsFieldId] = Number(d.points);
+  }
+  if (d.originalEstimate) {
+    fields.timetracking = { originalEstimate: `${Number(d.points)}h` };
+  }
+  // Nothing selected to write — treat as a no-op success.
+  if (Object.keys(fields).length === 0) return { ok: true };
+
   const { base, headers } = buildContext(d.domain, d.email, d.token);
   try {
     const res = await fetch(`${base}/rest/api/3/issue/${d.issueId}`, {
       method: 'PUT',
       headers,
-      body: JSON.stringify({ fields: { [d.fieldId]: Number(d.points) } }),
+      body: JSON.stringify({ fields }),
     });
     if (!res.ok) {
       const detail = await readJiraError(res);
@@ -351,6 +375,46 @@ export const jiraSetEstimate = onCall({ region: REGION }, async (request) => {
       );
     }
     return { ok: true };
+  } catch (error) {
+    return fail(error);
+  }
+});
+
+/** Rich details of a single issue (owner-only) for the in-app task modal. */
+export const jiraIssue = onCall({ region: REGION }, async (request) => {
+  requireAppCheck(request);
+  const d = request.data as Creds & { issueId: string };
+  requireCreds(d);
+  if (!d.issueId) {
+    throw new HttpsError('invalid-argument', 'Missing Jira issue.');
+  }
+  const { base, headers } = buildContext(d.domain, d.email, d.token);
+  try {
+    const data = await getJson(
+      `${base}/rest/api/3/issue/${encodeURIComponent(
+        d.issueId,
+      )}?fields=summary,description,status,issuetype,assignee,attachment&expand=renderedFields`,
+      headers,
+      'Jira issue',
+    );
+    const f = data.fields ?? {};
+    const rf = data.renderedFields ?? {};
+    return {
+      key: data.key,
+      summary: f.summary ?? '',
+      type: f.issuetype?.name ?? '',
+      status: f.status?.name ?? null,
+      statusCategory: f.status?.statusCategory?.key ?? null,
+      assignee: f.assignee?.displayName ?? null,
+      descriptionHtml: rf.description ?? '',
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      attachments: (f.attachment ?? []).map((a: any) => ({
+        id: a.id,
+        filename: a.filename,
+        size: a.size,
+        mimeType: a.mimeType,
+      })),
+    };
   } catch (error) {
     return fail(error);
   }

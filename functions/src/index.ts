@@ -12,6 +12,7 @@ export {
   jiraBoardIssues,
   jiraSearch,
   jiraSetEstimate,
+  jiraIssue,
 } from './jira';
 
 dotenv.config();
