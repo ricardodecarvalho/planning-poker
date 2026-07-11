@@ -267,7 +267,7 @@ const useJira = (roomId: string | undefined, isOwner: boolean) => {
         } else if (sel.mode === 'project' && sel.projectKey) {
           result = await call<IssuesResult>('jiraSearch', {
             ...creds,
-            jql: `project = "${sel.projectKey}" AND statusCategory != Done ORDER BY created DESC`,
+            jql: `project = "${sel.projectKey}" AND statusCategory != Done AND issuetype in standardIssueTypes() ORDER BY created DESC`,
           });
         } else {
           result = await call<IssuesResult>('jiraSearch', {

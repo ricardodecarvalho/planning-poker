@@ -227,11 +227,7 @@ export const jiraSprints = onCall({ region: REGION }, async (request) => {
  */
 export const jiraBoardIssues = onCall({ region: REGION }, async (request) => {
   requireAppCheck(request);
-  const d = request.data as Creds & {
-    boardId?: number;
-    sprintId?: number;
-    jql?: string;
-  };
+  const d = request.data as Creds & { boardId?: number; sprintId?: number };
   requireCreds(d);
   if (!d.boardId) {
     throw new HttpsError('invalid-argument', 'Missing board.');
@@ -246,37 +242,66 @@ export const jiraBoardIssues = onCall({ region: REGION }, async (request) => {
       'status',
       ...(spField ? [spField] : []),
     ].join(',');
-    const jql = d.jql?.trim() || 'statusCategory != Done';
-    const query =
-      `maxResults=50&fields=${encodeURIComponent(fieldsParam)}` +
-      `&jql=${encodeURIComponent(jql)}`;
+
+    // Exclude subtasks — they inflate the count vs. what the board shows and
+    // aren't estimated as backlog items. For a sprint keep every status (the
+    // sprint is already the curated set, matching Jira's "N work items"); for a
+    // backlog/Kanban board drop Done.
+    const clauses = ['issuetype in standardIssueTypes()'];
+    if (!d.sprintId) clauses.push('statusCategory != Done');
+    const jql = clauses.join(' AND ');
+    const encFields = encodeURIComponent(fieldsParam);
+    const encJql = encodeURIComponent(jql);
+
+    // Agile endpoints paginate (startAt/maxResults/isLast/total); fetch every
+    // page so nothing is dropped by a page cap.
+    const fetchAll = async (
+      path: string,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ): Promise<{ ok: boolean; res?: Response; issues: any[] }> => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const collected: any[] = [];
+      let startAt = 0;
+      // Hard cap of 10 pages (1000 issues) to avoid runaway loops.
+      for (let page = 0; page < 10; page++) {
+        const q =
+          `startAt=${startAt}&maxResults=100` +
+          `&fields=${encFields}&jql=${encJql}`;
+        const res = await fetch(`${path}?${q}`, { headers });
+        if (!res.ok) return { ok: false, res, issues: collected };
+        const data = await res.json();
+        const issues = data.issues ?? [];
+        collected.push(...issues);
+        if (data.isLast || issues.length === 0) break;
+        if (typeof data.total === 'number' && collected.length >= data.total) {
+          break;
+        }
+        startAt += issues.length;
+      }
+      return { ok: true, issues: collected };
+    };
 
     const boardUrl = `${base}/rest/agile/1.0/board/${d.boardId}`;
-    let res: Response;
+    let result;
     if (d.sprintId) {
-      res = await fetch(`${boardUrl}/sprint/${d.sprintId}/issue?${query}`, {
-        headers,
-      });
+      result = await fetchAll(`${boardUrl}/sprint/${d.sprintId}/issue`);
     } else {
       // Scrum boards have a backlog; Kanban/other boards don't — fall back to
       // all board issues so any board type works.
-      res = await fetch(`${boardUrl}/backlog?${query}`, { headers });
-      if (!res.ok) {
-        res = await fetch(`${boardUrl}/issue?${query}`, { headers });
-      }
+      result = await fetchAll(`${boardUrl}/backlog`);
+      if (!result.ok) result = await fetchAll(`${boardUrl}/issue`);
     }
-    if (!res.ok) {
-      const detail = await readJiraError(res);
-      console.error('jira board issues failed', res.status, detail);
+    if (!result.ok) {
+      const detail = result.res ? await readJiraError(result.res) : '';
+      console.error('jira board issues failed', result.res?.status, detail);
       throw new HttpsError(
         'permission-denied',
-        `Jira issues failed (${res.status}): ${detail}`,
+        `Jira issues failed (${result.res?.status}): ${detail}`,
       );
     }
-    const data = await res.json();
     return {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      issues: (data.issues ?? []).map((i: any) => mapIssue(i, spField)),
+      issues: result.issues.map((i: any) => mapIssue(i, spField)),
       storyPointsFieldId: spField ?? null,
     };
   } catch (error) {
@@ -301,7 +326,7 @@ export const jiraSearch = onCall({ region: REGION }, async (request) => {
         // Jira Cloud rejects unbounded queries ("add a search restriction"),
         // so the fallback is time-bounded.
         jql: d.jql?.trim() || 'updated >= -30d ORDER BY updated DESC',
-        maxResults: 50,
+        maxResults: 100,
         fields: [
           'summary',
           'issuetype',
