@@ -79,7 +79,26 @@
     "linkCopied": "Link copiado!",
     "revealHint": "revele quando estiver pronto",
     "revealHintTeam": "revele quando o time estiver pronto",
-    "fullRoom": "A sala está cheia :("
+    "fullRoom": "A sala está cheia :(",
+    "history": "Histórico",
+    "applyEstimate": "Aplicar {points} pts",
+    "estimating": "Estimando",
+    "backlogDone": "Todo o backlog foi estimado. Bom trabalho!"
+  },
+  "backlog": {
+    "title": "Backlog",
+    "empty": "Nenhum item ainda.",
+    "emptyOwner": "Adicione um tópico abaixo para começar a estimar.",
+    "addPlaceholder": "Novo tópico…",
+    "addItem": "Adicionar",
+    "delete": "Remover item"
+  },
+  "history": {
+    "title": "Histórico de votações",
+    "empty": "Nenhuma votação registrada ainda. Revele os votos e aplique a estimativa para guardar aqui.",
+    "votes": "{count} votos",
+    "pts": "pts",
+    "untitled": "Sem título"
   },
   "votes": {
     "errorClearingVotesNoRoomId": "Erro ao limpar votos, não foi fornecido um ID de sala",

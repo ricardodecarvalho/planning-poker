@@ -30,9 +30,15 @@ service cloud.firestore {
       // Max 15 participants per room. Kept in sync with MAX_PARTICIPANTS in
       // src/hooks/useParticipants.ts. Allow if the new list is within the
       // limit OR is not growing — so pre-existing rooms above the limit and
-      // non-participant updates (showVotes / name) are never blocked.
+      // non-participant updates (showVotes / name / activeItemId) are never
+      // blocked.
       return request.resource.data.participants.size() <= 15 ||
         request.resource.data.participants.size() <= resource.data.participants.size();
+    }
+
+    function isValidItemData() {
+      let d = request.resource.data;
+      return d.summary is string && d.source in ['manual', 'jira'];
     }
 
     function isValidUserData() {
@@ -70,8 +76,26 @@ service cloud.firestore {
           request.resource.data.userId == request.auth.uid &&
           request.resource.data.roomId == roomId;
         allow update: if isAuthenticated() && resource.data.userId == request.auth.uid;
-        allow delete: if isAuthenticated() && 
+        allow delete: if isAuthenticated() &&
           (resource.data.userId == request.auth.uid || isRoomOwner(roomId));
+      }
+
+      // Backlog de itens votáveis (somente o dono escreve; todos leem)
+      match /items/{itemId} {
+        allow read: if isAuthenticated();
+        allow create, update: if isRoomOwner(roomId) && isValidItemData();
+        allow delete: if isRoomOwner(roomId);
+      }
+
+      // Histórico de rodadas — criado pelo dono, imutável, excluído pelo dono
+      match /history/{historyId} {
+        allow read: if isAuthenticated();
+        allow create: if isRoomOwner(roomId) &&
+          request.resource.data.createdBy == request.auth.uid &&
+          request.resource.data.keys().hasAll(['votes', 'createdAt', 'createdBy']) &&
+          request.resource.data.votes is list;
+        allow update: if false;
+        allow delete: if isRoomOwner(roomId);
       }
     }
 

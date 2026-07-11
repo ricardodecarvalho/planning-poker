@@ -113,10 +113,61 @@ export const ToolbarActions = styled.div`
   display: flex;
   align-items: center;
   gap: 10px;
+  flex-wrap: wrap;
 `;
 
-/* ---------- desktop table ---------- */
+export const HistoryButton = styled.button`
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: var(--control-md);
+  padding: 0 15px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--surface-card);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-weight: var(--weight-semibold);
+  font-size: 14px;
+  cursor: pointer;
+  transition: var(--transition-colors);
+
+  &:hover {
+    background: var(--fill-hover);
+  }
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-focus);
+  }
+
+  .count {
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    border-radius: var(--radius-full);
+    background: var(--surface-sunken);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-secondary);
+    font-size: 11.5px;
+    font-weight: 700;
+    font-family: var(--font-mono);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+`;
+
+/* ---------- desktop layout ---------- */
+export const DesktopSplit = styled.div`
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+`;
+
 export const TableStage = styled.div`
+  flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
