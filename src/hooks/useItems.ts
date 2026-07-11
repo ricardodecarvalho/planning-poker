@@ -19,6 +19,9 @@ export interface Item {
   key?: string;
   type?: string;
   jiraId?: string;
+  status?: string;
+  statusCategory?: string;
+  browseUrl?: string;
   estimated?: boolean;
   points?: number | string;
   order?: number;
