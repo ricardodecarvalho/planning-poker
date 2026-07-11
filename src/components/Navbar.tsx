@@ -20,7 +20,7 @@ const Header = styled.header`
   align-items: center;
   justify-content: space-between;
   height: 64px;
-  padding: 0 clamp(16px, 4vw, 28px);
+  padding: 0 clamp(16px, 4vw, 32px);
   background: var(--surface-card);
   border-bottom: 1px solid var(--border-subtle);
 `;

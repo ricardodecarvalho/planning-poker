@@ -176,6 +176,38 @@ const Toggle = styled.button`
   padding: 0;
 `;
 
+const FieldsBox = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 14px;
+  background: var(--surface-sunken);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+
+  .title {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  label {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-size: 13.5px;
+    color: var(--text-primary);
+    cursor: pointer;
+  }
+  input {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--brand-primary);
+    cursor: pointer;
+  }
+`;
+
 const SecureNote = styled.div`
   display: flex;
   align-items: flex-start;
@@ -241,6 +273,8 @@ const JiraConnectModal = ({ open, jira, onClose }: JiraConnectModalProps) => {
   const [sprintId, setSprintId] = useState('');
   const [manual, setManual] = useState(false);
   const [jql, setJql] = useState('');
+  const [writeSP, setWriteSP] = useState(true);
+  const [writeOE, setWriteOE] = useState(false);
 
   const loadBoards = async (key: string) => {
     setBusy(true);
@@ -289,6 +323,8 @@ const JiraConnectModal = ({ open, jira, onClose }: JiraConnectModalProps) => {
       setSprintId(sel?.sprintId ? String(sel.sprintId) : '');
       setManual(sel?.mode === 'jql');
       setJql(sel?.jql ?? '');
+      setWriteSP(jira.creds.writeStoryPoints !== false);
+      setWriteOE(!!jira.creds.writeOriginalEstimate);
       setStep('select');
       loadProjects();
       if (sel?.projectKey) loadBoards(sel.projectKey);
@@ -556,6 +592,32 @@ const JiraConnectModal = ({ open, jira, onClose }: JiraConnectModalProps) => {
                 autoComplete="off"
               />
             )}
+
+            <FieldsBox>
+              <span className="title">{t('jira.fieldsToUpdate')}</span>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={writeSP}
+                  onChange={(e) => {
+                    setWriteSP(e.target.checked);
+                    jira.updateWriteFlags(e.target.checked, writeOE);
+                  }}
+                />
+                {t('jira.fieldStoryPoints')}
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={writeOE}
+                  onChange={(e) => {
+                    setWriteOE(e.target.checked);
+                    jira.updateWriteFlags(writeSP, e.target.checked);
+                  }}
+                />
+                {t('jira.fieldOriginalEstimate')}
+              </label>
+            </FieldsBox>
             {error && <ErrorText>{error}</ErrorText>}
           </Body>
         )}

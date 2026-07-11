@@ -1,9 +1,9 @@
 import styled from 'styled-components';
 
 export const Content = styled.div`
-  max-width: 1200px;
+  max-width: 1560px;
   margin: 0 auto;
-  padding: 32px clamp(16px, 4vw, 28px) 96px;
+  padding: 32px clamp(16px, 4vw, 32px) 96px;
 `;
 
 /* ---------- toolbar ---------- */
@@ -176,7 +176,7 @@ export const TableStage = styled.div`
 
 export const TableWrap = styled.div`
   width: 100%;
-  max-width: 860px;
+  max-width: 1040px;
   padding: 26px;
   background: var(--surface-sunken);
   border: 1px solid var(--border-subtle);
@@ -328,11 +328,27 @@ export const DistChip = styled.div`
 
 /* ---------- hand (desktop) ---------- */
 export const HandSection = styled.div`
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
   width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
+  gap: 6px;
+  padding: 8px 0 10px;
+  background: var(--surface-base);
+  box-shadow: 0 -14px 24px -16px rgba(0, 0, 0, 0.35);
+`;
+
+/* ---------- hand (mobile, sticky bottom) ---------- */
+export const MobileHand = styled.div`
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+  padding: 10px 0 4px;
+  background: var(--surface-base);
+  box-shadow: 0 -14px 24px -16px rgba(0, 0, 0, 0.35);
 `;
 
 export const Eyebrow = styled.span`

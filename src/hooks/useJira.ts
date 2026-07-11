@@ -3,9 +3,11 @@ import {
   collection,
   deleteDoc,
   doc,
+  getDoc,
   getDocs,
   query,
   setDoc,
+  updateDoc,
   where,
 } from 'firebase/firestore';
 import { useCallback, useEffect, useState } from 'react';
@@ -19,7 +21,32 @@ export interface JiraCreds {
   email: string;
   token: string;
   fieldId?: string;
+  // Which fields to write back on "Aplicar" (owner toggles). Story Points
+  // defaults ON (undefined === true) for backward-compat; Original Estimate
+  // is opt-in and written in hours.
+  writeStoryPoints?: boolean;
+  writeOriginalEstimate?: boolean;
 }
+
+export interface JiraIssueDetails {
+  key: string;
+  summary: string;
+  type: string;
+  status: string | null;
+  statusCategory: string | null;
+  assignee: string | null;
+  descriptionHtml: string;
+  attachments: {
+    id: string;
+    filename: string;
+    size: number;
+    mimeType: string;
+  }[];
+}
+
+// Base URL to open an issue in Jira, built from the (non-secret) domain.
+export const jiraBrowseUrl = (domain: string, key: string) =>
+  `https://${domain.replace(/^https?:\/\//, '').replace(/\/+$/, '')}/browse/${key}`;
 
 export interface JiraSelection {
   mode: 'board' | 'sprint' | 'project' | 'jql';
@@ -56,6 +83,8 @@ interface JiraIssue {
   key: string;
   summary: string;
   type: string;
+  status: string | null;
+  statusCategory: string | null;
   points: number | string | null;
 }
 
@@ -181,6 +210,9 @@ const useJira = (roomId: string | undefined, isOwner: boolean) => {
             source: 'jira',
             key: issue.key,
             type: issue.type,
+            status: issue.status ?? null,
+            statusCategory: issue.statusCategory ?? null,
+            browseUrl: jiraBrowseUrl(creds.domain, issue.key),
             jiraId: issue.jiraId,
             order: index,
             createdAt: new Date().toISOString(),
@@ -235,7 +267,7 @@ const useJira = (roomId: string | undefined, isOwner: boolean) => {
         } else if (sel.mode === 'project' && sel.projectKey) {
           result = await call<IssuesResult>('jiraSearch', {
             ...creds,
-            jql: `project = "${sel.projectKey}" AND statusCategory != Done ORDER BY created DESC`,
+            jql: `project = "${sel.projectKey}" AND statusCategory != Done AND issuetype in standardIssueTypes() ORDER BY created DESC`,
           });
         } else {
           result = await call<IssuesResult>('jiraSearch', {
@@ -245,6 +277,18 @@ const useJira = (roomId: string | undefined, isOwner: boolean) => {
         }
         await writeIssues(result);
         persistSelection(sel);
+
+        // Se a sala ainda não tem nome e uma sprint foi escolhida, usa o nome
+        // da sprint como nome da sala.
+        if (sel.mode === 'sprint' && sel.sprintName) {
+          const roomRef = doc(firestore, 'rooms', roomId);
+          const roomSnap = await getDoc(roomRef);
+          const currentName =
+            (roomSnap.data()?.name as string | undefined) ?? '';
+          if (!currentName.trim()) {
+            await updateDoc(roomRef, { name: sel.sprintName });
+          }
+        }
       } catch (error) {
         console.error('Jira sync error:', error);
         toast.error(t('jira.syncError'));
@@ -262,9 +306,18 @@ const useJira = (roomId: string | undefined, isOwner: boolean) => {
     [selection, syncSelection],
   );
 
+  // Story Points defaults ON (undefined === true); Original Estimate opt-in.
+  const willWriteStoryPoints = !!creds && creds.writeStoryPoints !== false;
+  const willWriteOriginalEstimate = !!creds?.writeOriginalEstimate;
+  const canWriteJira =
+    (willWriteStoryPoints && !!creds?.fieldId) || willWriteOriginalEstimate;
+
   const applyToJira = useCallback(
     async (item: Item, points: number) => {
-      if (!creds || !item.jiraId || !creds.fieldId) return;
+      if (!creds || !item.jiraId) return;
+      const storyPointsFieldId =
+        willWriteStoryPoints && creds.fieldId ? creds.fieldId : undefined;
+      if (!storyPointsFieldId && !willWriteOriginalEstimate) return;
       try {
         await call('jiraSetEstimate', {
           domain: creds.domain,
@@ -272,14 +325,35 @@ const useJira = (roomId: string | undefined, isOwner: boolean) => {
           token: creds.token,
           issueId: item.jiraId,
           points,
-          fieldId: creds.fieldId,
+          storyPointsFieldId,
+          originalEstimate: willWriteOriginalEstimate,
         });
       } catch (error) {
         console.error('Jira apply error:', error);
         toast.error(t('jira.applyError'));
       }
     },
-    [creds, t],
+    [creds, willWriteStoryPoints, willWriteOriginalEstimate, t],
+  );
+
+  const getIssue = useCallback(
+    async (item: Item): Promise<JiraIssueDetails | null> => {
+      if (!creds || !item.jiraId) return null;
+      return call<JiraIssueDetails>('jiraIssue', {
+        ...creds,
+        issueId: item.jiraId,
+      });
+    },
+    [creds],
+  );
+
+  // Liga/desliga quais campos gravar no Jira (sem revalidar credenciais).
+  const updateWriteFlags = useCallback(
+    (writeStoryPoints: boolean, writeOriginalEstimate: boolean) => {
+      if (!creds) return;
+      persistCreds({ ...creds, writeStoryPoints, writeOriginalEstimate });
+    },
+    [creds, persistCreds],
   );
 
   // "Trocar credenciais": limpa credenciais globais e a seleção da sala.
@@ -293,6 +367,9 @@ const useJira = (roomId: string | undefined, isOwner: boolean) => {
     creds,
     selection,
     syncing,
+    canWriteJira,
+    willWriteStoryPoints,
+    willWriteOriginalEstimate,
     saveCreds,
     listProjects,
     listBoards,
@@ -300,6 +377,8 @@ const useJira = (roomId: string | undefined, isOwner: boolean) => {
     syncSelection,
     sync,
     applyToJira,
+    getIssue,
+    updateWriteFlags,
     clearCreds,
   };
 };

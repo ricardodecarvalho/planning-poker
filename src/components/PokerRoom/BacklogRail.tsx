@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { useTranslation } from 'react-i18n-lite';
 import {
   FileText,
+  Info,
   Layers,
   PlugZap,
   Plus,
@@ -10,11 +11,19 @@ import {
   Trash2,
 } from 'lucide-react';
 
+import StatusPill from './StatusPill';
 import { Item } from '../../hooks/useItems';
+
+// To do -> In progress -> Done (Jira statusCategory keys).
+const STATUS_ORDER: Record<string, number> = {
+  new: 0,
+  indeterminate: 1,
+  done: 2,
+};
 
 const Aside = styled.aside<{ $mobile?: boolean }>`
   ${({ $mobile }) =>
-    $mobile ? `width:100%;` : `flex:none;width:322px;max-height:664px;`}
+    $mobile ? `width:100%;` : `flex:none;width:360px;max-height:720px;`}
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -107,7 +116,8 @@ const Row = styled.div<{ $active: boolean; $clickable: boolean }>`
     background: ${({ $active }) =>
       $active ? 'var(--success-bg)' : 'var(--fill-hover)'};
   }
-  &:hover .delete {
+  &:hover .delete,
+  &:hover .iconbtn {
     opacity: 1;
   }
 
@@ -122,6 +132,10 @@ const Row = styled.div<{ $active: boolean; $clickable: boolean }>`
     font-size: 11.5px;
     color: var(--text-muted);
     font-weight: 600;
+  }
+  a.key:hover {
+    color: var(--brand-primary);
+    text-decoration: underline;
   }
   .spacer {
     flex: 1;
@@ -170,6 +184,36 @@ const Row = styled.div<{ $active: boolean; $clickable: boolean }>`
     background: var(--danger-bg);
     color: var(--danger);
   }
+  .iconbtn {
+    flex: none;
+    width: 24px;
+    height: 24px;
+    border-radius: var(--radius-sm);
+    border: none;
+    background: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition:
+      opacity var(--duration-fast),
+      var(--transition-colors);
+  }
+  .iconbtn:hover {
+    background: var(--fill-hover);
+    color: var(--brand-primary);
+  }
+`;
+
+const SectionLabel = styled.span`
+  padding: 8px 8px 4px;
+  font-size: 10.5px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
 `;
 
 const AddRow = styled.form`
@@ -278,6 +322,7 @@ interface BacklogRailProps {
   onSelect: (id: string) => void;
   onAdd: (summary: string) => void;
   onDelete: (id: string) => void;
+  onDetails: (item: Item) => void;
   jira?: BacklogJira;
   mobile?: boolean;
 }
@@ -289,6 +334,7 @@ const BacklogRail = ({
   onSelect,
   onAdd,
   onDelete,
+  onDetails,
   jira,
   mobile,
 }: BacklogRailProps) => {
@@ -302,6 +348,77 @@ const BacklogRail = ({
     onAdd(value);
     setDraft('');
   };
+
+  // Tasks do Jira (ordenadas por status) e itens avulsos, em seções separadas.
+  const jiraItems = items
+    .filter((i) => i.source === 'jira')
+    .sort(
+      (a, b) =>
+        (STATUS_ORDER[a.statusCategory ?? ''] ?? 0) -
+        (STATUS_ORDER[b.statusCategory ?? ''] ?? 0),
+    );
+  const manualItems = items.filter((i) => i.source !== 'jira');
+  const showSections = jiraItems.length > 0 && manualItems.length > 0;
+
+  const renderRow = (item: Item, idx: number) => (
+    <Row
+      key={item.id}
+      $active={item.id === activeItemId}
+      $clickable={isOwner}
+      onClick={isOwner ? () => onSelect(item.id) : undefined}
+    >
+      <div className="top">
+        <FileText size={14} color="var(--text-muted)" />
+        {item.browseUrl ? (
+          <a
+            className="key"
+            href={item.browseUrl}
+            target="_blank"
+            rel="noreferrer"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {item.key}
+          </a>
+        ) : (
+          <span className="key">{item.key || `#${idx + 1}`}</span>
+        )}
+        {item.status && (
+          <StatusPill status={item.status} category={item.statusCategory} />
+        )}
+        <span className="spacer" />
+        {item.estimated && item.points !== undefined && (
+          <span className="points">{item.points}</span>
+        )}
+        {isOwner && item.source === 'jira' && (
+          <button
+            type="button"
+            className="iconbtn"
+            title={t('jira.details')}
+            onClick={(e) => {
+              e.stopPropagation();
+              onDetails(item);
+            }}
+          >
+            <Info size={14} />
+          </button>
+        )}
+        {isOwner && item.source !== 'jira' && (
+          <button
+            type="button"
+            className="delete"
+            title={t('backlog.delete')}
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete(item.id);
+            }}
+          >
+            <Trash2 size={14} />
+          </button>
+        )}
+      </div>
+      <span className="summary">{item.summary}</span>
+    </Row>
+  );
 
   return (
     <Aside $mobile={mobile}>
@@ -322,37 +439,14 @@ const BacklogRail = ({
         </EmptyState>
       ) : (
         <List $mobile={mobile}>
-          {items.map((item, index) => (
-            <Row
-              key={item.id}
-              $active={item.id === activeItemId}
-              $clickable={isOwner}
-              onClick={isOwner ? () => onSelect(item.id) : undefined}
-            >
-              <div className="top">
-                <FileText size={14} color="var(--text-muted)" />
-                <span className="key">{item.key || `#${index + 1}`}</span>
-                <span className="spacer" />
-                {item.estimated && item.points !== undefined && (
-                  <span className="points">{item.points}</span>
-                )}
-                {isOwner && (
-                  <button
-                    type="button"
-                    className="delete"
-                    title={t('backlog.delete')}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onDelete(item.id);
-                    }}
-                  >
-                    <Trash2 size={14} />
-                  </button>
-                )}
-              </div>
-              <span className="summary">{item.summary}</span>
-            </Row>
-          ))}
+          {showSections && jiraItems.length > 0 && (
+            <SectionLabel>{t('backlog.jiraSection')}</SectionLabel>
+          )}
+          {jiraItems.map((item, index) => renderRow(item, index))}
+          {showSections && manualItems.length > 0 && (
+            <SectionLabel>{t('backlog.manualSection')}</SectionLabel>
+          )}
+          {manualItems.map((item, index) => renderRow(item, index))}
         </List>
       )}
 

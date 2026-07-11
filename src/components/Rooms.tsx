@@ -12,9 +12,9 @@ import DeleteRoom from './DeleteRoom';
 import Button from './ui/Button';
 
 const Content = styled.div`
-  max-width: 1200px;
+  max-width: 1560px;
   margin: 0 auto;
-  padding: 32px clamp(16px, 4vw, 28px) 96px;
+  padding: 32px clamp(16px, 4vw, 32px) 96px;
 `;
 
 const Toolbar = styled.div`
@@ -77,8 +77,15 @@ const EmptyState = styled.div`
 
 const Grid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 18px;
+
+  @media (max-width: 900px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
 `;
 
 const RoomCard = styled.div`
@@ -218,11 +225,7 @@ const CopyLinkButton = ({ roomId, title }: CopyLinkButtonProps) => {
   };
 
   return (
-    <IconButton
-      className={copied ? 'copied' : ''}
-      onClick={copy}
-      title={title}
-    >
+    <IconButton className={copied ? 'copied' : ''} onClick={copy} title={title}>
       {copied ? <Check size={17} /> : <Link2 size={17} />}
     </IconButton>
   );
