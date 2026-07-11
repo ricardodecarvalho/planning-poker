@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18n-lite';
 import { ExternalLink, Paperclip, User, X } from 'lucide-react';
@@ -6,6 +6,22 @@ import { ExternalLink, Paperclip, User, X } from 'lucide-react';
 import StatusPill from './StatusPill';
 import { Item } from '../../hooks/useItems';
 import { JiraIssueDetails } from '../../hooks/useJira';
+import useThemeContext from '../../context/useThemeContext';
+
+// Resolve a CSS custom property to a concrete color so it can be inlined into
+// the sandboxed iframe (which doesn't inherit the app's CSS variables).
+const readCssColor = (name: string, fallback: string) => {
+  try {
+    const probe = document.createElement('span');
+    probe.style.cssText = `color:var(${name});position:absolute;visibility:hidden`;
+    document.body.appendChild(probe);
+    const value = getComputedStyle(probe).color;
+    probe.remove();
+    return value || fallback;
+  } catch {
+    return fallback;
+  }
+};
 
 const Overlay = styled.div`
   position: fixed;
@@ -134,7 +150,7 @@ const Section = styled.div`
     max-height: 320px;
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-md);
-    background: var(--surface-base);
+    background: var(--surface-card);
   }
   .empty {
     color: var(--text-muted);
@@ -212,9 +228,36 @@ interface JiraTaskModalProps {
 
 const JiraTaskModal = ({ item, onClose, fetchDetails }: JiraTaskModalProps) => {
   const { t } = useTranslation();
+  const { theme } = useThemeContext();
   const [details, setDetails] = useState<JiraIssueDetails | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
+
+  // Theme-aware colors resolved from the current tokens, inlined into the
+  // sandboxed iframe so the rendered description follows light/dark.
+  const descHtml = useMemo(() => {
+    if (!details?.descriptionHtml) return '';
+    const bg = readCssColor('--surface-card', '#fff');
+    const text = readCssColor('--text-primary', '#111');
+    const muted = readCssColor('--text-secondary', '#666');
+    const link = readCssColor('--brand-primary', '#12a84b');
+    const border = readCssColor('--border-subtle', '#e2e2e2');
+    const sunken = readCssColor('--surface-sunken', '#f4f4f4');
+    return `<!doctype html><meta charset="utf-8"><style>
+      html,body{background:${bg};color:${text};margin:0}
+      body{font:14px/1.55 system-ui,-apple-system,sans-serif;padding:12px;word-wrap:break-word;overflow-wrap:anywhere}
+      a{color:${link}}
+      img{max-width:100%;height:auto}
+      hr{border:none;border-top:1px solid ${border}}
+      blockquote{margin:8px 0;padding-left:12px;border-left:3px solid ${border};color:${muted}}
+      code,pre{background:${sunken};border-radius:4px}
+      code{padding:1px 4px}
+      pre{padding:10px;overflow:auto}
+      table{border-collapse:collapse}
+      td,th{border:1px solid ${border};padding:4px 8px}
+    </style>${details.descriptionHtml}`;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [details?.descriptionHtml, theme]);
 
   useEffect(() => {
     if (!item) return;
@@ -282,11 +325,11 @@ const JiraTaskModal = ({ item, onClose, fetchDetails }: JiraTaskModalProps) => {
               <span className="empty">{t('jira.loadingDetails')}</span>
             ) : error ? (
               <span className="empty">{t('jira.detailsError')}</span>
-            ) : details?.descriptionHtml ? (
+            ) : descHtml ? (
               <iframe
                 sandbox=""
                 title={t('jira.description')}
-                srcDoc={`<!doctype html><meta charset="utf-8"><style>body{font:14px/1.55 system-ui,sans-serif;color:#111;margin:12px}img{max-width:100%}a{color:#12a84b}</style>${details.descriptionHtml}`}
+                srcDoc={descHtml}
               />
             ) : (
               <span className="empty">{t('jira.noDescription')}</span>
