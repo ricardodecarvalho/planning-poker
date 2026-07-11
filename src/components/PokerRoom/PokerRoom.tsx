@@ -13,7 +13,6 @@ import useHistory from '../../hooks/useHistory';
 import useJira from '../../hooks/useJira';
 import RoomTitle from './RoomTitle';
 import BacklogRail from './BacklogRail';
-import ActiveItemBanner from './ActiveItemBanner';
 import ApplyEstimate from './ApplyEstimate';
 import HistoryDrawer from './HistoryDrawer';
 import JiraConnectModal from './JiraConnectModal';
@@ -169,8 +168,6 @@ const PokerRoom = () => {
   const jira = useJira(roomId, isRoomOwner);
 
   const activeItem = items.find((item) => item.id === activeItemId);
-  const allEstimated =
-    items.length > 0 && items.every((item) => item.estimated);
   // Só mostramos a trilha de backlog para o dono (que a gerencia) ou quando já
   // existem itens — assim salas sem backlog mantêm a mesa em largura cheia.
   const showBacklog = isRoomOwner || items.length > 0;
@@ -520,7 +517,6 @@ const PokerRoom = () => {
             />
           )}
           <S.TableStage>
-            <ActiveItemBanner item={activeItem} allEstimated={allEstimated} />
             <S.TableWrap>
               <S.Felt>
                 <S.CenterPot>
@@ -616,12 +612,6 @@ const PokerRoom = () => {
       {/* ---------- MOBILE ---------- */}
       {isMobile && (
         <S.MobileWrap>
-          <ActiveItemBanner
-            item={activeItem}
-            allEstimated={allEstimated}
-            mobile
-          />
-
           {/* participant strip */}
           <div>
             <S.StripHeader>
@@ -689,8 +679,22 @@ const PokerRoom = () => {
             </S.StatusWaiting>
           )}
 
-          {/* card grid */}
-          <div>
+          {showBacklog && (
+            <BacklogRail
+              items={items}
+              activeItemId={activeItemId}
+              isOwner={isRoomOwner}
+              onSelect={selectItem}
+              onAdd={addItem}
+              onDelete={deleteItem}
+              onDetails={setDetailsItem}
+              jira={backlogJira}
+              mobile
+            />
+          )}
+
+          {/* card grid — sticky bottom so the cards stay in view */}
+          <S.MobileHand>
             <S.Eyebrow style={{ display: 'block', marginBottom: 10 }}>
               {t('pokerRoom.yourVote')}
             </S.Eyebrow>
@@ -706,21 +710,7 @@ const PokerRoom = () => {
                 </S.MobileCard>
               ))}
             </S.CardGrid>
-          </div>
-
-          {showBacklog && (
-            <BacklogRail
-              items={items}
-              activeItemId={activeItemId}
-              isOwner={isRoomOwner}
-              onSelect={selectItem}
-              onAdd={addItem}
-              onDelete={deleteItem}
-              onDetails={setDetailsItem}
-              jira={backlogJira}
-              mobile
-            />
-          )}
+          </S.MobileHand>
         </S.MobileWrap>
       )}
 

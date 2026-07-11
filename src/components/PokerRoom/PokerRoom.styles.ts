@@ -328,11 +328,27 @@ export const DistChip = styled.div`
 
 /* ---------- hand (desktop) ---------- */
 export const HandSection = styled.div`
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
   width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
+  gap: 6px;
+  padding: 8px 0 10px;
+  background: var(--surface-base);
+  box-shadow: 0 -14px 24px -16px rgba(0, 0, 0, 0.35);
+`;
+
+/* ---------- hand (mobile, sticky bottom) ---------- */
+export const MobileHand = styled.div`
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+  padding: 10px 0 4px;
+  background: var(--surface-base);
+  box-shadow: 0 -14px 24px -16px rgba(0, 0, 0, 0.35);
 `;
 
 export const Eyebrow = styled.span`
