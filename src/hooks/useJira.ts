@@ -1,17 +1,54 @@
 import { httpsCallable } from 'firebase/functions';
-import { doc, setDoc } from 'firebase/firestore';
+import {
+  collection,
+  deleteDoc,
+  doc,
+  getDocs,
+  query,
+  setDoc,
+  where,
+} from 'firebase/firestore';
 import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18n-lite';
 import { firestore, functions } from '../firebase';
 import { Item } from './useItems';
 
-export interface JiraConfig {
+export interface JiraCreds {
   domain: string;
   email: string;
   token: string;
-  jql?: string;
   fieldId?: string;
+}
+
+export interface JiraSelection {
+  mode: 'board' | 'sprint' | 'project' | 'jql';
+  projectKey?: string;
+  projectName?: string;
+  boardId?: number;
+  boardName?: string;
+  boardType?: string;
+  sprintId?: number;
+  sprintName?: string;
+  jql?: string;
+}
+
+export interface JiraProject {
+  id: string;
+  key: string;
+  name: string;
+}
+
+export interface JiraBoard {
+  id: number;
+  name: string;
+  type: string;
+}
+
+export interface JiraSprint {
+  id: number;
+  name: string;
+  state: string;
 }
 
 interface JiraIssue {
@@ -22,89 +59,192 @@ interface JiraIssue {
   points: number | string | null;
 }
 
-interface JiraSearchResult {
+interface IssuesResult {
   issues: JiraIssue[];
   storyPointsFieldId: string | null;
 }
 
-const storageKey = (roomId?: string) => `pp:jira:${roomId}`;
+// Credentials are GLOBAL (saved once per browser and reused in every room).
+// The selection (project/board/JQL) is per-room, so each room can estimate a
+// different backlog. The token lives only here — never on the server.
+const CREDS_KEY = 'pp:jira:creds';
+const selectionKey = (roomId?: string) => `pp:jira:sel:${roomId}`;
 
-/**
- * Jira connection for the room owner. The credentials (incl. the API token)
- * live ONLY in the owner's browser localStorage and are sent per-request to the
- * `jiraSearch` / `jiraSetEstimate` Cloud Function proxies — never persisted
- * server-side. Fetched issues are written to `rooms/{id}/items` as `source:jira`
- * snapshots so every participant sees the backlog without needing the token.
- */
+const call = <T>(name: string, data: unknown): Promise<T> =>
+  httpsCallable<unknown, T>(functions, name)(data).then((r) => r.data);
+
 const useJira = (roomId: string | undefined, isOwner: boolean) => {
   const { t } = useTranslation();
-  const [config, setConfig] = useState<JiraConfig | null>(null);
+  const [creds, setCreds] = useState<JiraCreds | null>(null);
+  const [selection, setSelection] = useState<JiraSelection | null>(null);
   const [syncing, setSyncing] = useState(false);
 
-  // Só o dono carrega a conexão salva localmente (nunca no servidor).
+  // Credenciais globais (só o dono usa; nunca vão para o servidor).
   useEffect(() => {
-    if (!roomId || !isOwner) {
-      setConfig(null);
+    if (!isOwner) {
+      setCreds(null);
       return;
     }
-    const stored = localStorage.getItem(storageKey(roomId));
-    setConfig(stored ? (JSON.parse(stored) as JiraConfig) : null);
+    const stored = localStorage.getItem(CREDS_KEY);
+    setCreds(stored ? (JSON.parse(stored) as JiraCreds) : null);
+  }, [isOwner]);
+
+  // Seleção (projeto/board/JQL) por sala.
+  useEffect(() => {
+    if (!roomId || !isOwner) {
+      setSelection(null);
+      return;
+    }
+    const stored = localStorage.getItem(selectionKey(roomId));
+    setSelection(stored ? (JSON.parse(stored) as JiraSelection) : null);
   }, [roomId, isOwner]);
 
-  const persist = useCallback(
-    (cfg: JiraConfig | null) => {
+  const persistCreds = useCallback((next: JiraCreds | null) => {
+    if (next) localStorage.setItem(CREDS_KEY, JSON.stringify(next));
+    else localStorage.removeItem(CREDS_KEY);
+    setCreds(next);
+  }, []);
+
+  const persistSelection = useCallback(
+    (next: JiraSelection | null) => {
       if (!roomId) return;
-      if (cfg) localStorage.setItem(storageKey(roomId), JSON.stringify(cfg));
-      else localStorage.removeItem(storageKey(roomId));
-      setConfig(cfg);
+      if (next)
+        localStorage.setItem(selectionKey(roomId), JSON.stringify(next));
+      else localStorage.removeItem(selectionKey(roomId));
+      setSelection(next);
     },
     [roomId],
   );
 
-  const sync = useCallback(
-    async (cfg: JiraConfig) => {
-      if (!roomId) return;
+  // Valida as credenciais buscando os projetos; só salva se der certo.
+  const saveCreds = useCallback(
+    async (next: JiraCreds): Promise<JiraProject[]> => {
+      const { projects } = await call<{ projects: JiraProject[] }>(
+        'jiraProjects',
+        next,
+      );
+      persistCreds(next);
+      return projects;
+    },
+    [persistCreds],
+  );
+
+  const listProjects = useCallback(async (): Promise<JiraProject[]> => {
+    if (!creds) return [];
+    const { projects } = await call<{ projects: JiraProject[] }>(
+      'jiraProjects',
+      creds,
+    );
+    return projects;
+  }, [creds]);
+
+  const listBoards = useCallback(
+    async (projectKeyOrId: string): Promise<JiraBoard[]> => {
+      if (!creds) return [];
+      const { boards } = await call<{ boards: JiraBoard[] }>('jiraBoards', {
+        ...creds,
+        projectKeyOrId,
+      });
+      return boards;
+    },
+    [creds],
+  );
+
+  const listSprints = useCallback(
+    async (boardId: number): Promise<JiraSprint[]> => {
+      if (!creds) return [];
+      const { sprints } = await call<{ sprints: JiraSprint[] }>('jiraSprints', {
+        ...creds,
+        boardId,
+      });
+      return sprints;
+    },
+    [creds],
+  );
+
+  const writeIssues = useCallback(
+    async (result: IssuesResult) => {
+      if (!roomId || !creds) return;
+      // Guarda o campo de story points detectado para o write-back.
+      if (
+        result.storyPointsFieldId &&
+        result.storyPointsFieldId !== creds.fieldId
+      ) {
+        persistCreds({ ...creds, fieldId: result.storyPointsFieldId });
+      }
+      const newIds = new Set(result.issues.map((issue) => issue.jiraId));
+
+      await Promise.all(
+        result.issues.map((issue, index) => {
+          const snapshot: Record<string, unknown> = {
+            summary: issue.summary,
+            source: 'jira',
+            key: issue.key,
+            type: issue.type,
+            jiraId: issue.jiraId,
+            order: index,
+            createdAt: new Date().toISOString(),
+          };
+          if (issue.points !== null && issue.points !== undefined) {
+            snapshot.estimated = true;
+            snapshot.points = issue.points;
+          }
+          return setDoc(
+            doc(firestore, `rooms/${roomId}/items`, issue.jiraId),
+            snapshot,
+            { merge: true },
+          );
+        }),
+      );
+
+      // Reconcilia: remove itens do Jira que não estão mais no backlog
+      // escolhido (ao trocar de board/projeto) — mantém os itens manuais.
+      const existing = await getDocs(
+        query(
+          collection(firestore, `rooms/${roomId}/items`),
+          where('source', '==', 'jira'),
+        ),
+      );
+      await Promise.all(
+        existing.docs
+          .filter((d) => !newIds.has(d.id))
+          .map((d) => deleteDoc(d.ref)),
+      );
+    },
+    [roomId, creds, persistCreds],
+  );
+
+  // Busca as issues conforme a seleção e grava os snapshots de item.
+  const syncSelection = useCallback(
+    async (sel: JiraSelection) => {
+      if (!roomId || !creds) return;
       setSyncing(true);
       try {
-        const callable = httpsCallable<JiraConfig, JiraSearchResult>(
-          functions,
-          'jiraSearch',
-        );
-        const { data } = await callable(cfg);
-
-        // Guarda o campo de story points detectado para o write-back.
-        if (
-          data.storyPointsFieldId &&
-          data.storyPointsFieldId !== cfg.fieldId
-        ) {
-          persist({ ...cfg, fieldId: data.storyPointsFieldId });
+        let result: IssuesResult;
+        if (sel.mode === 'sprint' && sel.boardId && sel.sprintId) {
+          result = await call<IssuesResult>('jiraBoardIssues', {
+            ...creds,
+            boardId: sel.boardId,
+            sprintId: sel.sprintId,
+          });
+        } else if (sel.mode === 'board' && sel.boardId) {
+          result = await call<IssuesResult>('jiraBoardIssues', {
+            ...creds,
+            boardId: sel.boardId,
+          });
+        } else if (sel.mode === 'project' && sel.projectKey) {
+          result = await call<IssuesResult>('jiraSearch', {
+            ...creds,
+            jql: `project = "${sel.projectKey}" AND statusCategory != Done ORDER BY created DESC`,
+          });
+        } else {
+          result = await call<IssuesResult>('jiraSearch', {
+            ...creds,
+            jql: sel.jql,
+          });
         }
-
-        // Escreve cada issue como snapshot de item (participantes leem sem token).
-        await Promise.all(
-          data.issues.map((issue, index) => {
-            const snapshot: Record<string, unknown> = {
-              summary: issue.summary,
-              source: 'jira',
-              key: issue.key,
-              type: issue.type,
-              jiraId: issue.jiraId,
-              order: index,
-              createdAt: new Date().toISOString(),
-            };
-            // Só marca como estimado quando o Jira já tem pontos — assim não
-            // apagamos uma estimativa aplicada localmente.
-            if (issue.points !== null && issue.points !== undefined) {
-              snapshot.estimated = true;
-              snapshot.points = issue.points;
-            }
-            return setDoc(
-              doc(firestore, `rooms/${roomId}/items`, issue.jiraId),
-              snapshot,
-              { merge: true },
-            );
-          }),
-        );
+        await writeIssues(result);
+        persistSelection(sel);
       } catch (error) {
         console.error('Jira sync error:', error);
         toast.error(t('jira.syncError'));
@@ -113,48 +253,54 @@ const useJira = (roomId: string | undefined, isOwner: boolean) => {
         setSyncing(false);
       }
     },
-    [roomId, persist, t],
+    [roomId, creds, writeIssues, persistSelection, t],
   );
 
-  const connect = useCallback(
-    async (cfg: JiraConfig) => {
-      persist(cfg);
-      await sync(cfg);
-    },
-    [persist, sync],
+  // Re-sincroniza usando a seleção já salva desta sala.
+  const sync = useCallback(
+    () => (selection ? syncSelection(selection) : Promise.resolve()),
+    [selection, syncSelection],
   );
 
   const applyToJira = useCallback(
     async (item: Item, points: number) => {
-      if (!config || !item.jiraId || !config.fieldId) return;
+      if (!creds || !item.jiraId || !creds.fieldId) return;
       try {
-        const callable = httpsCallable(functions, 'jiraSetEstimate');
-        await callable({
-          domain: config.domain,
-          email: config.email,
-          token: config.token,
+        await call('jiraSetEstimate', {
+          domain: creds.domain,
+          email: creds.email,
+          token: creds.token,
           issueId: item.jiraId,
           points,
-          fieldId: config.fieldId,
+          fieldId: creds.fieldId,
         });
       } catch (error) {
         console.error('Jira apply error:', error);
         toast.error(t('jira.applyError'));
       }
     },
-    [config, t],
+    [creds, t],
   );
 
-  const disconnect = useCallback(() => persist(null), [persist]);
+  // "Trocar credenciais": limpa credenciais globais e a seleção da sala.
+  const clearCreds = useCallback(() => {
+    persistCreds(null);
+    persistSelection(null);
+  }, [persistCreds, persistSelection]);
 
   return {
-    connected: !!config,
-    config,
+    connected: !!creds,
+    creds,
+    selection,
     syncing,
-    connect,
-    sync: () => (config ? sync(config) : Promise.resolve()),
+    saveCreds,
+    listProjects,
+    listBoards,
+    listSprints,
+    syncSelection,
+    sync,
     applyToJira,
-    disconnect,
+    clearCreds,
   };
 };
 
