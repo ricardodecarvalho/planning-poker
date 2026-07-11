@@ -17,6 +17,8 @@ import ActiveItemBanner from './ActiveItemBanner';
 import ApplyEstimate from './ApplyEstimate';
 import HistoryDrawer from './HistoryDrawer';
 import JiraConnectModal from './JiraConnectModal';
+import JiraTaskModal from './JiraTaskModal';
+import { Item } from '../../hooks/useItems';
 import { useModal } from '../Modal';
 import {
   getUniqueDisplayNames,
@@ -108,6 +110,7 @@ const PokerRoom = () => {
   const [copied, setCopied] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [jiraModalOpen, setJiraModalOpen] = useState(false);
+  const [detailsItem, setDetailsItem] = useState<Item | null>(null);
 
   const { enterRoom } = useUserConnection();
   const userId = auth.currentUser?.uid;
@@ -221,11 +224,20 @@ const PokerRoom = () => {
     const next = items.find((i) => !i.estimated && i.id !== item.id);
     await setActiveItem(next?.id);
 
-    // Atualizar o campo no Jira só mediante confirmação do usuário.
-    if (item.source === 'jira' && item.jiraId && jira.creds?.fieldId) {
+    // Atualizar os campos no Jira só mediante confirmação do usuário.
+    if (item.source === 'jira' && item.jiraId && jira.canWriteJira) {
+      const fields = [
+        jira.willWriteStoryPoints && jira.creds?.fieldId
+          ? t('jira.fieldStoryPoints')
+          : null,
+        jira.willWriteOriginalEstimate ? t('jira.fieldOriginalEstimate') : null,
+      ]
+        .filter(Boolean)
+        .join(' + ');
       showModal({
         title: t('jira.updateTitle'),
         message: t('jira.updateMessage')
+          .replace('{fields}', fields)
           .replace('{key}', item.key ?? '')
           .replace('{points}', String(points)),
         onConfirm: () => jira.applyToJira(item, points),
@@ -464,6 +476,9 @@ const PokerRoom = () => {
             <span>{t('pokerRoom.history')}</span>
             <span className="count">{historyCount}</span>
           </S.HistoryButton>
+          {canApply && (
+            <ApplyEstimate points={suggestedEstimate} onApply={applyEstimate} />
+          )}
           {isRoomOwner && (
             <>
               <Button
@@ -500,6 +515,7 @@ const PokerRoom = () => {
               onSelect={selectItem}
               onAdd={addItem}
               onDelete={deleteItem}
+              onDetails={setDetailsItem}
               jira={backlogJira}
             />
           )}
@@ -573,13 +589,6 @@ const PokerRoom = () => {
                   </S.DistChip>
                 ))}
               </S.Distribution>
-            )}
-
-            {canApply && (
-              <ApplyEstimate
-                points={suggestedEstimate}
-                onApply={applyEstimate}
-              />
             )}
 
             {/* hand */}
@@ -670,13 +679,6 @@ const PokerRoom = () => {
                   </div>
                 </>
               )}
-              {canApply && (
-                <ApplyEstimate
-                  points={suggestedEstimate}
-                  onApply={applyEstimate}
-                  block
-                />
-              )}
             </S.StatusCard>
           ) : (
             <S.StatusWaiting>
@@ -714,6 +716,7 @@ const PokerRoom = () => {
               onSelect={selectItem}
               onAdd={addItem}
               onDelete={deleteItem}
+              onDetails={setDetailsItem}
               jira={backlogJira}
               mobile
             />
@@ -731,6 +734,12 @@ const PokerRoom = () => {
         open={jiraModalOpen}
         jira={jira}
         onClose={() => setJiraModalOpen(false)}
+      />
+
+      <JiraTaskModal
+        item={detailsItem}
+        onClose={() => setDetailsItem(null)}
+        fetchDetails={jira.getIssue}
       />
     </S.Content>
   );
