@@ -2,8 +2,8 @@ import styled from 'styled-components';
 import { useTranslation } from 'react-i18n-lite';
 import {
   ArrowUpRight,
+  FileText,
   Globe,
-  Heart,
   LogOut,
   Moon,
   Sun,
@@ -20,8 +20,8 @@ import GithubIcon from './ui/GithubIcon';
 
 const appName = import.meta.env.VITE_APP_NAME;
 const appVersion = import.meta.env.VITE_APP_VERSION;
-const donateLink = import.meta.env.VITE_DONATE_LINK;
 const REPOSITORY_LINK = 'https://github.com/ricardodecarvalho/planning-poker';
+const TERMS_LINK = 'https://skaptain.com/web-planning-poker/terms-of-use';
 
 const Overlay = styled.div`
   position: fixed;
@@ -286,6 +286,15 @@ const SettingsDrawer = ({ isOpen, onClose }: SettingsDrawerProps) => {
           <Divider />
 
           <Links>
+            <LinkItem href={TERMS_LINK} target="_blank" rel="noreferrer">
+              <FileText size={19} />
+              <span>{t('navbar.termsOfUse')}</span>
+              <ArrowUpRight
+                size={15}
+                color="var(--text-muted)"
+                style={{ marginLeft: 'auto' }}
+              />
+            </LinkItem>
             <LinkItem href={REPOSITORY_LINK} target="_blank" rel="noreferrer">
               <GithubIcon size={19} />
               <span>{t('navbar.repository')}</span>
@@ -295,12 +304,6 @@ const SettingsDrawer = ({ isOpen, onClose }: SettingsDrawerProps) => {
                 style={{ marginLeft: 'auto' }}
               />
             </LinkItem>
-            {donateLink && (
-              <LinkItem href={donateLink} target="_blank" rel="noreferrer">
-                <Heart size={19} color="var(--coral-500)" />
-                <span>{t('navbar.donate')}</span>
-              </LinkItem>
-            )}
             <LogoutButton onClick={logout}>
               <LogOut size={19} />
               <span>{t('navbar.logout')}</span>

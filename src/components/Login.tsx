@@ -8,7 +8,7 @@ import logoWhite from '../assets/images/logo-planning-poker-white.svg';
 
 const appName = import.meta.env.VITE_APP_NAME;
 
-const TERMS_URL = 'https://skapitao.com/web-planning-poker/terms-of-use';
+const TERMS_URL = 'https://skaptain.com/web-planning-poker/terms-of-use';
 
 const Page = styled.div`
   min-height: 100vh;
