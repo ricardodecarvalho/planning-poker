@@ -5,7 +5,14 @@ import { OpenAI } from 'openai';
 import dotenv from 'dotenv';
 
 // Jira Cloud proxy callables (token is passed per-request, never persisted).
-export { jiraSearch, jiraSetEstimate } from './jira';
+export {
+  jiraProjects,
+  jiraBoards,
+  jiraSprints,
+  jiraBoardIssues,
+  jiraSearch,
+  jiraSetEstimate,
+} from './jira';
 
 dotenv.config();
 admin.initializeApp();

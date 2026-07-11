@@ -17,6 +17,7 @@ import ActiveItemBanner from './ActiveItemBanner';
 import ApplyEstimate from './ApplyEstimate';
 import HistoryDrawer from './HistoryDrawer';
 import JiraConnectModal from './JiraConnectModal';
+import { useModal } from '../Modal';
 import {
   getUniqueDisplayNames,
   getVotingStatus,
@@ -101,6 +102,7 @@ const PokerRoom = () => {
     markEstimated,
   } = useItems(roomId);
   const { history, historyCount, saveRound } = useHistory(roomId);
+  const { showModal } = useModal();
 
   const [users, setUsers] = useState<Participant[]>([]);
   const [copied, setCopied] = useState(false);
@@ -197,30 +199,40 @@ const PokerRoom = () => {
   const applyEstimate = async () => {
     if (!roomId || !activeItem) return;
 
+    const item = activeItem;
+    const points = suggestedEstimate;
     const votesSnapshot = votingStatus.hasVoted.map((u) => ({
       name: u.displayName || '',
       value: u.vote.voteValue,
     }));
 
+    // Registra a rodada no histórico, marca o item e avança — sempre.
     await saveRound({
-      itemKey: activeItem.key ?? null,
-      itemSummary: activeItem.summary ?? null,
-      source: activeItem.source ?? 'manual',
+      itemKey: item.key ?? null,
+      itemSummary: item.summary ?? null,
+      source: item.source ?? 'manual',
       votes: votesSnapshot,
       average: votingStatus.average,
-      points: suggestedEstimate,
+      points,
     });
-
-    // Envia a estimativa de volta ao Jira quando o item veio de lá.
-    if (activeItem.source === 'jira') {
-      await jira.applyToJira(activeItem, suggestedEstimate);
-    }
-
-    await markEstimated(activeItem.id, suggestedEstimate);
+    await markEstimated(item.id, points);
     await clearVotes(roomId);
 
-    const next = items.find((i) => !i.estimated && i.id !== activeItem.id);
+    const next = items.find((i) => !i.estimated && i.id !== item.id);
     await setActiveItem(next?.id);
+
+    // Atualizar o campo no Jira só mediante confirmação do usuário.
+    if (item.source === 'jira' && item.jiraId && jira.creds?.fieldId) {
+      showModal({
+        title: t('jira.updateTitle'),
+        message: t('jira.updateMessage')
+          .replace('{key}', item.key ?? '')
+          .replace('{points}', String(points)),
+        onConfirm: () => jira.applyToJira(item, points),
+        onConfirmButtonText: t('jira.updateConfirm'),
+        onCloseButtonText: t('jira.updateCancel'),
+      });
+    }
   };
 
   const copyLink = () => {
@@ -717,9 +729,8 @@ const PokerRoom = () => {
 
       <JiraConnectModal
         open={jiraModalOpen}
-        initial={jira.config}
+        jira={jira}
         onClose={() => setJiraModalOpen(false)}
-        onConnect={jira.connect}
       />
     </S.Content>
   );
