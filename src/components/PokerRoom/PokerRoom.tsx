@@ -589,7 +589,6 @@ const PokerRoom = () => {
 
             {/* hand */}
             <S.HandSection>
-              <S.Eyebrow>{t('pokerRoom.yourHand')}</S.Eyebrow>
               <S.Hand className="pp-scroll">
                 {votingSystem.map((value) => (
                   <S.HandCard
