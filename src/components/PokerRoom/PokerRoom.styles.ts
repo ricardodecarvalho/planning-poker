@@ -1,9 +1,9 @@
 import styled from 'styled-components';
 
 export const Content = styled.div`
-  max-width: 1200px;
+  max-width: 1560px;
   margin: 0 auto;
-  padding: 32px clamp(16px, 4vw, 28px) 96px;
+  padding: 32px clamp(16px, 4vw, 32px) 96px;
 `;
 
 /* ---------- toolbar ---------- */
@@ -176,7 +176,7 @@ export const TableStage = styled.div`
 
 export const TableWrap = styled.div`
   width: 100%;
-  max-width: 860px;
+  max-width: 1040px;
   padding: 26px;
   background: var(--surface-sunken);
   border: 1px solid var(--border-subtle);

@@ -44,8 +44,9 @@ const Scrim = styled.div`
 const Dialog = styled.div`
   position: relative;
   width: 100%;
-  max-width: 620px;
-  max-height: 88vh;
+  max-width: 680px;
+  height: min(90vh, 820px);
+  max-height: 90vh;
   display: flex;
   flex-direction: column;
   background: var(--surface-card);
@@ -119,7 +120,8 @@ const CloseButton = styled.button`
 
 const Body = styled.div`
   flex: 1;
-  overflow-y: auto;
+  min-height: 0;
+  overflow: hidden;
   padding: 18px 24px;
   display: flex;
   flex-direction: column;
@@ -134,7 +136,10 @@ const Meta = styled.div`
   font-size: 13px;
 `;
 
-const Section = styled.div`
+const Section = styled.div<{ $grow?: boolean }>`
+  ${({ $grow }) =>
+    $grow && 'flex:1;min-height:0;display:flex;flex-direction:column;'}
+
   .label {
     display: block;
     font-size: 11px;
@@ -146,8 +151,8 @@ const Section = styled.div`
   }
   iframe {
     width: 100%;
-    min-height: 120px;
-    max-height: 320px;
+    flex: 1;
+    min-height: 240px;
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-md);
     background: var(--surface-card);
@@ -156,6 +161,14 @@ const Section = styled.div`
     color: var(--text-muted);
     font-size: 13.5px;
   }
+`;
+
+const AttachmentList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 168px;
+  overflow-y: auto;
 `;
 
 const Attachment = styled.div`
@@ -311,7 +324,7 @@ const JiraTaskModal = ({ item, onClose, fetchDetails }: JiraTaskModalProps) => {
           </CloseButton>
         </Head>
 
-        <Body className="pp-scroll">
+        <Body>
           {details?.assignee && (
             <Meta>
               <User size={15} />
@@ -319,7 +332,7 @@ const JiraTaskModal = ({ item, onClose, fetchDetails }: JiraTaskModalProps) => {
             </Meta>
           )}
 
-          <Section>
+          <Section $grow>
             <span className="label">{t('jira.description')}</span>
             {loading ? (
               <span className="empty">{t('jira.loadingDetails')}</span>
@@ -341,7 +354,7 @@ const JiraTaskModal = ({ item, onClose, fetchDetails }: JiraTaskModalProps) => {
               <span className="label">
                 {t('jira.attachments')} ({details.attachments.length})
               </span>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <AttachmentList className="pp-scroll">
                 {details.attachments.map((a) => (
                   <Attachment key={a.id}>
                     <Paperclip size={15} color="var(--text-muted)" />
@@ -349,7 +362,7 @@ const JiraTaskModal = ({ item, onClose, fetchDetails }: JiraTaskModalProps) => {
                     <span className="size">{formatBytes(a.size)}</span>
                   </Attachment>
                 ))}
-              </div>
+              </AttachmentList>
             </Section>
           )}
         </Body>

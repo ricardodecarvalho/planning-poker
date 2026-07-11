@@ -7,7 +7,7 @@ import { Item } from '../../hooks/useItems';
 
 const Card = styled.div<{ $mobile?: boolean }>`
   width: 100%;
-  max-width: ${({ $mobile }) => ($mobile ? 'none' : '860px')};
+  max-width: ${({ $mobile }) => ($mobile ? 'none' : '1040px')};
   background: var(--surface-card);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
@@ -68,7 +68,7 @@ const Eyebrow = styled.span`
 
 const Done = styled.div<{ $mobile?: boolean }>`
   width: 100%;
-  max-width: ${({ $mobile }) => ($mobile ? 'none' : '860px')};
+  max-width: ${({ $mobile }) => ($mobile ? 'none' : '1040px')};
   background: var(--success-bg);
   border: 1px solid var(--success-border);
   border-radius: var(--radius-lg);

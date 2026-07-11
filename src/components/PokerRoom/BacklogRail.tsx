@@ -23,7 +23,7 @@ const STATUS_ORDER: Record<string, number> = {
 
 const Aside = styled.aside<{ $mobile?: boolean }>`
   ${({ $mobile }) =>
-    $mobile ? `width:100%;` : `flex:none;width:322px;max-height:664px;`}
+    $mobile ? `width:100%;` : `flex:none;width:360px;max-height:720px;`}
   display: flex;
   flex-direction: column;
   overflow: hidden;

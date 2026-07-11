@@ -12,9 +12,9 @@ import DeleteRoom from './DeleteRoom';
 import Button from './ui/Button';
 
 const Content = styled.div`
-  max-width: 1200px;
+  max-width: 1560px;
   margin: 0 auto;
-  padding: 32px clamp(16px, 4vw, 28px) 96px;
+  padding: 32px clamp(16px, 4vw, 32px) 96px;
 `;
 
 const Toolbar = styled.div`
@@ -218,11 +218,7 @@ const CopyLinkButton = ({ roomId, title }: CopyLinkButtonProps) => {
   };
 
   return (
-    <IconButton
-      className={copied ? 'copied' : ''}
-      onClick={copy}
-      title={title}
-    >
+    <IconButton className={copied ? 'copied' : ''} onClick={copy} title={title}>
       {copied ? <Check size={17} /> : <Link2 size={17} />}
     </IconButton>
   );
